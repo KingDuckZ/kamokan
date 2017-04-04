@@ -1,0 +1,6 @@
+[submodule "lib/incredis"]
+	path = lib/incredis
+	url = https://github.com/KingDuckZ/incredis.git
+[submodule "lib/better-enums"]
+	path = lib/better-enums
+	url = https://github.com/aantron/better-enums
