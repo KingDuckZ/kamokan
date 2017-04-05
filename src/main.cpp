@@ -20,7 +20,7 @@ int main() {
 	resp.send();
 
 	tawashi::CGIEnv cgi_env;
-	for (auto& pair : cgi_env.query_string()) {
+	for (auto& pair : cgi_env.query_string_split()) {
 		std::cout << "first:\t\"" << pair.first <<
 			"\"\tsecond:\t\"" << pair.second << "\"\n";
 	}

@@ -27,7 +27,7 @@ namespace tawashi {
 		boost::optional<VersionInfo> gateway_interface() const a_pure;
 		const std::string& path_info() const;
 		const std::string& path_translated() const;
-		KeyValueList query_string() const a_pure;
+		const std::string& query_string() const;
 		const std::string& remote_addr() const;
 		const std::string& remote_host() const;
 		const std::string& remote_ident() const;
@@ -38,6 +38,8 @@ namespace tawashi {
 		uint16_t server_port() const a_pure;
 		boost::optional<VersionInfo> server_protocol() const a_pure;
 		const std::string& server_software() const;
+
+		KeyValueList query_string_split() const a_pure;
 
 		std::ostream& print_all (std::ostream& parStream, const char* parNewline) const;
 

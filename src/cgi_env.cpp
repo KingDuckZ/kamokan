@@ -97,8 +97,8 @@ namespace tawashi {
 		return m_cgi_env[CGIVars::PATH_TRANSLATED];
 	}
 
-	KeyValueList CGIEnv::query_string() const {
-		return split_env_vars(m_cgi_env[CGIVars::QUERY_STRING]);
+	const std::string& CGIEnv::query_string() const {
+		return m_cgi_env[CGIVars::QUERY_STRING];
 	}
 
 	const std::string& CGIEnv::remote_addr() const {
@@ -141,6 +141,10 @@ namespace tawashi {
 
 	const std::string& CGIEnv::server_software() const {
 		return m_cgi_env[CGIVars::SERVER_SOFTWARE];
+	}
+
+	KeyValueList CGIEnv::query_string_split() const {
+		return split_env_vars(m_cgi_env[CGIVars::QUERY_STRING]);
 	}
 
 	std::ostream& CGIEnv::print_all (std::ostream& parStream, const char* parNewline) const {
