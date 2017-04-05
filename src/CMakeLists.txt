@@ -13,6 +13,7 @@ add_executable(${PROJECT_NAME}
 	get_env.cpp
 	envy.cpp
 	cgi_env.cpp
+	num_to_token.cpp
 )
 
 target_include_directories(${PROJECT_NAME} SYSTEM
