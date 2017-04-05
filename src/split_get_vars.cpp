@@ -9,7 +9,7 @@
 #include <boost/range/algorithm/find.hpp>
 
 namespace tawashi {
-	std::vector<std::pair<boost::string_ref, boost::string_ref>> split_env_vars (const std::string& parList) {
+	KeyValueList split_env_vars (const std::string& parList) {
 		using MatchRange = boost::iterator_range<std::string::const_iterator>;
 		using boost::token_finder;
 		using boost::adaptors::transformed;
@@ -23,7 +23,7 @@ namespace tawashi {
 		//https://stackoverflow.com/questions/27999941/how-to-use-boostsplit-with-booststring-ref-in-boost-1-55
 		//http://www.boost.org/doc/libs/1_60_0/doc/html/boost/algorithm/token_finder.html
 		//https://stackoverflow.com/questions/20781090/difference-between-boostsplit-vs-boostiter-split
-		return boost::copy_range<std::vector<std::pair<string_ref, string_ref>>>(
+		return boost::copy_range<KeyValueList>(
 			make_iterator_range(
 				split_iterator<std::string::const_iterator>(parList, token_finder([](char c){return '&'==c;})),
 				split_iterator<std::string::const_iterator>()

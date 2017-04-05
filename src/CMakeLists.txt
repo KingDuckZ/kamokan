@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}
 	submit_form_response.cpp
 	get_env.cpp
 	envy.cpp
+	cgi_env.cpp
 )
 
 target_include_directories(${PROJECT_NAME} SYSTEM
