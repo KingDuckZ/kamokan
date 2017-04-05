@@ -65,7 +65,7 @@ namespace tawashi {
 	} //unnamed namespace
 
 	CGIEnv::CGIEnv() :
-		m_cgi_env(get_cgi_vars())
+		m_cgi_env(get_cgi_environment_vars())
 	{
 	}
 

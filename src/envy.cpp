@@ -2,7 +2,7 @@
 #include "get_env.hpp"
 
 namespace tawashi {
-	std::vector<std::string> get_cgi_vars() {
+	std::vector<std::string> get_cgi_environment_vars() {
 		using boost::string_ref;
 
 		std::vector<std::string> retlist;
