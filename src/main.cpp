@@ -29,13 +29,15 @@ int main() {
 	std::cout << "\n<br>\n";
 	std::cout << "Content length: \"" << in_len << "\"\n<br>\n";
 
-	//for (std::size_t z = 0; z < env.size(); ++z) {
-	//	std::cout << tawashi::CGIVars::_from_integral(z) << " = \"" << env[z] << "\"<br>\n";
-	//}
+	cgi_env.print_all(std::cout, "<br>\n");
 	std::string input;
 	if (in_len > 0)
 		std::copy_n(std::istream_iterator<char>(std::cin), in_len, std::back_inserter(input));
 	std::cout << input << '\n';
+
+	auto ver = cgi_env.gateway_interface();
+	if (ver)
+		std::cout << ver->name << " - v" << ver->major << ',' << ver->minor << "<br>\n";
 
 	return 0;
 }

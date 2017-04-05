@@ -23,3 +23,6 @@ target_link_libraries(${PROJECT_NAME}
 	PRIVATE ${Boost_LIBRARIES}
 	PRIVATE incredis
 )
+target_compile_definitions(${PROJECT_NAME}
+	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1
+)
