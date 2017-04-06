@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #if !defined(NDEBUG)
-#	define CURL_WRAPPER_VERBOSE
+//#	define CURL_WRAPPER_VERBOSE
 #endif
 
 #if defined(CURL_WRAPPER_VERBOSE)
