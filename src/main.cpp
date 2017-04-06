@@ -1,7 +1,7 @@
 #include "incredis/incredis.hpp"
 #include "submit_form_response.hpp"
+#include "index_response.hpp"
 #include "cgi_env.hpp"
-#include "cgi_post.hpp"
 #include <iostream>
 #include <string>
 
@@ -15,28 +15,16 @@ int main() {
 
 	redis::IncRedis incredis("127.0.0.1", 6379);
 
-	tawashi::SubmitFormResponse resp;
-	resp.send();
-
 	tawashi::CGIEnv cgi_env;
-	for (auto& pair : cgi_env.query_string_split()) {
-		std::cout << "first:\t\"" << pair.first <<
-			"\"\tsecond:\t\"" << pair.second << "\"\n";
+	if (cgi_env.path_info() == "/index.cgi") {
+		tawashi::IndexResponse resp;
+		resp.send();
 	}
-
-	const std::size_t in_len = cgi_env.content_length();
-	std::cout << "\n<br>\n";
-	std::cout << "Content length: \"" << in_len << "\"\n<br>\n";
-
-	cgi_env.print_all(std::cout, "<br>\n");
-	for (auto& itm : tawashi::cgi::read_post(cgi_env)) {
-		std::cout << "Key: \"" << itm.first << "\"<br>\nValue: \"" <<
-			itm.second << "\"<br>\n";
+	else if (cgi_env.path_info() == "/paste.cgi") {
+		incredis.connect();
+		tawashi::SubmitFormResponse resp(incredis);
+		resp.send();
 	}
-
-	auto ver = cgi_env.gateway_interface();
-	if (ver)
-		std::cout << ver->name << " - v" << ver->major << ',' << ver->minor << "<br>\n";
 
 	return 0;
 }

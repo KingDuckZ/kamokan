@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
 	num_to_token.cpp
 	cgi_post.cpp
 	curl_wrapper.cpp
+	index_response.cpp
 )
 
 target_include_directories(${PROJECT_NAME} SYSTEM
