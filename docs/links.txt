@@ -1,0 +1,5 @@
+http://cutelyst.org/blog
+https://www.cs.tut.fi/~jkorpela/forms/cgic.html
+https://www.gnu.org/software/cgicc/
+http://utfcpp.sourceforge.net/#examples
+https://www.gnu.org/software/src-highlite/
