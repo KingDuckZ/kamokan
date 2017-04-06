@@ -1,5 +1,6 @@
 #include "incredis/incredis.hpp"
 #include "submit_paste_response.hpp"
+#include "pastie_response.hpp"
 #include "index_response.hpp"
 #include "cgi_env.hpp"
 #include <iostream>
@@ -26,8 +27,8 @@ int main() {
 		resp.send();
 	}
 	else {
-		std::cout << "Content-type:text/plain\n\n";
-		std::cout << "you shouldn't be here\n";
+		tawashi::PastieResponse resp(incredis);
+		resp.send();
 	}
 
 	return 0;

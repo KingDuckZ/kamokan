@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME}
 	cgi_post.cpp
 	curl_wrapper.cpp
 	index_response.cpp
+	pastie_response.cpp
 )
 
 target_include_directories(${PROJECT_NAME} SYSTEM
