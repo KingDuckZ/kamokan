@@ -13,12 +13,12 @@ namespace tawashi {
 
 	protected:
 		Response (std::string&& parType);
-		const CGIEnv& cgi_env() const;
+		const cgi::Env& cgi_env() const;
 
 	private:
 		virtual void on_send (std::ostream& parStream) = 0;
 
-		CGIEnv m_cgi_env;
+		cgi::Env m_cgi_env;
 		std::string m_content_type;
 	};
 } //namespace tawashi

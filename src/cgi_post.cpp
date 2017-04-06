@@ -14,7 +14,7 @@ namespace tawashi {
 		namespace {
 		} //unnamed namespace
 
-		const PostMapType& read_post (const CGIEnv& parEnv) {
+		const PostMapType& read_post (const Env& parEnv) {
 			static bool already_read = false;
 			static PostMapType map;
 			static std::string original_data;

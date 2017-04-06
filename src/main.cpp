@@ -16,7 +16,7 @@ int main() {
 	redis::IncRedis incredis("127.0.0.1", 6379);
 	incredis.connect();
 
-	tawashi::CGIEnv cgi_env;
+	tawashi::cgi::Env cgi_env;
 	if (cgi_env.path_info() == "/index.cgi") {
 		tawashi::IndexResponse resp;
 		resp.send();

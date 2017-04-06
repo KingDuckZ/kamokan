@@ -15,7 +15,7 @@ namespace tawashi {
 		std::cout.flush();
 	}
 
-	const CGIEnv& Response::cgi_env() const {
+	const cgi::Env& Response::cgi_env() const {
 		return m_cgi_env;
 	}
 } //namespace tawashi

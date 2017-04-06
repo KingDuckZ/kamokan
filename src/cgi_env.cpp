@@ -15,15 +15,16 @@
 #include <boost/phoenix/stl/container.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(
-	tawashi::CGIEnv::VersionInfo,
+	tawashi::cgi::Env::VersionInfo,
 	(boost::string_ref, name)
 	(uint16_t, major)
 	(uint16_t, minor)
 );
 
 namespace tawashi {
+namespace cgi {
 	namespace {
-		boost::optional<CGIEnv::VersionInfo> split_version (const std::string& parString) {
+		boost::optional<Env::VersionInfo> split_version (const std::string& parString) {
 			namespace px = boost::phoenix;
 
 			using boost::spirit::ascii::space;
@@ -47,7 +48,7 @@ namespace tawashi {
 			VerNum ver_num;
 
 			auto it_curr = parString.cbegin();
-			CGIEnv::VersionInfo retval;
+			Env::VersionInfo retval;
 			const bool parse_ret = boost::spirit::qi::phrase_parse(
 				it_curr,
 				parString.end(),
@@ -59,90 +60,90 @@ namespace tawashi {
 			if (parse_ret and parString.end() == it_curr)
 				return make_optional(retval);
 			else
-				return optional<CGIEnv::VersionInfo>();
+				return optional<Env::VersionInfo>();
 		}
 	} //unnamed namespace
 
-	CGIEnv::CGIEnv() :
+	Env::Env() :
 		m_cgi_env(get_cgi_environment_vars())
 	{
 	}
 
-	CGIEnv::~CGIEnv() noexcept = default;
+	Env::~Env() noexcept = default;
 
-	const std::string& CGIEnv::auth_type() const {
+	const std::string& Env::auth_type() const {
 		return m_cgi_env[CGIVars::AUTH_TYPE];
 	}
 
-	std::size_t CGIEnv::content_length() const {
+	std::size_t Env::content_length() const {
 		using dhandy::lexical_cast;
 		const std::string& value = m_cgi_env[CGIVars::CONTENT_LENGTH];
 		return (value.empty() ? 0U : lexical_cast<std::size_t>(value));
 	}
 
-	const std::string& CGIEnv::content_type() const {
+	const std::string& Env::content_type() const {
 		return m_cgi_env[CGIVars::CONTENT_TYPE];
 	}
 
-	auto CGIEnv::gateway_interface() const -> boost::optional<VersionInfo> {
+	auto Env::gateway_interface() const -> boost::optional<VersionInfo> {
 		return split_version(m_cgi_env[CGIVars::GATEWAY_INTERFACE]);
 	}
 
-	const std::string& CGIEnv::path_info() const {
+	const std::string& Env::path_info() const {
 		return m_cgi_env[CGIVars::PATH_INFO];
 	}
 
-	const std::string& CGIEnv::path_translated() const {
+	const std::string& Env::path_translated() const {
 		return m_cgi_env[CGIVars::PATH_TRANSLATED];
 	}
 
-	const std::string& CGIEnv::query_string() const {
+	const std::string& Env::query_string() const {
 		return m_cgi_env[CGIVars::QUERY_STRING];
 	}
 
-	const std::string& CGIEnv::remote_addr() const {
+	const std::string& Env::remote_addr() const {
 		return m_cgi_env[CGIVars::REMOTE_ADDR];
 	}
 
-	const std::string& CGIEnv::remote_host() const {
+	const std::string& Env::remote_host() const {
 		return m_cgi_env[CGIVars::REMOTE_HOST];
 	}
 
-	const std::string& CGIEnv::remote_ident() const {
+	const std::string& Env::remote_ident() const {
 		return m_cgi_env[CGIVars::REMOTE_IDENT];
 	}
 
-	const std::string& CGIEnv::remote_user() const {
+	const std::string& Env::remote_user() const {
 		return m_cgi_env[CGIVars::REMOTE_USER];
 	}
 
-	const std::string& CGIEnv::request_method() const {
+	const std::string& Env::request_method() const {
 		return m_cgi_env[CGIVars::REQUEST_METHOD];
 	}
 
-	const std::string& CGIEnv::script_name() const {
+	const std::string& Env::script_name() const {
 		return m_cgi_env[CGIVars::SCRIPT_NAME];
 	}
 
-	const std::string& CGIEnv::server_name() const {
+	const std::string& Env::server_name() const {
 		return m_cgi_env[CGIVars::SERVER_NAME];
 	}
 
-	uint16_t CGIEnv::server_port() const {
+	uint16_t Env::server_port() const {
 		using dhandy::lexical_cast;
 		const std::string& value = m_cgi_env[CGIVars::SERVER_PORT];
 		return (value.empty() ? 0U : lexical_cast<uint16_t>(value));
 	}
 
-	auto CGIEnv::server_protocol() const -> boost::optional<VersionInfo> {
+	auto Env::server_protocol() const -> boost::optional<VersionInfo> {
 		return split_version(m_cgi_env[CGIVars::SERVER_PROTOCOL]);
 	}
 
-	const std::string& CGIEnv::server_software() const {
+	const std::string& Env::server_software() const {
 		return m_cgi_env[CGIVars::SERVER_SOFTWARE];
 	}
 
-	CGIEnv::GetMapType CGIEnv::query_string_split() const {
+	Env::GetMapType Env::query_string_split() const {
 		GetMapType retval;
 		const auto urlencoded_values = split_env_vars(m_cgi_env[CGIVars::QUERY_STRING]);
 		retval.reserve(urlencoded_values.size());
@@ -152,11 +153,13 @@ namespace tawashi {
 		return retval;
 	}
 
-	std::ostream& CGIEnv::print_all (std::ostream& parStream, const char* parNewline) const {
+	std::ostream& Env::print_all (std::ostream& parStream, const char* parNewline) const {
 		for (std::size_t z = 0; z < m_cgi_env.size(); ++z) {
 			parStream << CGIVars::_from_integral(z) <<
 				" = \"" << m_cgi_env[z] << '"' << parNewline;
 		}
 		return parStream;
 	}
+
+} //namespace cgi
 } //namespace tawashi
