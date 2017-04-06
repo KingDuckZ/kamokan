@@ -1,10 +1,9 @@
 #include "incredis/incredis.hpp"
 #include "submit_form_response.hpp"
 #include "cgi_env.hpp"
+#include "cgi_post.hpp"
 #include <iostream>
 #include <string>
-#include <algorithm>
-#include <iterator>
 
 //www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4150.pdf
 
@@ -30,10 +29,10 @@ int main() {
 	std::cout << "Content length: \"" << in_len << "\"\n<br>\n";
 
 	cgi_env.print_all(std::cout, "<br>\n");
-	std::string input;
-	if (in_len > 0)
-		std::copy_n(std::istream_iterator<char>(std::cin), in_len, std::back_inserter(input));
-	std::cout << input << '\n';
+	for (auto& itm : tawashi::cgi::read_post(cgi_env)) {
+		std::cout << "Key: \"" << itm.first << "\"<br>\nValue: \"" <<
+			itm.second << "\"<br>\n";
+	}
 
 	auto ver = cgi_env.gateway_interface();
 	if (ver)

@@ -29,7 +29,6 @@ namespace tawashi {
 			using boost::spirit::ascii::space;
 			using boost::spirit::qi::raw;
 			using boost::spirit::qi::char_;
-			using boost::spirit::qi::int_;
 			using boost::string_ref;
 			using VerNum = boost::spirit::qi::uint_parser<uint16_t, 10, 1, 1>;
 			using RuleType = boost::spirit::qi::rule<std::string::const_iterator, string_ref(), boost::spirit::ascii::space_type>;
@@ -143,8 +142,14 @@ namespace tawashi {
 		return m_cgi_env[CGIVars::SERVER_SOFTWARE];
 	}
 
-	KeyValueList CGIEnv::query_string_split() const {
-		return split_env_vars(m_cgi_env[CGIVars::QUERY_STRING]);
+	CGIEnv::GetMapType CGIEnv::query_string_split() const {
+		GetMapType retval;
+		const auto urlencoded_values = split_env_vars(m_cgi_env[CGIVars::QUERY_STRING]);
+		retval.reserve(urlencoded_values.size());
+		for (auto& itm : urlencoded_values) {
+			retval[m_curl.url_unescape(itm.first)] = m_curl.url_unescape(itm.second);
+		}
+		return retval;
 	}
 
 	std::ostream& CGIEnv::print_all (std::ostream& parStream, const char* parNewline) const {

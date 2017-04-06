@@ -6,7 +6,7 @@
 #include <utility>
 
 namespace tawashi {
-	typedef std::vector<std::pair<boost::string_ref, boost::string_ref>> KeyValueList;
+	typedef std::vector<std::pair<boost::string_ref, boost::string_ref>> RawKeyValueList;
 
-	KeyValueList split_env_vars ( const std::string& parCommaSeparatedList ) a_pure;
+	RawKeyValueList split_env_vars ( const std::string& parCommaSeparatedList ) a_pure;
 } //namespace tawashi

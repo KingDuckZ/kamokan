@@ -1,6 +1,7 @@
 #include "cgi_post.hpp"
 #include "cgi_env.hpp"
 #include "split_get_vars.hpp"
+#include "curl_wrapper.hpp"
 #include <iostream>
 #include <iterator>
 #include <algorithm>
@@ -31,8 +32,9 @@ namespace tawashi {
 						std::back_inserter(original_data)
 					);
 
+					CurlWrapper curl;
 					for (auto& itm : split_env_vars(original_data)) {
-						map[itm.first] = itm.second;
+						map[curl.url_unescape(itm.first)] = curl.url_unescape(itm.second);
 					}
 				}
 

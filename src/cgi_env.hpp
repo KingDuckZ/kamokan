@@ -2,12 +2,14 @@
 
 #include "split_get_vars.hpp"
 #include "duckhandy/compatibility.h"
+#include "curl_wrapper.hpp"
 #include <vector>
 #include <string>
 #include <boost/utility/string_ref.hpp>
 #include <cstdint>
 #include <iostream>
 #include <boost/optional.hpp>
+#include <boost/container/flat_map.hpp>
 
 namespace tawashi {
 	class CGIEnv {
@@ -17,6 +19,8 @@ namespace tawashi {
 			uint16_t major;
 			uint16_t minor;
 		};
+
+		typedef boost::container::flat_map<std::string, std::string> GetMapType;
 
 		CGIEnv();
 		~CGIEnv() noexcept;
@@ -39,11 +43,12 @@ namespace tawashi {
 		boost::optional<VersionInfo> server_protocol() const a_pure;
 		const std::string& server_software() const;
 
-		KeyValueList query_string_split() const a_pure;
+		GetMapType query_string_split() const a_pure;
 
 		std::ostream& print_all (std::ostream& parStream, const char* parNewline) const;
 
 	private:
 		std::vector<std::string> m_cgi_env;
+		CurlWrapper m_curl;
 	};
 } //namespace tawashi
