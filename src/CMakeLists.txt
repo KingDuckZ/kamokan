@@ -12,7 +12,7 @@ add_executable(${PROJECT_NAME}
 	response.cpp
 	submit_paste_response.cpp
 	get_env.cpp
-	envy.cpp
+	cgi_environment_vars.cpp
 	cgi_env.cpp
 	num_to_token.cpp
 	cgi_post.cpp

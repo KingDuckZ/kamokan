@@ -25,5 +25,5 @@ namespace tawashi {
 		SERVER_SOFTWARE
 	);
 
-	std::vector<std::string> get_cgi_environment_vars();
+	std::vector<std::string> cgi_environment_vars();
 } //namespace tawashi

@@ -1,5 +1,5 @@
 #include "cgi_env.hpp"
-#include "envy.hpp"
+#include "cgi_environment_vars.hpp"
 #include "duckhandy/lexical_cast.hpp"
 #include <cassert>
 #include <ciso646>
@@ -65,7 +65,7 @@ namespace cgi {
 	} //unnamed namespace
 
 	Env::Env() :
-		m_cgi_env(get_cgi_environment_vars())
+		m_cgi_env(cgi_environment_vars())
 	{
 	}
 
