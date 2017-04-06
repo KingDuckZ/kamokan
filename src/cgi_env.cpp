@@ -147,7 +147,7 @@ namespace tawashi {
 		const auto urlencoded_values = split_env_vars(m_cgi_env[CGIVars::QUERY_STRING]);
 		retval.reserve(urlencoded_values.size());
 		for (auto& itm : urlencoded_values) {
-			retval[m_curl.url_unescape(itm.first)] = m_curl.url_unescape(itm.second);
+			retval[unescape_string(m_curl, itm.first)] = unescape_string(m_curl, itm.second);
 		}
 		return retval;
 	}

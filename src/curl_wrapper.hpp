@@ -21,4 +21,6 @@ namespace tawashi {
 	private:
 		CurlPtr m_curl;
 	};
+
+	std::string unescape_string (const CurlWrapper& parCurl, const boost::string_ref& parString);
 } //namespace tawashi

@@ -2,6 +2,7 @@
 #include <curl/curl.h>
 #include <cassert>
 #include <ciso646>
+#include <algorithm>
 
 #if !defined(NDEBUG)
 #	define CURL_WRAPPER_VERBOSE
@@ -64,6 +65,15 @@ namespace tawashi {
 			return shared;
 		}
 	} //unnamed namespace
+
+	std::string unescape_string (const CurlWrapper& parCurl, const boost::string_ref& parString) {
+		if (parString.empty())
+			return std::string();
+
+		std::string new_value(parString.data(), parString.size());
+		std::replace(new_value.begin(), new_value.end(), '+', ' ');
+		return parCurl.url_unescape(new_value);
+	}
 
 	CurlWrapper::CurlWrapper() :
 		m_curl(get_new_curl())

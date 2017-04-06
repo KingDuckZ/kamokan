@@ -34,7 +34,7 @@ namespace tawashi {
 
 					CurlWrapper curl;
 					for (auto& itm : split_env_vars(original_data)) {
-						map[curl.url_unescape(itm.first)] = curl.url_unescape(itm.second);
+						map[unescape_string(curl, itm.first)] = unescape_string(curl, itm.second);
 					}
 				}
 
