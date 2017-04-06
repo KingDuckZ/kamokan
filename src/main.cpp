@@ -14,6 +14,7 @@ int main() {
 	//std::cout << "Content-type:text/plain\n\n";
 
 	redis::IncRedis incredis("127.0.0.1", 6379);
+	incredis.connect();
 
 	tawashi::CGIEnv cgi_env;
 	if (cgi_env.path_info() == "/index.cgi") {
@@ -21,9 +22,12 @@ int main() {
 		resp.send();
 	}
 	else if (cgi_env.path_info() == "/paste.cgi") {
-		incredis.connect();
 		tawashi::SubmitFormResponse resp(incredis);
 		resp.send();
+	}
+	else {
+		std::cout << "Content-type:text/plain\n\n";
+		std::cout << "you shouldn't be here\n";
 	}
 
 	return 0;

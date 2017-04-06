@@ -1,6 +1,7 @@
 #pragma once
 
 #include "response.hpp"
+#include <string>
 
 namespace redis {
 	class IncRedis;
@@ -13,6 +14,8 @@ namespace tawashi {
 
 	private:
 		virtual void on_send (std::ostream& parStream) override;
+		bool submit_to_redis (const std::string& parText) const;
+
 		redis::IncRedis& m_redis;
 	};
 } //namespace tawashi

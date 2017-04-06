@@ -5,5 +5,5 @@
 #include <cstdint>
 
 namespace tawashi {
-	std::string make_token (uint64_t parNum) a_pure;
+	std::string num_to_token (int64_t parNum) a_pure;
 } //namespace tawashi

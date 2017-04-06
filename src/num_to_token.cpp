@@ -32,13 +32,13 @@ namespace tawashi {
 		//}
 	} //unnamed namespace
 
-	std::string make_token (uint64_t parNum) {
-		assert(0 != parNum);
+	std::string num_to_token (int64_t parNum) {
+		assert(0 < parNum);
 		std::string retval;
 
 		do {
 			const auto remainder = parNum % ('z' - 'a' + 1);
-			retval.push_back(static_cast<char>(remainder));
+			retval.push_back(static_cast<char>('a' + remainder));
 			parNum /= ('z' - 'a' + 1);
 		} while (parNum);
 
