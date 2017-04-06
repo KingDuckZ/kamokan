@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}
 	envy.cpp
 	cgi_env.cpp
 	num_to_token.cpp
+	cgi_post.cpp
 )
 
 target_include_directories(${PROJECT_NAME} SYSTEM
