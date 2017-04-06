@@ -21,7 +21,7 @@
 
 namespace tawashi {
 	PastieResponse::PastieResponse (redis::IncRedis& parRedis) :
-		Response("text/plain"),
+		Response(Response::ContentType, "text/plain"),
 		m_redis(parRedis)
 	{
 	}

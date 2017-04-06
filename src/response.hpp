@@ -29,13 +29,22 @@ namespace tawashi {
 		void send();
 
 	protected:
-		Response (std::string&& parType);
+		enum Types {
+			ContentType,
+			Location
+		};
+
+		Response (Types parRespType, std::string&& parValue);
 		const cgi::Env& cgi_env() const;
+		void change_type (Types parRespType, std::string&& parValue);
 
 	private:
+		virtual void on_process();
 		virtual void on_send (std::ostream& parStream) = 0;
 
 		cgi::Env m_cgi_env;
-		std::string m_content_type;
+		std::string m_resp_value;
+		Types m_resp_type;
+		bool m_header_sent;
 	};
 } //namespace tawashi

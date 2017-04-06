@@ -20,6 +20,7 @@
 #include "cgi_post.hpp"
 #include "num_to_token.hpp"
 #include <ciso646>
+#include <sstream>
 
 namespace tawashi {
 	namespace {
@@ -27,36 +28,49 @@ namespace tawashi {
 	} //unnamed namespace
 
 	SubmitPasteResponse::SubmitPasteResponse (redis::IncRedis& parRedis) :
-		Response("text/plain"),
+		Response(Response::ContentType, "text/plain"),
 		m_redis(parRedis)
 	{
 	}
 
-	void SubmitPasteResponse::on_send (std::ostream& parStream) {
+	void SubmitPasteResponse::on_process() {
 		auto post = cgi::read_post(cgi_env());
 		auto post_data_it = post.find(g_post_key);
 		if (post.end() == post_data_it) {
-			parStream << "can't find POST data\n";
+			m_error_message = "can't find POST data";
+			return;
 		}
-		else if (submit_to_redis(post_data_it->second)) {
-			parStream << "post submitted correctly\n";
-		}
-		else {
-			parStream << "something happened? :/\n";
+
+		boost::optional<std::string> token = submit_to_redis(post_data_it->second);
+		if (token) {
+			std::ostringstream oss;
+			oss << "http://127.0.0.1:8080/" << *token;
+			this->change_type(Response::Location, oss.str());
 		}
 	}
 
-	bool SubmitPasteResponse::submit_to_redis (const std::string& parText) const {
+	void SubmitPasteResponse::on_send (std::ostream& parStream) {
+		assert(not m_error_message.empty());
+		parStream << "something happened? :/<br>\n" <<
+			m_error_message << '\n';
+	}
+
+	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const std::string& parText) const {
 		if (not m_redis.is_connected()) {
 			m_redis.connect();
 			m_redis.wait_for_connect();
 			if (not m_redis.is_connected())
-				return false;
+				return boost::optional<std::string>();
 		}
 
 		const auto next_id = m_redis.incr("paste_counter");
 		const std::string token = num_to_token(next_id);
 		assert(not token.empty());
-		return m_redis.set(token, parText);
+		if (m_redis.set(token, parText)) {
+			return boost::make_optional(token);
+		}
+		else {
+			return boost::optional<std::string>();
+		}
 	}
 } //namespace tawashi

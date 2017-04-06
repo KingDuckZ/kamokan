@@ -19,7 +19,7 @@
 
 namespace tawashi {
 	IndexResponse::IndexResponse() :
-		Response("text/html")
+		Response(Response::ContentType, "text/html")
 	{
 	}
 

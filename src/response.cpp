@@ -17,22 +17,47 @@
 
 #include "response.hpp"
 #include <utility>
+#include <cassert>
 
 namespace tawashi {
-	Response::Response (std::string&& parType) :
-		m_content_type(std::move(parType))
+	Response::Response (Types parRespType, std::string&& parValue) :
+		m_resp_value(std::move(parValue)),
+		m_resp_type(parRespType),
+		m_header_sent(false)
 	{
 	}
 
 	Response::~Response() noexcept = default;
 
+	void Response::on_process() {
+	}
+
 	void Response::send() {
-		std::cout << "Content-type:" << m_content_type << "\n\n";
-		this->on_send(std::cout);
+		this->on_process();
+
+		m_header_sent = true;
+		switch (m_resp_type) {
+		case ContentType:
+			std::cout << "Content-type: " << m_resp_value << "\n\n";
+			break;
+		case Location:
+			std::cout << "Location: " << m_resp_value << "\n\n";
+			break;
+		}
+
+		if (ContentType == m_resp_type)
+			this->on_send(std::cout);
 		std::cout.flush();
 	}
 
 	const cgi::Env& Response::cgi_env() const {
 		return m_cgi_env;
+	}
+
+	void Response::change_type (Types parRespType, std::string&& parValue) {
+		assert(not m_header_sent);
+		assert(not parValue.empty());
+		m_resp_type = parRespType;
+		m_resp_value = std::move(parValue);
 	}
 } //namespace tawashi
