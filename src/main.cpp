@@ -1,5 +1,5 @@
 #include "incredis/incredis.hpp"
-#include "submit_form_response.hpp"
+#include "submit_paste_response.hpp"
 #include "index_response.hpp"
 #include "cgi_env.hpp"
 #include <iostream>
@@ -22,7 +22,7 @@ int main() {
 		resp.send();
 	}
 	else if (cgi_env.path_info() == "/paste.cgi") {
-		tawashi::SubmitFormResponse resp(incredis);
+		tawashi::SubmitPasteResponse resp(incredis);
 		resp.send();
 	}
 	else {

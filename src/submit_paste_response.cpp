@@ -1,4 +1,4 @@
-#include "submit_form_response.hpp"
+#include "submit_paste_response.hpp"
 #include "incredis/incredis.hpp"
 #include "cgi_post.hpp"
 #include "num_to_token.hpp"
@@ -9,13 +9,13 @@ namespace tawashi {
 		const char g_post_key[] = "pastie";
 	} //unnamed namespace
 
-	SubmitFormResponse::SubmitFormResponse (redis::IncRedis& parRedis) :
+	SubmitPasteResponse::SubmitPasteResponse (redis::IncRedis& parRedis) :
 		Response("text/plain"),
 		m_redis(parRedis)
 	{
 	}
 
-	void SubmitFormResponse::on_send (std::ostream& parStream) {
+	void SubmitPasteResponse::on_send (std::ostream& parStream) {
 		auto post = cgi::read_post(cgi_env());
 		auto post_data_it = post.find(g_post_key);
 		if (post.end() == post_data_it) {
@@ -29,7 +29,7 @@ namespace tawashi {
 		}
 	}
 
-	bool SubmitFormResponse::submit_to_redis (const std::string& parText) const {
+	bool SubmitPasteResponse::submit_to_redis (const std::string& parText) const {
 		if (not m_redis.is_connected()) {
 			m_redis.connect();
 			m_redis.wait_for_connect();

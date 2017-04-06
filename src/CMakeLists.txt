@@ -10,7 +10,7 @@ add_executable(${PROJECT_NAME}
 	main.cpp
 	split_get_vars.cpp
 	response.cpp
-	submit_form_response.cpp
+	submit_paste_response.cpp
 	get_env.cpp
 	envy.cpp
 	cgi_env.cpp

@@ -8,9 +8,9 @@ namespace redis {
 } //namespace redis
 
 namespace tawashi {
-	class SubmitFormResponse : public Response {
+	class SubmitPasteResponse : public Response {
 	public:
-		explicit SubmitFormResponse (redis::IncRedis& parRedis);
+		explicit SubmitPasteResponse (redis::IncRedis& parRedis);
 
 	private:
 		virtual void on_send (std::ostream& parStream) override;
