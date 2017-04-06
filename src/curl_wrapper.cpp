@@ -16,7 +16,7 @@ namespace tawashi {
 		struct CurlDeleter {
 			void operator() (CURL* parCurl) const {
 #if defined(CURL_WRAPPER_VERBOSE)
-				std::cout << "Deleting CURL* " << parCurl << " and cleaning up\n";
+				std::cerr << "Deleting CURL* " << parCurl << " and cleaning up\n";
 #endif
 				assert(parCurl);
 				curl_easy_cleanup(parCurl);
@@ -37,17 +37,17 @@ namespace tawashi {
 			static std::weak_ptr<CURL> curl;
 
 #if defined(CURL_WRAPPER_VERBOSE)
-			std::cout << "CURL object requested\n";
+			std::cerr << "CURL object requested\n";
 #endif
 			auto shared = curl.lock();
 			if (not shared) {
 #if defined(CURL_WRAPPER_VERBOSE)
-				std::cout << "CURL weak pointer has expired! Calling curl_global_init()\n";
+				std::cerr << "CURL weak pointer has expired! Calling curl_global_init()\n";
 #endif
 				if (curl_global_init(CURL_GLOBAL_ALL))
 					return CurlWrapper::CurlPtr();
 #if defined(CURL_WRAPPER_VERBOSE)
-				std::cout << "Calling curl_easy_init()\n";
+				std::cerr << "Calling curl_easy_init()\n";
 #endif
 				shared.reset(curl_easy_init(), CurlDeleter());
 
@@ -58,7 +58,7 @@ namespace tawashi {
 				curl = shared;
 			}
 #if defined(CURL_WRAPPER_VERBOSE)
-			std::cout << "CURL shared pointer ready: " << shared.get() << '\n';
+			std::cerr << "CURL shared pointer ready: " << shared.get() << '\n';
 #endif
 			assert(shared);
 			return shared;
