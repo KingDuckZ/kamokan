@@ -2,6 +2,7 @@ project(tawashi CXX)
 
 find_package(Boost 1.53.0 REQUIRED COMPONENTS program_options filesystem system)
 find_package(CURL REQUIRED)
+find_package(SourceHighlight REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,11 +26,13 @@ target_include_directories(${PROJECT_NAME} SYSTEM
 	PRIVATE ${Boost_INCLUDE_DIRS}
 	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/bette-enums
 	PRIVATE ${CURL_INCLUDE_DIR}
+	PRIVATE ${SourceHighlight_INCLUDE_DIR}
 )
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE ${Boost_LIBRARIES}
 	PRIVATE incredis
-	${CURL_LIBRARIES}
+	PRIVATE ${CURL_LIBRARIES}
+	PRIVATE ${SourceHighlight_LIBRARIES}
 )
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1

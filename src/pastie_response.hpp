@@ -30,8 +30,11 @@ namespace tawashi {
 		PastieResponse (redis::IncRedis& parRedis);
 
 	private:
+		virtual void on_process() override;
 		virtual void on_send (std::ostream& parStream) override;
 
 		redis::IncRedis& m_redis;
+		std::string m_lang_file;
+		bool m_plain_text;
 	};
 } //namespace tawashi

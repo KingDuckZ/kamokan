@@ -18,12 +18,32 @@
 #include "pastie_response.hpp"
 #include "incredis/incredis.hpp"
 #include <ciso646>
+#include <srchilite/sourcehighlight.h>
+#include <srchilite/langmap.h>
+#include <sstream>
 
 namespace tawashi {
 	PastieResponse::PastieResponse (redis::IncRedis& parRedis) :
-		Response(Response::ContentType, "text/plain"),
-		m_redis(parRedis)
+		Response(Response::ContentType, "text/html"),
+		m_redis(parRedis),
+		m_plain_text(false)
 	{
+	}
+
+	void PastieResponse::on_process() {
+		auto env = cgi_env().query_string_split();
+		if (env["m"] == "plain") {
+			this->change_type(Response::ContentType, "text/plain");
+			m_plain_text = true;
+		}
+		else {
+			srchilite::LangMap lang_map("/usr/share/source-highlight", "lang.map");
+			lang_map.open();
+			if (not cgi_env().query_string().empty())
+				m_lang_file = lang_map.getFileName(cgi_env().query_string());
+			else
+				m_lang_file = "default.lang";
+		}
 	}
 
 	void PastieResponse::on_send (std::ostream& parStream) {
@@ -38,6 +58,18 @@ namespace tawashi {
 		if (not pastie) {
 		}
 
-		parStream << *pastie;
+		if (m_plain_text) {
+			parStream << *pastie;
+		}
+		else {
+			srchilite::SourceHighlight highlighter;
+			highlighter.setDataDir("/usr/share/source-highlight");
+			highlighter.setGenerateEntireDoc(false);
+			highlighter.setGenerateLineNumbers(true);
+			const auto lang = m_lang_file;
+			std::istringstream iss(*pastie);
+
+			highlighter.highlight(iss, parStream, lang);
+		}
 	}
 } //namespace tawashi
