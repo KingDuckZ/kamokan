@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME}
 	curl_wrapper.cpp
 	index_response.cpp
 	pastie_response.cpp
+	ini_file.cpp
 )
 
 target_include_directories(${PROJECT_NAME} SYSTEM
