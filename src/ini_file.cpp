@@ -38,7 +38,7 @@
 
 namespace tawashi {
 	namespace {
-		typedef std::string string_type;
+		typedef boost::string_ref string_type;
 
 		template <typename Iterator, typename Skipper>
 		struct IniGrammar : boost::spirit::qi::grammar<Iterator, IniFile::IniMapType(), Skipper> {
@@ -65,32 +65,28 @@ namespace tawashi {
 			using boost::spirit::_1;
 			using boost::spirit::qi::char_;
 			using boost::spirit::qi::eol;
-			typedef IniFile::KeyValueMapType refpair;
+			using boost::spirit::qi::raw;
+			using boost::string_ref;
+			typedef IniFile::KeyValueMapType::value_type refpair;
 
-			section_head = '[' >> +(char_ - ']') >> ']' >> eol;
-			key = +(char_ - '=');
-			key_value = key >> '=' >> *(char_ - eol) >> eol;
+			section_head = '[' >> raw[+(char_ - ']')][_val = px::bind(
+				&string_ref::substr,
+				px::construct<string_ref>(px::ref(*m_master_string)),
+				px::begin(_1) - px::ref(m_begin), px::size(_1)
+			)] >> ']' >> eol;
+			key = raw[+(char_ - '=')][_val = px::bind(
+				&string_ref::substr,
+				px::construct<string_ref>(px::ref(*m_master_string)),
+				px::begin(_1) - px::ref(m_begin), px::size(_1)
+			)];
+			key_value = key[px::bind(&refpair::first, _val) = _1] >> '=' >>
+				raw[*(char_ - eol)][px::bind(&refpair::second, _val) = px::bind(
+					&string_ref::substr,
+					px::construct<string_ref>(px::ref(*m_master_string)),
+					px::begin(_1) - px::ref(m_begin), px::size(_1)
+			)] >> eol;
 			key_values = *key_value;
 			start = *(section_head >> key_values);
-
-			//start %= *(section_head >> key_values);
-			//key_values %= *key_value;
-			//key_value = key[px::bind(&refpair::first, _val) = _1] >> '=' >>
-			//	raw[*char_][px::bind(&refpair::second, _val) = px::bind(
-			//		&string_ref::substr,
-			//		px::construct<string_ref>(px::ref(*m_master_string)),
-			//		px::begin(_1) - px::ref(m_begin), px::size(_1)
-			//)];
-			//key = as_string[+(char_ - '=')][_val = px::bind(
-			//	&string_ref::substr,
-			//	px::construct<string_ref>(px::ref(*m_master_string)),
-			//	px::begin(_1) - px::ref(m_begin), px::size(_1)
-			//)];
-			//section_head = '[' >> as_string[(+char_ - ']')][_val = px::bind(
-			//	&string_ref::substr,
-			//	px::construct<string_ref>(px::ref(*m_master_string)),
-			//	px::begin(_1) - px::ref(m_begin), px::size(_1)
-			//)] >> ']';
 		}
 
 		IniFile::IniMapType parse_ini (const std::string* parIni) {

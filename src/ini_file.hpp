@@ -19,13 +19,14 @@
 
 #include <boost/container/flat_map.hpp>
 #include <iterator>
+#include <boost/utility/string_ref.hpp>
 #include <string>
 
 namespace tawashi {
 	class IniFile {
 	public:
-		typedef boost::container::flat_map<std::string, std::string> KeyValueMapType;
-		typedef boost::container::flat_map<std::string, KeyValueMapType> IniMapType;
+		typedef boost::container::flat_map<boost::string_ref, boost::string_ref> KeyValueMapType;
+		typedef boost::container::flat_map<boost::string_ref, KeyValueMapType> IniMapType;
 
 		IniFile (std::istream_iterator<char> parInputFrom, std::istream_iterator<char> parInputEnd);
 		explicit IniFile (std::string&& parIniData);
