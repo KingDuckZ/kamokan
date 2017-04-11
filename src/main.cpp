@@ -67,16 +67,17 @@ int main() {
 	incredis.connect();
 
 	tawashi::cgi::Env cgi_env;
+	const boost::string_ref& base_uri = settings.at("base_uri");
 	if (cgi_env.path_info() == "/index.cgi") {
-		tawashi::IndexResponse resp;
+		tawashi::IndexResponse resp(base_uri);
 		resp.send();
 	}
 	else if (cgi_env.path_info() == "/paste.cgi") {
-		tawashi::SubmitPasteResponse resp(incredis);
+		tawashi::SubmitPasteResponse resp(incredis, base_uri);
 		resp.send();
 	}
 	else {
-		tawashi::PastieResponse resp(incredis);
+		tawashi::PastieResponse resp(incredis, base_uri);
 		resp.send();
 	}
 

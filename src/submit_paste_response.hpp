@@ -28,7 +28,7 @@ namespace redis {
 namespace tawashi {
 	class SubmitPasteResponse : public Response {
 	public:
-		explicit SubmitPasteResponse (redis::IncRedis& parRedis);
+		SubmitPasteResponse (redis::IncRedis& parRedis, const boost::string_ref& parBaseURI);
 
 	private:
 		virtual void on_process() override;

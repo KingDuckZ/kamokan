@@ -16,23 +16,26 @@
  */
 
 #include "index_response.hpp"
+#include <boost/algorithm/string/replace.hpp>
 
 namespace tawashi {
-	IndexResponse::IndexResponse() :
-		Response(Response::ContentType, "text/html")
+	IndexResponse::IndexResponse (const boost::string_ref& parBaseURI) :
+		Response(Response::ContentType, "text/html", parBaseURI)
 	{
 	}
 
 	void IndexResponse::on_send (std::ostream& parStream) {
-		parStream <<
-			R"(
+		std::string html(R"(
 <form action="http://127.0.0.1:8080/paste.cgi" method="POST" accept-charset="UTF-8">
 	<textarea name="pastie" cols="80" rows="24"></textarea>
 	<br>
 		<button type="submit">tawashi</button>
 	</br>
 </form>
-)";
+)");
+
+		boost::replace_all(html, "{base_uri}", base_uri());
+		parStream << html;
 	}
 } //namespace tawashi
 

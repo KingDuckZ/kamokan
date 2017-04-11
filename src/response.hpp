@@ -20,6 +20,7 @@
 #include "cgi_env.hpp"
 #include <string>
 #include <iostream>
+#include <boost/utility/string_ref.hpp>
 
 namespace tawashi {
 	class Response {
@@ -34,9 +35,10 @@ namespace tawashi {
 			Location
 		};
 
-		Response (Types parRespType, std::string&& parValue);
+		Response (Types parRespType, std::string&& parValue, const boost::string_ref& parBaseURI);
 		const cgi::Env& cgi_env() const;
 		void change_type (Types parRespType, std::string&& parValue);
+		const boost::string_ref& base_uri() const;
 
 	private:
 		virtual void on_process();
@@ -44,6 +46,7 @@ namespace tawashi {
 
 		cgi::Env m_cgi_env;
 		std::string m_resp_value;
+		boost::string_ref m_base_uri;
 		Types m_resp_type;
 		bool m_header_sent;
 	};

@@ -20,8 +20,9 @@
 #include <cassert>
 
 namespace tawashi {
-	Response::Response (Types parRespType, std::string&& parValue) :
+	Response::Response (Types parRespType, std::string&& parValue, const boost::string_ref& parBaseURI) :
 		m_resp_value(std::move(parValue)),
+		m_base_uri(parBaseURI),
 		m_resp_type(parRespType),
 		m_header_sent(false)
 	{
@@ -59,5 +60,9 @@ namespace tawashi {
 		assert(not parValue.empty());
 		m_resp_type = parRespType;
 		m_resp_value = std::move(parValue);
+	}
+
+	const boost::string_ref& Response::base_uri() const {
+		return m_base_uri;
 	}
 } //namespace tawashi

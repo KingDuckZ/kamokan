@@ -19,6 +19,7 @@
 
 #include "response.hpp"
 #include <string>
+#include <boost/utility/string_ref.hpp>
 
 namespace redis {
 	class IncRedis;
@@ -27,7 +28,7 @@ namespace redis {
 namespace tawashi {
 	class PastieResponse : public Response {
 	public:
-		PastieResponse (redis::IncRedis& parRedis);
+		PastieResponse (redis::IncRedis& parRedis, const boost::string_ref& parBaseURI);
 
 	private:
 		virtual void on_process() override;

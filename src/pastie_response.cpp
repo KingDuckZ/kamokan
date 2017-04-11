@@ -23,8 +23,8 @@
 #include <sstream>
 
 namespace tawashi {
-	PastieResponse::PastieResponse (redis::IncRedis& parRedis) :
-		Response(Response::ContentType, "text/html"),
+	PastieResponse::PastieResponse (redis::IncRedis& parRedis, const boost::string_ref& parBaseURI) :
+		Response(Response::ContentType, "text/html", parBaseURI),
 		m_redis(parRedis),
 		m_plain_text(false)
 	{

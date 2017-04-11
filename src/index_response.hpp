@@ -18,11 +18,12 @@
 #pragma once
 
 #include "response.hpp"
+#include <boost/utility/string_ref.hpp>
 
 namespace tawashi {
 	class IndexResponse : public Response {
 	public:
-		IndexResponse();
+		explicit IndexResponse (const boost::string_ref& parBaseURI);
 
 	private:
 		virtual void on_send (std::ostream& parStream) override;

@@ -27,8 +27,8 @@ namespace tawashi {
 		const char g_post_key[] = "pastie";
 	} //unnamed namespace
 
-	SubmitPasteResponse::SubmitPasteResponse (redis::IncRedis& parRedis) :
-		Response(Response::ContentType, "text/plain"),
+	SubmitPasteResponse::SubmitPasteResponse (redis::IncRedis& parRedis, const boost::string_ref& parBaseURI) :
+		Response(Response::ContentType, "text/plain", parBaseURI),
 		m_redis(parRedis)
 	{
 	}
