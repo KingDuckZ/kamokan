@@ -16,6 +16,7 @@
  */
 
 #include "incredis/incredis.hpp"
+#include "tawashiConfig.h"
 #include "submit_paste_response.hpp"
 #include "pastie_response.hpp"
 #include "index_response.hpp"

@@ -7,6 +7,9 @@ find_package(SourceHighlight REQUIRED)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(TAWASHI_CONFIG_PATH "etc")
+set(TAWASHI_CONFIG_FILE "${PROJECT_NAME}.ini")
+
 add_executable(${PROJECT_NAME}
 	main.cpp
 	split_get_vars.cpp
@@ -23,6 +26,14 @@ add_executable(${PROJECT_NAME}
 	ini_file.cpp
 )
 
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.h.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/include/${PROJECT_NAME}Config.h"
+)
+
+target_include_directories(${PROJECT_NAME}
+	PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
+)
 target_include_directories(${PROJECT_NAME} SYSTEM
 	PRIVATE ${Boost_INCLUDE_DIRS}
 	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/bette-enums
@@ -37,4 +48,8 @@ target_link_libraries(${PROJECT_NAME}
 )
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1
+)
+
+target_compile_options(${PROJECT_NAME}
+	PRIVATE -fdiagnostics-color=always
 )
