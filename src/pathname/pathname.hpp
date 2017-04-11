@@ -34,6 +34,8 @@ namespace mchlib {
 		explicit PathName ( boost::string_ref parPath );
 		~PathName ( void ) noexcept = default;
 
+		PathName& operator= ( PathName&& ) = default;
+
 		bool is_absolute ( void ) const { return m_absolute; }
 		std::string path ( void ) const;
 		std::size_t str_path_size ( void ) const;

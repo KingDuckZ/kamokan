@@ -21,18 +21,49 @@
 #include "pastie_response.hpp"
 #include "index_response.hpp"
 #include "cgi_env.hpp"
+#include "ini_file.hpp"
+#include "pathname/pathname.hpp"
+#include "duckhandy/compatibility.h"
+#include "duckhandy/lexical_cast.hpp"
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <iterator>
+#include <ciso646>
 
 //www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4150.pdf
 
 namespace {
+	std::string config_file_path() a_pure;
+
+	std::string config_file_path() {
+		mchlib::PathName config_path(TAWASHI_CONFIG_PATH);
+		mchlib::PathName full_path("");
+		if (config_path.is_absolute()) {
+			full_path = std::move(config_path);
+		}
+		else {
+			full_path = mchlib::PathName(TAWASHI_PATH_PREFIX);
+			full_path.join(config_path);
+		}
+		full_path.join(TAWASHI_CONFIG_FILE);
+		return full_path.path();
+	}
 } //unnamed namespace
 
 int main() {
 	//std::cout << "Content-type:text/plain\n\n";
 
-	redis::IncRedis incredis("127.0.0.1", 6379);
+#if !defined(NDEBUG)
+	std::cerr << "Loading config: \"" << config_file_path() << "\"\n";
+#endif
+	std::ifstream conf(config_file_path());
+	conf >> std::noskipws;
+	tawashi::IniFile ini = tawashi::IniFile(std::istream_iterator<char>(conf), std::istream_iterator<char>());
+	conf.close();
+	const auto& settings = ini.parsed().at("tawashi");
+
+	redis::IncRedis incredis(std::string(settings.at("redis_server")), dhandy::lexical_cast<uint16_t>(settings.at("redis_port")));
 	incredis.connect();
 
 	tawashi::cgi::Env cgi_env;

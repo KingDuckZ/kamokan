@@ -7,8 +7,8 @@ find_package(SourceHighlight REQUIRED)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(TAWASHI_CONFIG_PATH "etc")
-set(TAWASHI_CONFIG_FILE "${PROJECT_NAME}.ini")
+set(TAWASHI_CONFIG_PATH "etc" CACHE STRING "Path where config file will be located, absolute or relative to the install prefix")
+set(TAWASHI_CONFIG_FILE "${PROJECT_NAME}.ini" CACHE STRING "Filename of the config file in TAWASHI_CONFIG_PATH")
 
 add_executable(${PROJECT_NAME}
 	main.cpp
@@ -24,6 +24,7 @@ add_executable(${PROJECT_NAME}
 	index_response.cpp
 	pastie_response.cpp
 	ini_file.cpp
+	pathname/pathname.cpp
 )
 
 configure_file(
