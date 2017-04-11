@@ -50,7 +50,12 @@ target_link_libraries(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1
 )
-
 target_compile_options(${PROJECT_NAME}
 	PRIVATE -fdiagnostics-color=always
+)
+
+install(TARGETS ${PROJECT_NAME}
+	LIBRARY DESTINATION lib
+	RUNTIME DESTINATION bin
+	ARCHIVE DESTINATION lib/static
 )
