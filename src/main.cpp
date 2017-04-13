@@ -49,11 +49,26 @@ namespace {
 		full_path.join(TAWASHI_CONFIG_FILE);
 		return full_path.path();
 	}
+
+	redis::IncRedis make_incredis (const tawashi::IniFile::KeyValueMapType& parSettings) {
+		using redis::IncRedis;
+
+		if (parSettings.at("redis_mode") == "inet") {
+			return IncRedis(
+				std::string(parSettings.at("redis_server")),
+				dhandy::lexical_cast<uint16_t>(parSettings.at("redis_port"))
+			);
+		}
+		else if (parSettings.at("redis_mode") == "sock") {
+			return IncRedis(std::string(parSettings.at("redis_sock")));
+		}
+		else {
+			throw std::runtime_error("Unknown setting for \"redis_mode\", valid settings are \"inet\" or \"sock\"");
+		}
+	}
 } //unnamed namespace
 
 int main() {
-	//std::cout << "Content-type:text/plain\n\n";
-
 #if !defined(NDEBUG)
 	std::cerr << "Loading config: \"" << config_file_path() << "\"\n";
 #endif
@@ -63,7 +78,7 @@ int main() {
 	conf.close();
 	const auto& settings = ini.parsed().at("tawashi");
 
-	redis::IncRedis incredis(std::string(settings.at("redis_server")), dhandy::lexical_cast<uint16_t>(settings.at("redis_port")));
+	auto incredis = make_incredis(settings);
 	incredis.connect();
 
 	tawashi::cgi::Env cgi_env;
