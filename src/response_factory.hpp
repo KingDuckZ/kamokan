@@ -15,20 +15,29 @@
  * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "index_response.hpp"
-#include <boost/algorithm/string/replace.hpp>
+#pragma once
+
+#include "response.hpp"
+#include "kakoune/safe_ptr.hh"
+#include <memory>
 
 namespace tawashi {
-	IndexResponse::IndexResponse (const IniFile& parIni) :
-		Response(Response::ContentType, "text/html", "index", parIni, false)
-	{
-	}
+	class IniFile;
 
-	void IndexResponse::on_send (std::ostream& parStream) {
-		std::string html(load_mustache());
+	class ResponseFactory {
+	public:
+		typedef std::function<std::unique_ptr<Response>(const IniFile&)> ResponseMakerFunc;
 
-		boost::replace_all(html, "{base_uri}", base_uri());
-		parStream << html;
-	}
+		explicit ResponseFactory (const Kakoune::SafePtr<IniFile>& parSettings);
+		~ResponseFactory() noexcept;
+
+		std::unique_ptr<Response> make_response(const boost::string_ref& parName);
+		void register_maker (std::string&& parName, ResponseMakerFunc parMaker);
+		void register_jolly_maker (ResponseMakerFunc parMaker);
+
+	private:
+		struct LocalData;
+
+		std::unique_ptr<LocalData> m_local_data;
+	};
 } //namespace tawashi
-

@@ -17,13 +17,14 @@
 
 #pragma once
 
+#include "kakoune/safe_ptr.hh"
 #include <boost/container/flat_map.hpp>
 #include <iterator>
 #include <boost/utility/string_ref.hpp>
 #include <string>
 
 namespace tawashi {
-	class IniFile {
+	class IniFile : public Kakoune::SafeCountable {
 	public:
 		typedef boost::container::flat_map<boost::string_ref, boost::string_ref> KeyValueMapType;
 		typedef boost::container::flat_map<boost::string_ref, KeyValueMapType> IniMapType;

@@ -23,7 +23,7 @@
 namespace tawashi {
 	class IndexResponse : public Response {
 	public:
-		explicit IndexResponse (const boost::string_ref& parBaseURI);
+		explicit IndexResponse (const IniFile& parIni);
 
 	private:
 		virtual void on_send (std::ostream& parStream) override;

@@ -25,6 +25,7 @@ add_executable(${PROJECT_NAME}
 	pastie_response.cpp
 	ini_file.cpp
 	pathname/pathname.cpp
+	response_factory.cpp
 )
 
 configure_file(
@@ -34,10 +35,11 @@ configure_file(
 
 target_include_directories(${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
+	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/kakoune
 )
 target_include_directories(${PROJECT_NAME} SYSTEM
 	PRIVATE ${Boost_INCLUDE_DIRS}
-	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/bette-enums
+	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/better-enums
 	PRIVATE ${CURL_INCLUDE_DIR}
 	PRIVATE ${SourceHighlight_INCLUDE_DIR}
 )

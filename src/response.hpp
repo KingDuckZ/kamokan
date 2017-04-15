@@ -21,8 +21,15 @@
 #include <string>
 #include <iostream>
 #include <boost/utility/string_ref.hpp>
+#include <memory>
+
+namespace redis {
+	class IncRedis;
+} //namespace redis
 
 namespace tawashi {
+	class IniFile;
+
 	class Response {
 	public:
 		virtual ~Response() noexcept;
@@ -35,10 +42,13 @@ namespace tawashi {
 			Location
 		};
 
-		Response (Types parRespType, std::string&& parValue, const boost::string_ref& parBaseURI);
+		Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const IniFile& parIni, bool parWantRedis);
 		const cgi::Env& cgi_env() const;
 		void change_type (Types parRespType, std::string&& parValue);
 		const boost::string_ref& base_uri() const;
+		const std::string& page_basename() const;
+		std::string load_mustache() const;
+		redis::IncRedis& redis() const;
 
 	private:
 		virtual void on_process();
@@ -47,7 +57,9 @@ namespace tawashi {
 		cgi::Env m_cgi_env;
 		std::string m_resp_value;
 		boost::string_ref m_base_uri;
+		std::string m_page_basename;
 		Types m_resp_type;
+		std::unique_ptr<redis::IncRedis> m_redis;
 		bool m_header_sent;
 	};
 } //namespace tawashi

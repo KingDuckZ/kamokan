@@ -21,20 +21,15 @@
 #include <string>
 #include <boost/utility/string_ref.hpp>
 
-namespace redis {
-	class IncRedis;
-} //namespace redis
-
 namespace tawashi {
 	class PastieResponse : public Response {
 	public:
-		PastieResponse (redis::IncRedis& parRedis, const boost::string_ref& parBaseURI);
+		explicit PastieResponse (const IniFile& parIni);
 
 	private:
 		virtual void on_process() override;
 		virtual void on_send (std::ostream& parStream) override;
 
-		redis::IncRedis& m_redis;
 		std::string m_lang_file;
 		bool m_plain_text;
 	};

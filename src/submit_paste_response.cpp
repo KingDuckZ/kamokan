@@ -27,9 +27,8 @@ namespace tawashi {
 		const char g_post_key[] = "pastie";
 	} //unnamed namespace
 
-	SubmitPasteResponse::SubmitPasteResponse (redis::IncRedis& parRedis, const boost::string_ref& parBaseURI) :
-		Response(Response::ContentType, "text/plain", parBaseURI),
-		m_redis(parRedis)
+	SubmitPasteResponse::SubmitPasteResponse (const IniFile& parIni) :
+		Response(Response::ContentType, "text/plain", "paste", parIni, true)
 	{
 	}
 
@@ -56,17 +55,14 @@ namespace tawashi {
 	}
 
 	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const std::string& parText) const {
-		if (not m_redis.is_connected()) {
-			m_redis.connect();
-			m_redis.wait_for_connect();
-			if (not m_redis.is_connected())
-				return boost::optional<std::string>();
-		}
+		auto& redis = this->redis();
+		if (not redis.is_connected())
+			return boost::optional<std::string>();
 
-		const auto next_id = m_redis.incr("paste_counter");
+		const auto next_id = redis.incr("paste_counter");
 		const std::string token = num_to_token(next_id);
 		assert(not token.empty());
-		if (m_redis.set(token, parText)) {
+		if (redis.set(token, parText)) {
 			return boost::make_optional(token);
 		}
 		else {

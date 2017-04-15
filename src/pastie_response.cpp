@@ -23,9 +23,8 @@
 #include <sstream>
 
 namespace tawashi {
-	PastieResponse::PastieResponse (redis::IncRedis& parRedis, const boost::string_ref& parBaseURI) :
-		Response(Response::ContentType, "text/html", parBaseURI),
-		m_redis(parRedis),
+	PastieResponse::PastieResponse (const IniFile& parIni) :
+		Response(Response::ContentType, "text/html", "", parIni, true),
 		m_plain_text(false)
 	{
 	}
@@ -54,7 +53,8 @@ namespace tawashi {
 		}
 
 		auto token = boost::string_ref(cgi_env().path_info()).substr(1);
-		opt_string pastie = m_redis.get(token);
+		auto& redis = this->redis();
+		opt_string pastie = redis.get(token);
 		if (not pastie) {
 		}
 

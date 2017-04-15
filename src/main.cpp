@@ -15,13 +15,14 @@
  * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "incredis/incredis.hpp"
 #include "tawashiConfig.h"
 #include "submit_paste_response.hpp"
 #include "pastie_response.hpp"
 #include "index_response.hpp"
+#include "response_factory.hpp"
 #include "cgi_env.hpp"
 #include "ini_file.hpp"
+#include "safe_stack_object.hpp"
 #include "pathname/pathname.hpp"
 #include "duckhandy/compatibility.h"
 #include "duckhandy/lexical_cast.hpp"
@@ -50,51 +51,36 @@ namespace {
 		return full_path.path();
 	}
 
-	redis::IncRedis make_incredis (const tawashi::IniFile::KeyValueMapType& parSettings) {
-		using redis::IncRedis;
-
-		if (parSettings.at("redis_mode") == "inet") {
-			return IncRedis(
-				std::string(parSettings.at("redis_server")),
-				dhandy::lexical_cast<uint16_t>(parSettings.at("redis_port"))
-			);
-		}
-		else if (parSettings.at("redis_mode") == "sock") {
-			return IncRedis(std::string(parSettings.at("redis_sock")));
-		}
-		else {
-			throw std::runtime_error("Unknown setting for \"redis_mode\", valid settings are \"inet\" or \"sock\"");
-		}
+	template <typename T>
+	std::unique_ptr<tawashi::Response> make_response (const tawashi::IniFile& parIni) {
+		return static_cast<std::unique_ptr<tawashi::Response>>(std::make_unique<T>(parIni));
 	}
 } //unnamed namespace
 
 int main() {
+	using curry::SafeStackObject;
+	using tawashi::IndexResponse;
+	using tawashi::SubmitPasteResponse;
+	using tawashi::PastieResponse;
+	using tawashi::Response;
+
 #if !defined(NDEBUG)
 	std::cerr << "Loading config: \"" << config_file_path() << "\"\n";
 #endif
 	std::ifstream conf(config_file_path());
 	conf >> std::noskipws;
-	tawashi::IniFile ini = tawashi::IniFile(std::istream_iterator<char>(conf), std::istream_iterator<char>());
+	auto ini = SafeStackObject<tawashi::IniFile>(std::istream_iterator<char>(conf), std::istream_iterator<char>());
 	conf.close();
-	const auto& settings = ini.parsed().at("tawashi");
-
-	auto incredis = make_incredis(settings);
-	incredis.connect();
 
 	tawashi::cgi::Env cgi_env;
-	const boost::string_ref& base_uri = settings.at("base_uri");
-	if (cgi_env.path_info() == "/index.cgi") {
-		tawashi::IndexResponse resp(base_uri);
-		resp.send();
-	}
-	else if (cgi_env.path_info() == "/paste.cgi") {
-		tawashi::SubmitPasteResponse resp(incredis, base_uri);
-		resp.send();
-	}
-	else {
-		tawashi::PastieResponse resp(incredis, base_uri);
-		resp.send();
-	}
+	tawashi::ResponseFactory resp_factory(ini);
+	resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);
+	resp_factory.register_maker("", &make_response<IndexResponse>);
+	resp_factory.register_maker("paste.cgi", &make_response<SubmitPasteResponse>);
+	resp_factory.register_jolly_maker(&make_response<PastieResponse>);
+
+	std::unique_ptr<Response> response = resp_factory.make_response(cgi_env.path_info().substr(1));
+	response->send();
 
 	return 0;
 }

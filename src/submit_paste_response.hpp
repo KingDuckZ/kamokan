@@ -21,21 +21,16 @@
 #include <string>
 #include <boost/optional.hpp>
 
-namespace redis {
-	class IncRedis;
-} //namespace redis
-
 namespace tawashi {
 	class SubmitPasteResponse : public Response {
 	public:
-		SubmitPasteResponse (redis::IncRedis& parRedis, const boost::string_ref& parBaseURI);
+		explicit SubmitPasteResponse (const IniFile& parIni);
 
 	private:
 		virtual void on_process() override;
 		virtual void on_send (std::ostream& parStream) override;
 		boost::optional<std::string> submit_to_redis (const std::string& parText) const;
 
-		redis::IncRedis& m_redis;
 		std::string m_error_message;
 	};
 } //namespace tawashi
