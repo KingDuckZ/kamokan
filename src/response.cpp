@@ -20,6 +20,7 @@
 #include "ini_file.hpp"
 #include "tawashiConfig.h"
 #include "duckhandy/stringize.h"
+#include "pathname/pathname.hpp"
 #include <utility>
 #include <cassert>
 #include <fstream>
@@ -38,6 +39,17 @@ namespace tawashi {
 		//	assert(substr_len < path.size() and substr_len - path.size() - start_index);
 		//	return path.substr(start_index, substr_len);
 		//}
+
+		std::string make_root_path (const IniFile::KeyValueMapType& parSettings) {
+			const auto it_found = parSettings.find("website_root");
+			if (parSettings.end() == it_found) {
+				return "";
+			}
+			else {
+				mchlib::PathName retval(it_found->second);
+				return retval.path() + '/';
+			}
+		}
 
 		redis::IncRedis make_incredis (const tawashi::IniFile::KeyValueMapType& parSettings) {
 			using redis::IncRedis;
@@ -61,6 +73,7 @@ namespace tawashi {
 		m_resp_value(std::move(parValue)),
 		m_base_uri(parIni.parsed().at("tawashi").at("base_uri")),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
+		m_website_root(make_root_path(parIni.parsed().at("tawashi"))),
 		m_page_basename(std::move(parPageBaseName)),
 		m_resp_type(parRespType),
 		m_header_sent(false)
@@ -133,7 +146,7 @@ namespace tawashi {
 
 	std::string Response::load_mustache() const {
 		std::ostringstream oss;
-		oss << "html/" << page_basename() << ".html.mstch";
+		oss << m_website_root << page_basename() << ".html.mstch";
 		std::cerr << "Trying to load \"" << oss.str() << "\"\n";
 		std::ifstream if_mstch(oss.str(), std::ios::binary | std::ios::in);
 

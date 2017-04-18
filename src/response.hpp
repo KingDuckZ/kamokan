@@ -59,6 +59,7 @@ namespace tawashi {
 		cgi::Env m_cgi_env;
 		std::string m_resp_value;
 		boost::string_ref m_base_uri;
+		std::string m_website_root;
 		std::string m_page_basename;
 		Types m_resp_type;
 		std::unique_ptr<redis::IncRedis> m_redis;

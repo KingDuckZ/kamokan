@@ -50,7 +50,7 @@ namespace tawashi {
 
 	void SubmitPasteResponse::on_send (std::ostream& parStream) {
 		assert(not m_error_message.empty());
-		parStream << "something happened? :/<br>\n" <<
+		parStream << "something happened? :/\n" <<
 			m_error_message << '\n';
 	}
 

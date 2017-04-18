@@ -56,6 +56,7 @@ namespace tawashi {
 		auto& redis = this->redis();
 		opt_string pastie = redis.get(token);
 		if (not pastie) {
+			assert(false);
 		}
 
 		if (m_plain_text) {
