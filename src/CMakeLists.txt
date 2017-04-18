@@ -1,4 +1,4 @@
-project(tawashi CXX)
+project(tawashi VERSION 0.1.0 LANGUAGES CXX)
 
 find_package(Boost 1.53.0 REQUIRED COMPONENTS program_options filesystem system)
 find_package(CURL REQUIRED)
@@ -36,6 +36,7 @@ configure_file(
 target_include_directories(${PROJECT_NAME}
 	PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
 	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/kakoune
+	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/mstch/include
 )
 target_include_directories(${PROJECT_NAME} SYSTEM
 	PRIVATE ${Boost_INCLUDE_DIRS}
@@ -48,6 +49,7 @@ target_link_libraries(${PROJECT_NAME}
 	PRIVATE incredis
 	PRIVATE ${CURL_LIBRARIES}
 	PRIVATE ${SourceHighlight_LIBRARIES}
+	PRIVATE mstch
 )
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1

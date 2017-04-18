@@ -18,6 +18,8 @@
 #include "response.hpp"
 #include "incredis/incredis.hpp"
 #include "ini_file.hpp"
+#include "tawashiConfig.h"
+#include "duckhandy/stringize.h"
 #include <utility>
 #include <cassert>
 #include <fstream>
@@ -74,11 +76,24 @@ namespace tawashi {
 	void Response::on_process() {
 	}
 
+	void Response::on_send (std::ostream& parStream) {
+		parStream << load_mustache();
+	}
+
+	void Response::on_mustache_prepare (mstch::map&) {
+	}
+
 	void Response::send() {
+		mstch::map mustache_context {
+			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
+			{"base_uri", std::string(m_base_uri.data(), m_base_uri.size())}
+		};
+
 		if (m_redis)
 			m_redis->wait_for_connect();
 
 		this->on_process();
+		this->on_mustache_prepare(mustache_context);
 
 		m_header_sent = true;
 		switch (m_resp_type) {
@@ -90,8 +105,10 @@ namespace tawashi {
 			break;
 		}
 
+		std::ostringstream stream_out;
 		if (ContentType == m_resp_type)
-			this->on_send(std::cout);
+			this->on_send(stream_out);
+		std::cout << mstch::render(stream_out.str(), mustache_context);
 		std::cout.flush();
 	}
 

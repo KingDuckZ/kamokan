@@ -23,12 +23,5 @@ namespace tawashi {
 		Response(Response::ContentType, "text/html", "index", parIni, false)
 	{
 	}
-
-	void IndexResponse::on_send (std::ostream& parStream) {
-		std::string html(load_mustache());
-
-		boost::replace_all(html, "{base_uri}", base_uri());
-		parStream << html;
-	}
 } //namespace tawashi
 

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "cgi_env.hpp"
+#include "mstch/mstch.hpp"
 #include <string>
 #include <iostream>
 #include <boost/utility/string_ref.hpp>
@@ -52,7 +53,8 @@ namespace tawashi {
 
 	private:
 		virtual void on_process();
-		virtual void on_send (std::ostream& parStream) = 0;
+		virtual void on_send (std::ostream& parStream);
+		virtual void on_mustache_prepare (mstch::map& parContext);
 
 		cgi::Env m_cgi_env;
 		std::string m_resp_value;

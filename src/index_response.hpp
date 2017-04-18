@@ -26,6 +26,5 @@ namespace tawashi {
 		explicit IndexResponse (const IniFile& parIni);
 
 	private:
-		virtual void on_send (std::ostream& parStream) override;
 	};
 } //namespace tawashi

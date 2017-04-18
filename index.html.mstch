@@ -1,0 +1,7 @@
+<p>tawashi v{{version}}</p>
+<form action="{{base_uri}}/paste.cgi" method="POST" accept-charset="UTF-8">
+	<textarea name="pastie" cols="80" rows="24"></textarea>
+	<br>
+		<button type="submit">tawashi</button>
+	</br>
+</form>
