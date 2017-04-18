@@ -1,0 +1,82 @@
+---
+---
+/*get rid of defaults*/
+
+*{/*everything on the webpage*/
+	margin:0px;
+	padding:0px;
+}
+
+/* Tell the browser to render HTML5 elements as block */
+header, footer, aside, nav, article {
+    display: block;
+}
+
+/*caratteristiche generali di tutto il body*/
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    background: #303030;
+}
+
+/*style della barra di navigazione*/
+#topbar {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	border-bottom: 2px solid black;
+}
+
+#version{
+	font-size: 20px;
+	margin: 0px;
+	padding: 0px 10px;
+	color: RGBA(0, 146, 0, 255);
+	font-weight: bold;
+}
+
+.icon {
+	padding-right: 20px;
+}
+
+.icon-green {
+	height: 80px;
+}
+
+.icon-right {
+	float: right;
+}
+
+
+#PasteTextBox{
+	width: 100%;
+	height: 400px;
+   padding: 20px 5px;
+   border: black;
+   margin: 20px;
+   box-sizing: border-box;
+   border-radius: 4px;
+   background-color: #303030;
+   color: #EDEDED;
+   resize: none;
+}
+
+.title{
+	display: inline-block;
+	color: #EDEDED;
+	font-weight: bold;
+}
+
+.selectBox {
+  font-size: 15px;
+  background: #EDEDED;
+  color: black;
+  padding: 5px;
+  margin-right: 20px;
+  border: solid #9e9e9e 1px;
+  text-decoration: none;
+  display: inline-block; 
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
