@@ -27,6 +27,7 @@ add_executable(${PROJECT_NAME}
 	pathname/pathname.cpp
 	response_factory.cpp
 	list_highlight_langs.cpp
+	settings_bag.cpp
 )
 
 configure_file(

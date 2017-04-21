@@ -17,14 +17,25 @@
 
 #pragma once
 
-#include "response.hpp"
+#include "ini_file.hpp"
+#include "kakoune/safe_ptr.hh"
+#include <map>
 #include <boost/utility/string_ref.hpp>
+#include <functional>
 
 namespace tawashi {
-	class IndexResponse : public Response {
+	class SettingsBag : public Kakoune::SafeCountable {
+		typedef std::map<boost::string_ref, boost::string_ref> MapType;
 	public:
-		explicit IndexResponse (const SettingsBag& parSettings);
+		explicit SettingsBag (const Kakoune::SafePtr<IniFile>& parIni);
+		~SettingsBag() noexcept;
+
+		const boost::string_ref& operator[] (boost::string_ref parIndex) const;
+		void add_default (boost::string_ref parKey, boost::string_ref parValue);
 
 	private:
+		MapType m_defaults;
+		Kakoune::SafePtr<IniFile> m_ini;
+		const IniFile::KeyValueMapType* m_values;
 	};
 } //namespace tawashi

@@ -17,7 +17,7 @@
 
 #include "response.hpp"
 #include "incredis/incredis.hpp"
-#include "ini_file.hpp"
+#include "settings_bag.hpp"
 #include "tawashiConfig.h"
 #include "duckhandy/stringize.h"
 #include "pathname/pathname.hpp"
@@ -43,28 +43,27 @@ namespace tawashi {
 		//	return path.substr(start_index, substr_len);
 		//}
 
-		std::string make_root_path (const IniFile::KeyValueMapType& parSettings) {
-			const auto it_found = parSettings.find("website_root");
-			if (parSettings.end() == it_found) {
+		std::string make_root_path (const SettingsBag& parSettings) {
+			auto retval = parSettings["website_root"];
+			if (retval.empty()) {
 				return "";
 			}
 			else {
-				mchlib::PathName retval(it_found->second);
-				return retval.path() + '/';
+				return mchlib::PathName(retval).path() + '/';
 			}
 		}
 
-		redis::IncRedis make_incredis (const tawashi::IniFile::KeyValueMapType& parSettings) {
+		redis::IncRedis make_incredis (const tawashi::SettingsBag& parSettings) {
 			using redis::IncRedis;
 
-			if (parSettings.at("redis_mode") == "inet") {
+			if (parSettings["redis_mode"] == "inet") {
 				return IncRedis(
-					std::string(parSettings.at("redis_server")),
-					dhandy::lexical_cast<uint16_t>(parSettings.at("redis_port"))
+					std::string(parSettings["redis_server"]),
+					dhandy::lexical_cast<uint16_t>(parSettings["redis_port"])
 				);
 			}
-			else if (parSettings.at("redis_mode") == "sock") {
-				return IncRedis(std::string(parSettings.at("redis_sock")));
+			else if (parSettings["redis_mode"] == "sock") {
+				return IncRedis(std::string(parSettings["redis_sock"]));
 			}
 			else {
 				throw std::runtime_error("Unknown setting for \"redis_mode\", valid settings are \"inet\" or \"sock\"");
@@ -99,17 +98,17 @@ namespace tawashi {
 		}
 	} //unnamed namespace
 
-	Response::Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const IniFile& parIni, bool parWantRedis) :
+	Response::Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const SettingsBag& parSettings, bool parWantRedis) :
 		m_resp_value(std::move(parValue)),
-		m_base_uri(parIni.parsed().at("tawashi").at("base_uri")),
+		m_base_uri(parSettings["base_uri"]),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
-		m_website_root(make_root_path(parIni.parsed().at("tawashi"))),
+		m_website_root(make_root_path(parSettings)),
 		m_page_basename(std::move(parPageBaseName)),
 		m_resp_type(parRespType),
 		m_header_sent(false)
 	{
 		if (parWantRedis) {
-			m_redis = std::make_unique<redis::IncRedis>(make_incredis(parIni.parsed().at("tawashi")));
+			m_redis = std::make_unique<redis::IncRedis>(make_incredis(parSettings));
 			m_redis->connect();
 		}
 	}

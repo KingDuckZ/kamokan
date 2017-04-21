@@ -25,7 +25,7 @@
 #include "safe_stack_object.hpp"
 #include "pathname/pathname.hpp"
 #include "duckhandy/compatibility.h"
-#include "duckhandy/lexical_cast.hpp"
+#include "settings_bag.hpp"
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -52,8 +52,17 @@ namespace {
 	}
 
 	template <typename T>
-	std::unique_ptr<tawashi::Response> make_response (const tawashi::IniFile& parIni) {
-		return static_cast<std::unique_ptr<tawashi::Response>>(std::make_unique<T>(parIni));
+	std::unique_ptr<tawashi::Response> make_response (const tawashi::SettingsBag& parSettings) {
+		return static_cast<std::unique_ptr<tawashi::Response>>(std::make_unique<T>(parSettings));
+	}
+
+	void fill_defaults (tawashi::SettingsBag& parSettings) {
+		parSettings.add_default("redis_server", "127.0.0.1");
+		parSettings.add_default("redis_port", "6379");
+		parSettings.add_default("redis_mode", "sock");
+		parSettings.add_default("redis_sock", "/tmp/redis.sock");
+		parSettings.add_default("base_uri", "http://127.0.0.1");
+		parSettings.add_default("website_root", "html");
 	}
 } //unnamed namespace
 
@@ -72,8 +81,11 @@ int main() {
 	auto ini = SafeStackObject<tawashi::IniFile>(std::istream_iterator<char>(conf), std::istream_iterator<char>());
 	conf.close();
 
+	auto settings = SafeStackObject<tawashi::SettingsBag>(ini);
+	fill_defaults(*settings);
+
 	tawashi::cgi::Env cgi_env;
-	tawashi::ResponseFactory resp_factory(ini);
+	tawashi::ResponseFactory resp_factory(settings);
 	resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);
 	resp_factory.register_maker("", &make_response<IndexResponse>);
 	resp_factory.register_maker("paste.cgi", &make_response<SubmitPasteResponse>);

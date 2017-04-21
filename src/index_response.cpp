@@ -19,8 +19,8 @@
 #include <boost/algorithm/string/replace.hpp>
 
 namespace tawashi {
-	IndexResponse::IndexResponse (const IniFile& parIni) :
-		Response(Response::ContentType, "text/html", "index", parIni, false)
+	IndexResponse::IndexResponse (const SettingsBag& parSettings) :
+		Response(Response::ContentType, "text/html", "index", parSettings, false)
 	{
 	}
 } //namespace tawashi

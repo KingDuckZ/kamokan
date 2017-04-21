@@ -24,7 +24,7 @@
 namespace tawashi {
 	class SubmitPasteResponse : public Response {
 	public:
-		explicit SubmitPasteResponse (const IniFile& parIni);
+		explicit SubmitPasteResponse (const SettingsBag& parSettings);
 
 	private:
 		virtual void on_process() override;

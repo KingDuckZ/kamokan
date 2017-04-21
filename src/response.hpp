@@ -29,7 +29,7 @@ namespace redis {
 } //namespace redis
 
 namespace tawashi {
-	class IniFile;
+	class SettingsBag;
 
 	class Response {
 	public:
@@ -43,7 +43,7 @@ namespace tawashi {
 			Location
 		};
 
-		Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const IniFile& parIni, bool parWantRedis);
+		Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const SettingsBag& parSettings, bool parWantRedis);
 		const cgi::Env& cgi_env() const;
 		void change_type (Types parRespType, std::string&& parValue);
 		const boost::string_ref& base_uri() const;

@@ -16,7 +16,7 @@
  */
 
 #include "response_factory.hpp"
-#include "ini_file.hpp"
+#include "settings_bag.hpp"
 #include <functional>
 #include <boost/container/flat_map.hpp>
 
@@ -25,12 +25,12 @@ namespace tawashi {
 	} //unnamed namespace
 
 	struct ResponseFactory::LocalData {
-		Kakoune::SafePtr<IniFile> settings;
+		Kakoune::SafePtr<SettingsBag> settings;
 		boost::container::flat_map<std::string, ResponseMakerFunc> makers;
 		ResponseMakerFunc jolly_maker;
 	};
 
-	ResponseFactory::ResponseFactory (const Kakoune::SafePtr<IniFile>& parSettings) :
+	ResponseFactory::ResponseFactory (const Kakoune::SafePtr<SettingsBag>& parSettings) :
 		m_local_data(std::make_unique<LocalData>())
 	{
 		m_local_data->settings = parSettings;

@@ -15,16 +15,30 @@
  * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "response.hpp"
-#include <boost/utility/string_ref.hpp>
+#include "settings_bag.hpp"
+#include <cassert>
 
 namespace tawashi {
-	class IndexResponse : public Response {
-	public:
-		explicit IndexResponse (const SettingsBag& parSettings);
+	SettingsBag::SettingsBag (const Kakoune::SafePtr<IniFile>& parIni) :
+		m_ini(parIni),
+		m_values(&parIni->parsed().at("tawashi"))
+	{
+		assert(m_values);
+	}
 
-	private:
-	};
+	SettingsBag::~SettingsBag() noexcept = default;
+
+	const boost::string_ref& SettingsBag::operator[] (boost::string_ref parIndex) const {
+		auto it_found = m_values->find(parIndex);
+		if (m_values->end() != it_found)
+			return it_found->second;
+		else
+			return m_defaults.at(parIndex);
+	}
+
+	void SettingsBag::add_default (boost::string_ref parKey, boost::string_ref parValue) {
+		assert(m_defaults.find(parKey) == m_defaults.end());
+		m_defaults[parKey] = parValue;
+	}
 } //namespace tawashi
+

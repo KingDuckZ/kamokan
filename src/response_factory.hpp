@@ -22,13 +22,13 @@
 #include <memory>
 
 namespace tawashi {
-	class IniFile;
+	class SettingsBag;
 
 	class ResponseFactory {
 	public:
-		typedef std::function<std::unique_ptr<Response>(const IniFile&)> ResponseMakerFunc;
+		typedef std::function<std::unique_ptr<Response>(const SettingsBag&)> ResponseMakerFunc;
 
-		explicit ResponseFactory (const Kakoune::SafePtr<IniFile>& parSettings);
+		explicit ResponseFactory (const Kakoune::SafePtr<SettingsBag>& parSettings);
 		~ResponseFactory() noexcept;
 
 		std::unique_ptr<Response> make_response(const boost::string_ref& parName);

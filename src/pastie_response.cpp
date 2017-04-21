@@ -23,8 +23,8 @@
 #include <sstream>
 
 namespace tawashi {
-	PastieResponse::PastieResponse (const IniFile& parIni) :
-		Response(Response::ContentType, "text/html", "", parIni, true),
+	PastieResponse::PastieResponse (const SettingsBag& parSettings) :
+		Response(Response::ContentType, "text/html", "", parSettings, true),
 		m_plain_text(false)
 	{
 	}
