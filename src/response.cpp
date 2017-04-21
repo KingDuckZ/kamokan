@@ -25,6 +25,8 @@
 #include <cassert>
 #include <fstream>
 #include <sstream>
+#include <functional>
+#include <boost/optional.hpp>
 
 namespace tawashi {
 	namespace {
@@ -66,6 +68,24 @@ namespace tawashi {
 			else {
 				throw std::runtime_error("Unknown setting for \"redis_mode\", valid settings are \"inet\" or \"sock\"");
 			}
+		}
+
+		boost::optional<std::string> load_whole_file (const std::string& parWebsiteRoot, const char* parSuffix, const std::string& parName, bool parThrow) {
+			std::ostringstream oss;
+			oss << parWebsiteRoot << parName << parSuffix;
+			std::cerr << "Trying to load \"" << oss.str() << "\"\n";
+			std::ifstream if_mstch(oss.str(), std::ios::binary | std::ios::in);
+
+			if (not if_mstch) {
+				if (parThrow)
+					throw std::runtime_error(std::string("File \"") + oss.str() + "\" not found");
+				else
+					return boost::optional<std::string>();
+			}
+
+			std::ostringstream buffer;
+			buffer << if_mstch.rdbuf();
+			return boost::make_optional(buffer.str());
 		}
 	} //unnamed namespace
 
@@ -121,7 +141,17 @@ namespace tawashi {
 		std::ostringstream stream_out;
 		if (ContentType == m_resp_type)
 			this->on_send(stream_out);
-		std::cout << mstch::render(stream_out.str(), mustache_context);
+		std::cout << mstch::render(
+			stream_out.str(),
+			mustache_context,
+			std::bind(
+				&load_whole_file,
+				std::cref(m_website_root),
+				".mustache",
+				std::placeholders::_1,
+				false
+			)
+		);
 		std::cout.flush();
 	}
 
@@ -145,17 +175,8 @@ namespace tawashi {
 	}
 
 	std::string Response::load_mustache() const {
-		std::ostringstream oss;
-		oss << m_website_root << page_basename() << ".html.mstch";
-		std::cerr << "Trying to load \"" << oss.str() << "\"\n";
-		std::ifstream if_mstch(oss.str(), std::ios::binary | std::ios::in);
-
-		if (!if_mstch)
-			throw std::runtime_error(std::string("File \"") + oss.str() + "\" not found");
-
-		std::ostringstream buffer;
-		buffer << if_mstch.rdbuf();
-		return buffer.str();
+		boost::optional<std::string> content = load_whole_file(m_website_root, ".html.mstch", page_basename(), true);
+		return *content;
 	}
 
 	redis::IncRedis& Response::redis() const {
