@@ -21,6 +21,7 @@
 #include "tawashiConfig.h"
 #include "duckhandy/stringize.h"
 #include "pathname/pathname.hpp"
+#include "list_highlight_langs.hpp"
 #include <utility>
 #include <cassert>
 #include <fstream>
@@ -87,6 +88,15 @@ namespace tawashi {
 			buffer << if_mstch.rdbuf();
 			return boost::make_optional(buffer.str());
 		}
+
+		mstch::array make_mstch_langmap() {
+			mstch::array retval;
+
+			for (auto&& lang : list_highlight_langs()) {
+				retval.push_back(mstch::map{{"language_name", std::move(lang)}});
+			}
+			return retval;
+		}
 	} //unnamed namespace
 
 	Response::Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const IniFile& parIni, bool parWantRedis) :
@@ -119,7 +129,8 @@ namespace tawashi {
 	void Response::send() {
 		mstch::map mustache_context {
 			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
-			{"base_uri", std::string(m_base_uri.data(), m_base_uri.size())}
+			{"base_uri", std::string(m_base_uri.data(), m_base_uri.size())},
+			{"languages", make_mstch_langmap()}
 		};
 
 		if (m_redis)
