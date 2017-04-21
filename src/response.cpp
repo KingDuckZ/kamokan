@@ -22,6 +22,7 @@
 #include "duckhandy/stringize.h"
 #include "pathname/pathname.hpp"
 #include "list_highlight_langs.hpp"
+#include "duckhandy/lexical_cast.hpp"
 #include <utility>
 #include <cassert>
 #include <fstream>
@@ -102,6 +103,7 @@ namespace tawashi {
 		m_resp_value(std::move(parValue)),
 		m_base_uri(parSettings["base_uri"]),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
+		m_redis_db(parSettings["redis_db"]),
 		m_website_root(make_root_path(parSettings)),
 		m_page_basename(std::move(parPageBaseName)),
 		m_resp_type(parRespType),
@@ -132,8 +134,13 @@ namespace tawashi {
 			{"languages", make_mstch_langmap()}
 		};
 
-		if (m_redis)
+		if (m_redis) {
 			m_redis->wait_for_connect();
+			auto batch = m_redis->make_batch();
+			batch.select(dhandy::lexical_cast<int>(m_redis_db));
+			batch.client_setname("tawashi_v" STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH));
+			batch.throw_if_failed();
+		}
 
 		this->on_process();
 		this->on_mustache_prepare(mustache_context);

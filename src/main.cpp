@@ -61,6 +61,7 @@ namespace {
 		parSettings.add_default("redis_port", "6379");
 		parSettings.add_default("redis_mode", "sock");
 		parSettings.add_default("redis_sock", "/tmp/redis.sock");
+		parSettings.add_default("redis_db", "0");
 		parSettings.add_default("base_uri", "http://127.0.0.1");
 		parSettings.add_default("website_root", "html");
 	}
