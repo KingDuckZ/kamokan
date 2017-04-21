@@ -28,7 +28,7 @@ find_library(SourceHighlight_LIBRARIES
 if(SourceHighlight_INCLUDE_DIR AND SourceHighlight_LIBRARIES AND Ncurses_LIBRARY)
 	set(SourceHighlight_FOUND ON)
 else(SourceHighlight_INCLUDE_DIR AND SourceHighlight_LIBRARIES AND Ncurses_LIBRARY)
-	find_library(SourceHighlight_LIBRARIES NAMES readline)
+	find_library(SourceHighlight_LIBRARIES NAMES source-highlight)
 	include(FindPackageHandleStandardArgs)
 	find_package_handle_standard_args(SourceHighlight DEFAULT_MSG SourceHighlight_INCLUDE_DIR SourceHighlight_LIBRARIES )
 	mark_as_advanced(SourceHighlight_INCLUDE_DIR SourceHighlight_LIBRARIES)
