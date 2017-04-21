@@ -6,4 +6,4 @@
 	url = https://github.com/aantron/better-enums
 [submodule "lib/mstch"]
 	path = lib/mstch
-	url = https://github.com/no1msd/mstch.git
+	url = https://github.com/KingDuckZ/mstch.git
