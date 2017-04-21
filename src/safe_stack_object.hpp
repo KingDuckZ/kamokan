@@ -38,7 +38,7 @@ namespace curry {
 		SafeStackObject& operator= (const SafeStackObject& parOther) = delete;
 
 		operator Kakoune::SafePtr<T>&();
-		safe_ptr& operator*();
+		T& operator*();
 		safe_ptr& operator->();
 
 	private:
@@ -85,8 +85,8 @@ namespace curry {
 	}
 
 	template <typename T>
-	auto SafeStackObject<T>::operator*() -> safe_ptr& {
-		return m_obj_ptr;
+	T& SafeStackObject<T>::operator*() {
+		return *m_obj_ptr;
 	}
 
 	template <typename T>
