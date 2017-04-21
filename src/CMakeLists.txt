@@ -26,6 +26,7 @@ add_executable(${PROJECT_NAME}
 	ini_file.cpp
 	pathname/pathname.cpp
 	response_factory.cpp
+	list_highlight_langs.cpp
 )
 
 configure_file(
