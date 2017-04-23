@@ -59,12 +59,12 @@ namespace tawashi {
 
 			if (parSettings["redis_mode"] == "inet") {
 				return IncRedis(
-					std::string(parSettings["redis_server"]),
+					parSettings.as_str("redis_server"),
 					dhandy::lexical_cast<uint16_t>(parSettings["redis_port"])
 				);
 			}
 			else if (parSettings["redis_mode"] == "sock") {
-				return IncRedis(std::string(parSettings["redis_sock"]));
+				return IncRedis(parSettings.as_str("redis_sock"));
 			}
 			else {
 				throw std::runtime_error("Unknown setting for \"redis_mode\", valid settings are \"inet\" or \"sock\"");
@@ -127,10 +127,9 @@ namespace tawashi {
 	}
 
 	void Response::send() {
-		auto& base_uri = this->base_uri();
 		mstch::map mustache_context {
 			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
-			{"base_uri", std::string(base_uri.data(), base_uri.size())},
+			{"base_uri", m_settings->as_str("base_uri")},
 			{"languages", make_mstch_langmap()}
 		};
 
@@ -184,7 +183,7 @@ namespace tawashi {
 	}
 
 	const boost::string_ref& Response::base_uri() const {
-		return (*m_settings)["base_uri"];
+		return m_settings->as_ref("base_uri");
 	}
 
 	const std::string& Response::page_basename() const {

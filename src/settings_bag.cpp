@@ -36,6 +36,15 @@ namespace tawashi {
 			return m_defaults.at(parIndex);
 	}
 
+	const boost::string_ref& SettingsBag::as_ref (boost::string_ref parIndex) const {
+		return (*this)[parIndex];
+	}
+
+	std::string SettingsBag::as_str (boost::string_ref parIndex) const {
+		auto& setting = (*this)[parIndex];
+		return std::string(setting.data(), setting.size());
+	}
+
 	void SettingsBag::add_default (boost::string_ref parKey, boost::string_ref parValue) {
 		assert(m_defaults.find(parKey) == m_defaults.end());
 		m_defaults[parKey] = parValue;
