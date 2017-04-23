@@ -43,7 +43,7 @@ namespace tawashi {
 		boost::optional<std::string> token = submit_to_redis(post_data_it->second);
 		if (token) {
 			std::ostringstream oss;
-			oss << "http://127.0.0.1:8080/" << *token;
+			oss << base_uri() << '/' << *token;
 			this->change_type(Response::Location, oss.str());
 		}
 	}
