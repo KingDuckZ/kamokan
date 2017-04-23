@@ -24,7 +24,7 @@
 namespace tawashi {
 	class SubmitPasteResponse : public Response {
 	public:
-		explicit SubmitPasteResponse (const SettingsBag& parSettings);
+		explicit SubmitPasteResponse (const Kakoune::SafePtr<SettingsBag>& parSettings);
 
 	private:
 		virtual void on_process() override;

@@ -27,7 +27,7 @@ namespace tawashi {
 		const char g_post_key[] = "pastie";
 	} //unnamed namespace
 
-	SubmitPasteResponse::SubmitPasteResponse (const SettingsBag& parSettings) :
+	SubmitPasteResponse::SubmitPasteResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
 		Response(Response::ContentType, "text/plain", "paste", parSettings, true)
 	{
 	}

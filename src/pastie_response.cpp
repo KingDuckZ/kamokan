@@ -17,13 +17,14 @@
 
 #include "pastie_response.hpp"
 #include "incredis/incredis.hpp"
+#include "settings_bag.hpp"
 #include <ciso646>
 #include <srchilite/sourcehighlight.h>
 #include <srchilite/langmap.h>
 #include <sstream>
 
 namespace tawashi {
-	PastieResponse::PastieResponse (const SettingsBag& parSettings) :
+	PastieResponse::PastieResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
 		Response(Response::ContentType, "text/html", "", parSettings, true),
 		m_plain_text(false)
 	{

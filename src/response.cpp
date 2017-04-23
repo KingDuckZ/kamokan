@@ -99,18 +99,17 @@ namespace tawashi {
 		}
 	} //unnamed namespace
 
-	Response::Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const SettingsBag& parSettings, bool parWantRedis) :
+	Response::Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const Kakoune::SafePtr<SettingsBag>& parSettings, bool parWantRedis) :
 		m_resp_value(std::move(parValue)),
-		m_base_uri(parSettings["base_uri"]),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
-		m_redis_db(parSettings["redis_db"]),
-		m_website_root(make_root_path(parSettings)),
+		m_settings(parSettings),
+		m_website_root(make_root_path(*parSettings)),
 		m_page_basename(std::move(parPageBaseName)),
 		m_resp_type(parRespType),
 		m_header_sent(false)
 	{
 		if (parWantRedis) {
-			m_redis = std::make_unique<redis::IncRedis>(make_incredis(parSettings));
+			m_redis = std::make_unique<redis::IncRedis>(make_incredis(*parSettings));
 			m_redis->connect();
 		}
 	}
@@ -128,16 +127,17 @@ namespace tawashi {
 	}
 
 	void Response::send() {
+		auto& base_uri = this->base_uri();
 		mstch::map mustache_context {
 			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
-			{"base_uri", std::string(m_base_uri.data(), m_base_uri.size())},
+			{"base_uri", std::string(base_uri.data(), base_uri.size())},
 			{"languages", make_mstch_langmap()}
 		};
 
 		if (m_redis) {
 			m_redis->wait_for_connect();
 			auto batch = m_redis->make_batch();
-			batch.select(dhandy::lexical_cast<int>(m_redis_db));
+			batch.select(dhandy::lexical_cast<int>((*m_settings)["redis_db"]));
 			batch.client_setname("tawashi_v" STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH));
 			batch.throw_if_failed();
 		}
@@ -184,7 +184,7 @@ namespace tawashi {
 	}
 
 	const boost::string_ref& Response::base_uri() const {
-		return m_base_uri;
+		return (*m_settings)["base_uri"];
 	}
 
 	const std::string& Response::page_basename() const {

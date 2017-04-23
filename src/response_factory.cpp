@@ -42,10 +42,10 @@ namespace tawashi {
 	std::unique_ptr<Response> ResponseFactory::make_response (const boost::string_ref& parName) {
 		auto maker_it = m_local_data->makers.find(std::string(parName.data(), parName.size()));
 		if (m_local_data->makers.end() != maker_it) {
-			return maker_it->second(*m_local_data->settings);
+			return maker_it->second(m_local_data->settings);
 		}
 		else if (m_local_data->jolly_maker) {
-			return m_local_data->jolly_maker(*m_local_data->settings);
+			return m_local_data->jolly_maker(m_local_data->settings);
 		}
 		else {
 			assert(false);

@@ -24,7 +24,7 @@
 namespace tawashi {
 	class PastieResponse : public Response {
 	public:
-		explicit PastieResponse (const SettingsBag& parSettings);
+		explicit PastieResponse (const Kakoune::SafePtr<SettingsBag>& parSettings);
 
 	private:
 		virtual void on_process() override;

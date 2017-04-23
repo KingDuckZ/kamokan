@@ -22,6 +22,7 @@
 #include <map>
 #include <boost/utility/string_ref.hpp>
 #include <functional>
+#include <string>
 
 namespace tawashi {
 	class SettingsBag : public Kakoune::SafeCountable {
@@ -38,4 +39,8 @@ namespace tawashi {
 		Kakoune::SafePtr<IniFile> m_ini;
 		const IniFile::KeyValueMapType* m_values;
 	};
+
+	inline std::string string_ref_to_string (const boost::string_ref& parIn) {
+		return std::string(parIn.data(), parIn.size());
+	}
 } //namespace tawashi

@@ -23,7 +23,7 @@
 namespace tawashi {
 	class IndexResponse : public Response {
 	public:
-		explicit IndexResponse (const SettingsBag& parSettings);
+		explicit IndexResponse (const Kakoune::SafePtr<SettingsBag>& parSettings);
 
 	private:
 	};

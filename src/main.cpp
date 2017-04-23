@@ -52,7 +52,7 @@ namespace {
 	}
 
 	template <typename T>
-	std::unique_ptr<tawashi::Response> make_response (const tawashi::SettingsBag& parSettings) {
+	std::unique_ptr<tawashi::Response> make_response (const Kakoune::SafePtr<tawashi::SettingsBag>& parSettings) {
 		return static_cast<std::unique_ptr<tawashi::Response>>(std::make_unique<T>(parSettings));
 	}
 

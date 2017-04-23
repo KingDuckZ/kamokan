@@ -19,7 +19,7 @@
 #include <boost/algorithm/string/replace.hpp>
 
 namespace tawashi {
-	IndexResponse::IndexResponse (const SettingsBag& parSettings) :
+	IndexResponse::IndexResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
 		Response(Response::ContentType, "text/html", "index", parSettings, false)
 	{
 	}

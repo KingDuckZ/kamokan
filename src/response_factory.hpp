@@ -26,7 +26,7 @@ namespace tawashi {
 
 	class ResponseFactory {
 	public:
-		typedef std::function<std::unique_ptr<Response>(const SettingsBag&)> ResponseMakerFunc;
+		typedef std::function<std::unique_ptr<Response>(const Kakoune::SafePtr<SettingsBag>&)> ResponseMakerFunc;
 
 		explicit ResponseFactory (const Kakoune::SafePtr<SettingsBag>& parSettings);
 		~ResponseFactory() noexcept;

@@ -19,6 +19,7 @@
 
 #include "cgi_env.hpp"
 #include "mstch/mstch.hpp"
+#include "kakoune/safe_ptr.hh"
 #include <string>
 #include <iostream>
 #include <boost/utility/string_ref.hpp>
@@ -43,7 +44,7 @@ namespace tawashi {
 			Location
 		};
 
-		Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const SettingsBag& parSettings, bool parWantRedis);
+		Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const Kakoune::SafePtr<SettingsBag>& parSettings, bool parWantRedis);
 		const cgi::Env& cgi_env() const;
 		void change_type (Types parRespType, std::string&& parValue);
 		const boost::string_ref& base_uri() const;
@@ -58,8 +59,7 @@ namespace tawashi {
 
 		cgi::Env m_cgi_env;
 		std::string m_resp_value;
-		boost::string_ref m_base_uri;
-		boost::string_ref m_redis_db;
+		Kakoune::SafePtr<SettingsBag> m_settings;
 		std::string m_website_root;
 		std::string m_page_basename;
 		Types m_resp_type;
