@@ -21,7 +21,8 @@
 #include <string>
 
 namespace tawashi {
+	class SettingsBag;
 	typedef std::vector<std::string> HighlightLangList;
 
-	HighlightLangList list_highlight_langs();
+	HighlightLangList list_highlight_langs (const SettingsBag& parSettings);
 } //namespace tawashi

@@ -31,6 +31,7 @@ namespace tawashi {
 		virtual void on_send (std::ostream& parStream) override;
 
 		std::string m_lang_file;
+		std::string m_langmap_dir;
 		bool m_plain_text;
 	};
 } //namespace tawashi

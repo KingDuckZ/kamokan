@@ -16,15 +16,15 @@
  */
 
 #include "list_highlight_langs.hpp"
+#include "settings_bag.hpp"
 #include <srchilite/langmap.h>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/iterator_range_core.hpp>
 
 namespace tawashi {
-	HighlightLangList list_highlight_langs() {
-		const char langmap_path[] = "/usr/share/source-highlight";
-		srchilite::LangMap lang_map(langmap_path, "lang.map");
+	HighlightLangList list_highlight_langs (const SettingsBag& parSettings) {
+		srchilite::LangMap lang_map(parSettings.as_str("langmap_dir"), "lang.map");
 		lang_map.open();
 
 		const auto lang_range = boost::make_iterator_range(lang_map.begin(), lang_map.end());

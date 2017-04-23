@@ -64,6 +64,7 @@ namespace {
 		parSettings.add_default("redis_db", "0");
 		parSettings.add_default("base_uri", "http://127.0.0.1");
 		parSettings.add_default("website_root", "html");
+		parSettings.add_default("langmap_dir", "/usr/share/source-highlight");
 	}
 } //unnamed namespace
 

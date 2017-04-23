@@ -26,6 +26,7 @@
 namespace tawashi {
 	PastieResponse::PastieResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
 		Response(Response::ContentType, "text/html", "", parSettings, true),
+		m_langmap_dir(parSettings->as_str("langmap_dir")),
 		m_plain_text(false)
 	{
 	}
@@ -37,7 +38,7 @@ namespace tawashi {
 			m_plain_text = true;
 		}
 		else {
-			srchilite::LangMap lang_map("/usr/share/source-highlight", "lang.map");
+			srchilite::LangMap lang_map(m_langmap_dir, "lang.map");
 			lang_map.open();
 			if (not cgi_env().query_string().empty())
 				m_lang_file = lang_map.getFileName(cgi_env().query_string());

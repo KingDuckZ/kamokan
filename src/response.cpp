@@ -89,10 +89,10 @@ namespace tawashi {
 			return boost::make_optional(buffer.str());
 		}
 
-		mstch::array make_mstch_langmap() {
+		mstch::array make_mstch_langmap (const SettingsBag& parSettings) {
 			mstch::array retval;
 
-			for (auto&& lang : list_highlight_langs()) {
+			for (auto&& lang : list_highlight_langs(parSettings)) {
 				retval.push_back(mstch::map{{"language_name", std::move(lang)}});
 			}
 			return retval;
@@ -130,7 +130,7 @@ namespace tawashi {
 		mstch::map mustache_context {
 			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
 			{"base_uri", m_settings->as_str("base_uri")},
-			{"languages", make_mstch_langmap()}
+			{"languages", make_mstch_langmap(*m_settings)}
 		};
 
 		if (m_redis) {
