@@ -16,7 +16,11 @@
  */
 
 #include "settings_bag.hpp"
+#include "duckhandy/lexical_cast.hpp"
+#include <ciso646>
 #include <cassert>
+#include <cstdint>
+#include <sstream>
 
 namespace tawashi {
 	SettingsBag::SettingsBag (const Kakoune::SafePtr<IniFile>& parIni) :
@@ -43,9 +47,38 @@ namespace tawashi {
 
 	template <>
 	std::string SettingsBag::as (boost::string_ref parIndex) const {
-		auto& setting = (*this)[parIndex];
+		auto& setting = this->at(parIndex);
 		return std::string(setting.data(), setting.size());
 	}
 
+	template <>
+	bool SettingsBag::as (boost::string_ref parIndex) const {
+		auto& setting = this->at(parIndex);
+		if (setting == "true" or setting == "yes" or setting == "1" or setting == "on") {
+			return true;
+		}
+		else if (setting == "false" or setting == "no" or setting == "0" or setting == "off") {
+			return false;
+		}
+		else {
+			std::ostringstream oss;
+			oss << "Bad conversion: can't convert \"" << setting << "\" to bool";
+			throw std::runtime_error(oss.str());
+		}
+	}
+
+	template <>
+	uint16_t SettingsBag::as (boost::string_ref parIndex) const {
+		return dhandy::lexical_cast<uint16_t>(this->at(parIndex));
+	}
+
+	template <>
+	int SettingsBag::as (boost::string_ref parIndex) const {
+		return dhandy::lexical_cast<int>(this->at(parIndex));
+	}
+
 	template std::string SettingsBag::as<std::string> (boost::string_ref parIndex) const;
+	template bool SettingsBag::as<bool> (boost::string_ref parIndex) const;
+	template uint16_t SettingsBag::as<uint16_t> (boost::string_ref parIndex) const;
+	template int SettingsBag::as<int> (boost::string_ref parIndex) const;
 } //namespace tawashi

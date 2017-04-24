@@ -22,7 +22,6 @@
 #include "duckhandy/stringize.h"
 #include "pathname/pathname.hpp"
 #include "list_highlight_langs.hpp"
-#include "duckhandy/lexical_cast.hpp"
 #include <utility>
 #include <cassert>
 #include <fstream>
@@ -60,7 +59,7 @@ namespace tawashi {
 			if (parSettings["redis_mode"] == "inet") {
 				return IncRedis(
 					parSettings.as<std::string>("redis_server"),
-					dhandy::lexical_cast<uint16_t>(parSettings["redis_port"])
+					parSettings.as<uint16_t>("redis_port")
 				);
 			}
 			else if (parSettings["redis_mode"] == "sock") {
@@ -136,7 +135,7 @@ namespace tawashi {
 		if (m_redis) {
 			m_redis->wait_for_connect();
 			auto batch = m_redis->make_batch();
-			batch.select(dhandy::lexical_cast<int>((*m_settings)["redis_db"]));
+			batch.select(m_settings->as<int>("redis_db"));
 			batch.client_setname("tawashi_v" STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH));
 			batch.throw_if_failed();
 		}
