@@ -21,12 +21,44 @@
 #include "num_to_token.hpp"
 #include "settings_bag.hpp"
 #include "curl_wrapper.hpp"
+#include "duckhandy/compatibility.h"
+#include "duckhandy/lexical_cast.hpp"
 #include <ciso646>
 #include <sstream>
+#include <stdexcept>
+#include <algorithm>
+#include <boost/lexical_cast.hpp>
 
 namespace tawashi {
 	namespace {
 		const char g_post_key[] = "pastie";
+		const char g_language_key[] = "lang";
+		const char g_duration_key[] = "ttl";
+
+		class MissingPostVarError : public std::runtime_error {
+		public:
+			MissingPostVarError (const std::string& parMsg) : std::runtime_error(parMsg) {}
+		};
+
+		template <std::size_t N>
+		inline boost::string_ref make_string_ref (const char (&parStr)[N]) a_always_inline;
+
+		template <std::size_t N>
+		boost::string_ref make_string_ref (const char (&parStr)[N]) {
+			static_assert(N > 0, "wat?");
+			return boost::string_ref(parStr, N - 1);
+		}
+
+		boost::string_ref get_value_from_post (const cgi::PostMapType& parPost, boost::string_ref parKey) {
+			std::string key(parKey.data(), parKey.size());
+			auto post_data_it = parPost.find(key);
+			if (parPost.end() == post_data_it) {
+				std::ostringstream oss;
+				oss << "can't find POST data field \"" << parKey << '"';
+				throw MissingPostVarError(oss.str());
+			}
+			return post_data_it->second;
+		}
 	} //unnamed namespace
 
 	SubmitPasteResponse::SubmitPasteResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
@@ -36,29 +68,44 @@ namespace tawashi {
 
 	void SubmitPasteResponse::on_process() {
 		auto post = cgi::read_post(cgi_env());
-		auto post_data_it = post.find(g_post_key);
-		if (post.end() == post_data_it) {
-			m_error_message = "can't find POST data";
+		boost::string_ref pastie;
+		boost::string_ref lang;
+		boost::string_ref duration;
+		try {
+			pastie = get_value_from_post(post, make_string_ref(g_post_key));
+		}
+		catch (const MissingPostVarError& e) {
+			m_error_message = e.what();
 			return;
+		}
+		try {
+			lang = get_value_from_post(post, make_string_ref(g_language_key));
+			duration = get_value_from_post(post, make_string_ref(g_duration_key));
+		}
+		catch (const MissingPostVarError&) {
 		}
 
 		const SettingsBag& settings = this->settings();
 		const auto max_sz = settings.as<uint32_t>("max_pastie_size");
-		boost::string_ref pastie(post_data_it->second);
-		if (post_data_it->second.size() < settings.as<uint32_t>("min_pastie_size"))
+		if (pastie.size() < settings.as<uint32_t>("min_pastie_size"))
 			return;
-		if (max_sz and post_data_it->second.size() > max_sz) {
+		if (max_sz and pastie.size() > max_sz) {
 			if (settings.as<bool>("truncate_long_pasties"))
 				pastie = pastie.substr(0, max_sz);
 			else
 				return;
 		}
 
+		//TODO: replace boost's lexical_cast with mine when I have some checks
+		//oven invalid inputs
+		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
 		CurlWrapper curl;
-		boost::optional<std::string> token = submit_to_redis(curl.escape(pastie));
+		boost::optional<std::string> token = submit_to_redis(curl.escape(pastie), duration_int, lang);
 		if (token) {
 			std::ostringstream oss;
 			oss << base_uri() << '/' << *token;
+			if (not lang.empty())
+				oss << '?' << lang;
 			this->change_type(Response::Location, oss.str());
 		}
 	}
@@ -69,7 +116,7 @@ namespace tawashi {
 			m_error_message << '\n';
 	}
 
-	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const std::string& parText) const {
+	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const std::string& parText, uint32_t parExpiry, const boost::string_ref& parLang) const {
 		auto& redis = this->redis();
 		if (not redis.is_connected())
 			return boost::optional<std::string>();
@@ -77,11 +124,15 @@ namespace tawashi {
 		const auto next_id = redis.incr("paste_counter");
 		const std::string token = num_to_token(next_id);
 		assert(not token.empty());
-		if (redis.set(token, parText)) {
-			return boost::make_optional(token);
+		if (redis.hmset(token,
+			"pastie", parText,
+			"max_ttl", dhandy::lexical_cast<std::string>(parExpiry),
+			"lang", parLang)
+		) {
+			if (redis.expire(token, parExpiry))
+				return boost::make_optional(token);
 		}
-		else {
-			return boost::optional<std::string>();
-		}
+
+		return boost::optional<std::string>();
 	}
 } //namespace tawashi

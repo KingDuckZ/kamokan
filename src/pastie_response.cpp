@@ -49,6 +49,7 @@ namespace tawashi {
 
 	void PastieResponse::on_send (std::ostream& parStream) {
 		using opt_string = redis::IncRedis::opt_string;
+		using opt_string_list = redis::IncRedis::opt_string_list;
 
 		if (cgi_env().path_info().empty()) {
 			return;
@@ -56,7 +57,9 @@ namespace tawashi {
 
 		auto token = boost::string_ref(cgi_env().path_info()).substr(1);
 		auto& redis = this->redis();
-		opt_string pastie = redis.get(token);
+		opt_string_list pastie_reply = redis.hmget(token, "pastie");
+		opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
+
 		if (not pastie) {
 			assert(false);
 		}
