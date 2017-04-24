@@ -20,6 +20,7 @@
 #include "cgi_post.hpp"
 #include "num_to_token.hpp"
 #include "settings_bag.hpp"
+#include "curl_wrapper.hpp"
 #include <ciso646>
 #include <sstream>
 
@@ -53,7 +54,8 @@ namespace tawashi {
 				return;
 		}
 
-		boost::optional<std::string> token = submit_to_redis(pastie);
+		CurlWrapper curl;
+		boost::optional<std::string> token = submit_to_redis(curl.escape(pastie));
 		if (token) {
 			std::ostringstream oss;
 			oss << base_uri() << '/' << *token;
@@ -67,7 +69,7 @@ namespace tawashi {
 			m_error_message << '\n';
 	}
 
-	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (boost::string_ref parText) const {
+	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const std::string& parText) const {
 		auto& redis = this->redis();
 		if (not redis.is_connected())
 			return boost::optional<std::string>();

@@ -32,8 +32,8 @@ namespace tawashi {
 		CurlWrapper (const CurlWrapper&) = delete;
 		~CurlWrapper() noexcept;
 
-		std::string url_escape (const boost::string_ref& parText) const;
-		std::string url_unescape (const boost::string_ref& parText) const;
+		std::string escape (const boost::string_ref& parText) const;
+		std::string unescape (const boost::string_ref& parText) const;
 
 	private:
 		CurlPtr m_curl;

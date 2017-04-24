@@ -89,7 +89,7 @@ namespace tawashi {
 
 		std::string new_value(parString.data(), parString.size());
 		std::replace(new_value.begin(), new_value.end(), '+', ' ');
-		return parCurl.url_unescape(new_value);
+		return parCurl.unescape(new_value);
 	}
 
 	CurlWrapper::CurlWrapper() :
@@ -100,12 +100,12 @@ namespace tawashi {
 
 	CurlWrapper::~CurlWrapper() noexcept = default;
 
-	std::string CurlWrapper::url_escape (const boost::string_ref& parText) const {
+	std::string CurlWrapper::escape (const boost::string_ref& parText) const {
 		const CurlBufferPointer buff(curl_easy_escape(m_curl.get(), parText.data(), parText.size()));
 		return std::string(buff.get());
 	}
 
-	std::string CurlWrapper::url_unescape (const boost::string_ref& parText) const {
+	std::string CurlWrapper::unescape (const boost::string_ref& parText) const {
 		int outLen;
 		const CurlBufferPointer buff(curl_easy_unescape(m_curl.get(), parText.data(), parText.size(), &outLen));
 		return std::string(buff.get(), outLen);
