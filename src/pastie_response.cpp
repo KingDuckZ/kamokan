@@ -66,7 +66,7 @@ namespace tawashi {
 		}
 		else {
 			srchilite::SourceHighlight highlighter;
-			highlighter.setDataDir("/usr/share/source-highlight");
+			highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
 			highlighter.setGenerateEntireDoc(false);
 			highlighter.setGenerateLineNumbers(true);
 			const auto lang = m_lang_file;
