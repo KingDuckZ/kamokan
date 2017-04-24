@@ -65,6 +65,9 @@ namespace {
 		parSettings.add_default("base_uri", "http://127.0.0.1");
 		parSettings.add_default("website_root", "");
 		parSettings.add_default("langmap_dir", "/usr/share/source-highlight");
+		parSettings.add_default("min_pastie_size", "10");
+		parSettings.add_default("max_pastie_size", "10000");
+		parSettings.add_default("truncate_long_pasties", "false");
 	}
 } //unnamed namespace
 

@@ -19,6 +19,7 @@
 #include "incredis/incredis.hpp"
 #include "cgi_post.hpp"
 #include "num_to_token.hpp"
+#include "settings_bag.hpp"
 #include <ciso646>
 #include <sstream>
 
@@ -40,7 +41,19 @@ namespace tawashi {
 			return;
 		}
 
-		boost::optional<std::string> token = submit_to_redis(post_data_it->second);
+		const SettingsBag& settings = this->settings();
+		const auto max_sz = settings.as<uint32_t>("max_pastie_size");
+		boost::string_ref pastie(post_data_it->second);
+		if (post_data_it->second.size() < settings.as<uint32_t>("min_pastie_size"))
+			return;
+		if (max_sz and post_data_it->second.size() > max_sz) {
+			if (settings.as<bool>("truncate_long_pasties"))
+				pastie = pastie.substr(0, max_sz);
+			else
+				return;
+		}
+
+		boost::optional<std::string> token = submit_to_redis(pastie);
 		if (token) {
 			std::ostringstream oss;
 			oss << base_uri() << '/' << *token;
@@ -54,7 +67,7 @@ namespace tawashi {
 			m_error_message << '\n';
 	}
 
-	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const std::string& parText) const {
+	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (boost::string_ref parText) const {
 		auto& redis = this->redis();
 		if (not redis.is_connected())
 			return boost::optional<std::string>();

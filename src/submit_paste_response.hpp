@@ -20,6 +20,7 @@
 #include "response.hpp"
 #include <string>
 #include <boost/optional.hpp>
+#include <boost/utility/string_ref.hpp>
 
 namespace tawashi {
 	class SubmitPasteResponse : public Response {
@@ -29,7 +30,7 @@ namespace tawashi {
 	private:
 		virtual void on_process() override;
 		virtual void on_send (std::ostream& parStream) override;
-		boost::optional<std::string> submit_to_redis (const std::string& parText) const;
+		boost::optional<std::string> submit_to_redis (boost::string_ref parText) const;
 
 		std::string m_error_message;
 	};

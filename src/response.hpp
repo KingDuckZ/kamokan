@@ -51,6 +51,7 @@ namespace tawashi {
 		const std::string& page_basename() const;
 		std::string load_mustache() const;
 		redis::IncRedis& redis() const;
+		const SettingsBag& settings() const;
 
 	private:
 		virtual void on_process();

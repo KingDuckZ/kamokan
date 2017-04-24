@@ -73,12 +73,12 @@ namespace tawashi {
 	}
 
 	template <>
-	int SettingsBag::as (boost::string_ref parIndex) const {
-		return dhandy::lexical_cast<int>(this->at(parIndex));
+	uint32_t SettingsBag::as (boost::string_ref parIndex) const {
+		return dhandy::lexical_cast<uint32_t>(this->at(parIndex));
 	}
 
 	template std::string SettingsBag::as<std::string> (boost::string_ref parIndex) const;
 	template bool SettingsBag::as<bool> (boost::string_ref parIndex) const;
 	template uint16_t SettingsBag::as<uint16_t> (boost::string_ref parIndex) const;
-	template int SettingsBag::as<int> (boost::string_ref parIndex) const;
+	template uint32_t SettingsBag::as<uint32_t> (boost::string_ref parIndex) const;
 } //namespace tawashi

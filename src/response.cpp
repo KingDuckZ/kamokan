@@ -28,6 +28,7 @@
 #include <sstream>
 #include <functional>
 #include <boost/optional.hpp>
+#include <cstdint>
 
 namespace tawashi {
 	namespace {
@@ -135,7 +136,7 @@ namespace tawashi {
 		if (m_redis) {
 			m_redis->wait_for_connect();
 			auto batch = m_redis->make_batch();
-			batch.select(m_settings->as<int>("redis_db"));
+			batch.select(m_settings->as<uint32_t>("redis_db"));
 			batch.client_setname("tawashi_v" STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH));
 			batch.throw_if_failed();
 		}
@@ -197,5 +198,10 @@ namespace tawashi {
 	redis::IncRedis& Response::redis() const {
 		assert(m_redis);
 		return *m_redis;
+	}
+
+	const SettingsBag& Response::settings() const {
+		assert(m_settings);
+		return *m_settings;
 	}
 } //namespace tawashi
