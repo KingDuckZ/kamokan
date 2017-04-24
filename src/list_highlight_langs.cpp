@@ -24,7 +24,7 @@
 
 namespace tawashi {
 	HighlightLangList list_highlight_langs (const SettingsBag& parSettings) {
-		srchilite::LangMap lang_map(parSettings.as_str("langmap_dir"), "lang.map");
+		srchilite::LangMap lang_map(parSettings.as<std::string>("langmap_dir"), "lang.map");
 		lang_map.open();
 
 		const auto lang_range = boost::make_iterator_range(lang_map.begin(), lang_map.end());

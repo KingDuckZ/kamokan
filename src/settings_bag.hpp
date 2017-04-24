@@ -32,8 +32,8 @@ namespace tawashi {
 		~SettingsBag() noexcept;
 
 		const boost::string_ref& operator[] (boost::string_ref parIndex) const;
-		const boost::string_ref& as_ref (boost::string_ref parIndex) const;
-		std::string as_str (boost::string_ref parIndex) const;
+		const boost::string_ref& at (boost::string_ref parIndex) const;
+		template <typename T> T as (boost::string_ref parIndex) const;
 		void add_default (boost::string_ref parKey, boost::string_ref parValue);
 
 	private:
@@ -41,4 +41,13 @@ namespace tawashi {
 		Kakoune::SafePtr<IniFile> m_ini;
 		const IniFile::KeyValueMapType* m_values;
 	};
+
+	template <>
+	inline boost::string_ref SettingsBag::as (boost::string_ref parIndex) const {
+		return (*this)[parIndex];
+	}
+
+	inline const boost::string_ref& SettingsBag::at (boost::string_ref parIndex) const {
+		return (*this)[parIndex];
+	}
 } //namespace tawashi
