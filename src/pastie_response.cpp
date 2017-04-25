@@ -18,7 +18,6 @@
 #include "pastie_response.hpp"
 #include "incredis/incredis.hpp"
 #include "settings_bag.hpp"
-#include "escapist.hpp"
 #include <ciso646>
 #include <srchilite/sourcehighlight.h>
 #include <srchilite/langmap.h>
@@ -26,7 +25,7 @@
 
 namespace tawashi {
 	PastieResponse::PastieResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
-		Response(Response::ContentType, "text/html", "", parSettings, true),
+		Response(Response::ContentType, "text/html", "text", parSettings, true),
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false)
 	{
@@ -48,6 +47,34 @@ namespace tawashi {
 		}
 	}
 
+	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
+		using opt_string = redis::IncRedis::opt_string;
+		using opt_string_list = redis::IncRedis::opt_string_list;
+
+		if (not m_plain_text) {
+			call_on_send(false);
+
+			auto token = boost::string_ref(cgi_env().path_info()).substr(1);
+			auto& redis = this->redis();
+			opt_string_list pastie_reply = redis.hmget(token, "pastie");
+			opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
+
+			srchilite::SourceHighlight highlighter;
+			highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
+			highlighter.setGenerateEntireDoc(false);
+			highlighter.setGenerateLineNumbers(true);
+			const auto lang = m_lang_file;
+			//Escapist houdini;
+			//std::istringstream iss(houdini.escape_html(*pastie));
+			std::istringstream iss(*pastie);
+
+			std::ostringstream oss;
+			highlighter.highlight(iss, oss, lang);
+
+			parContext["pastie"] = oss.str();
+		}
+	}
+
 	void PastieResponse::on_send (std::ostream& parStream) {
 		using opt_string = redis::IncRedis::opt_string;
 		using opt_string_list = redis::IncRedis::opt_string_list;
@@ -55,6 +82,8 @@ namespace tawashi {
 		if (cgi_env().path_info().empty()) {
 			return;
 		}
+
+		assert(m_plain_text);
 
 		auto token = boost::string_ref(cgi_env().path_info()).substr(1);
 		auto& redis = this->redis();
@@ -65,19 +94,6 @@ namespace tawashi {
 			assert(false);
 		}
 
-		if (m_plain_text) {
-			parStream << *pastie;
-		}
-		else {
-			srchilite::SourceHighlight highlighter;
-			highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
-			highlighter.setGenerateEntireDoc(false);
-			highlighter.setGenerateLineNumbers(true);
-			const auto lang = m_lang_file;
-			Escapist houdini;
-			std::istringstream iss(houdini.escape_html(*pastie));
-
-			highlighter.highlight(iss, parStream, lang);
-		}
+		parStream << *pastie;
 	}
 } //namespace tawashi

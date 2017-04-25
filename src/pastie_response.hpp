@@ -29,6 +29,7 @@ namespace tawashi {
 	private:
 		virtual void on_process() override;
 		virtual void on_send (std::ostream& parStream) override;
+		virtual void on_mustache_prepare (mstch::map& parContext) override;
 
 		std::string m_lang_file;
 		std::string m_langmap_dir;

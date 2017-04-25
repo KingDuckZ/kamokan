@@ -52,6 +52,7 @@ namespace tawashi {
 		std::string load_mustache() const;
 		redis::IncRedis& redis() const;
 		const SettingsBag& settings() const;
+		void call_on_send (bool parCall);
 
 	private:
 		virtual void on_process();
@@ -66,5 +67,6 @@ namespace tawashi {
 		Types m_resp_type;
 		std::unique_ptr<redis::IncRedis> m_redis;
 		bool m_header_sent;
+		bool m_call_derived_on_send;
 	};
 } //namespace tawashi

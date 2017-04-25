@@ -97,6 +97,10 @@ namespace tawashi {
 			}
 			return retval;
 		}
+
+		std::string disable_mstch_escaping (const std::string& parStr) {
+			return parStr;
+		};
 	} //unnamed namespace
 
 	Response::Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const Kakoune::SafePtr<SettingsBag>& parSettings, bool parWantRedis) :
@@ -106,12 +110,15 @@ namespace tawashi {
 		m_website_root(make_root_path(*parSettings)),
 		m_page_basename(std::move(parPageBaseName)),
 		m_resp_type(parRespType),
-		m_header_sent(false)
+		m_header_sent(false),
+		m_call_derived_on_send(true)
 	{
 		if (parWantRedis) {
 			m_redis = std::make_unique<redis::IncRedis>(make_incredis(*parSettings));
 			m_redis->connect();
 		}
+
+		mstch::config::escape = &disable_mstch_escaping;
 	}
 
 	Response::~Response() noexcept = default;
@@ -155,8 +162,13 @@ namespace tawashi {
 		}
 
 		std::ostringstream stream_out;
-		if (ContentType == m_resp_type)
-			this->on_send(stream_out);
+		if (ContentType == m_resp_type) {
+			if (m_call_derived_on_send)
+				this->on_send(stream_out);
+			else
+				Response::on_send(stream_out);
+		}
+
 		std::cout << mstch::render(
 			stream_out.str(),
 			mustache_context,
@@ -203,5 +215,9 @@ namespace tawashi {
 	const SettingsBag& Response::settings() const {
 		assert(m_settings);
 		return *m_settings;
+	}
+
+	void Response::call_on_send (bool parCall) {
+		m_call_derived_on_send = parCall;
 	}
 } //namespace tawashi
