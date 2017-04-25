@@ -96,7 +96,7 @@ namespace tawashi {
 		}
 
 		//TODO: replace boost's lexical_cast with mine when I have some checks
-		//oven invalid inputs
+		//over invalid inputs
 		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
 		boost::optional<std::string> token = submit_to_redis(pastie, duration_int, lang);
 		if (token) {
