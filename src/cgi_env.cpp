@@ -165,7 +165,7 @@ namespace cgi {
 		const auto urlencoded_values = split_env_vars(m_cgi_env[CGIVars::QUERY_STRING]);
 		retval.reserve(urlencoded_values.size());
 		for (auto& itm : urlencoded_values) {
-			retval[unescape_string(m_curl, itm.first)] = unescape_string(m_curl, itm.second);
+			retval[m_houdini.unescape_url(itm.first)] = m_houdini.unescape_url(itm.second);
 		}
 		return retval;
 	}

@@ -1,7 +1,6 @@
 project(tawashi VERSION 0.1.1 LANGUAGES CXX)
 
 find_package(Boost 1.53.0 REQUIRED COMPONENTS program_options filesystem system)
-find_package(CURL REQUIRED)
 find_package(SourceHighlight REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -20,7 +19,7 @@ add_executable(${PROJECT_NAME}
 	cgi_env.cpp
 	num_to_token.cpp
 	cgi_post.cpp
-	curl_wrapper.cpp
+	escapist.cpp
 	index_response.cpp
 	pastie_response.cpp
 	ini_file.cpp
@@ -43,13 +42,11 @@ target_include_directories(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} SYSTEM
 	PRIVATE ${Boost_INCLUDE_DIRS}
 	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/better-enums
-	PRIVATE ${CURL_INCLUDE_DIR}
 	PRIVATE ${SourceHighlight_INCLUDE_DIR}
 )
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE ${Boost_LIBRARIES}
 	PRIVATE incredis
-	PRIVATE ${CURL_LIBRARIES}
 	PRIVATE ${SourceHighlight_LIBRARIES}
 	PRIVATE mstch
 	PRIVATE houdini

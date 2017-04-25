@@ -19,7 +19,7 @@
 
 #include "split_get_vars.hpp"
 #include "duckhandy/compatibility.h"
-#include "curl_wrapper.hpp"
+#include "escapist.hpp"
 #include <vector>
 #include <string>
 #include <boost/utility/string_ref.hpp>
@@ -67,7 +67,7 @@ namespace tawashi {
 
 		private:
 			std::vector<std::string> m_cgi_env;
-			CurlWrapper m_curl;
+			Escapist m_houdini;
 		};
 	} //namespace cgi
 } //namespace tawashi

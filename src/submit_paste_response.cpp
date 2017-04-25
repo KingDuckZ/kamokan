@@ -20,7 +20,6 @@
 #include "cgi_post.hpp"
 #include "num_to_token.hpp"
 #include "settings_bag.hpp"
-#include "curl_wrapper.hpp"
 #include "duckhandy/compatibility.h"
 #include "duckhandy/lexical_cast.hpp"
 #include <ciso646>
@@ -99,8 +98,7 @@ namespace tawashi {
 		//TODO: replace boost's lexical_cast with mine when I have some checks
 		//oven invalid inputs
 		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
-		CurlWrapper curl;
-		boost::optional<std::string> token = submit_to_redis(curl.escape(pastie), duration_int, lang);
+		boost::optional<std::string> token = submit_to_redis(pastie, duration_int, lang);
 		if (token) {
 			std::ostringstream oss;
 			oss << base_uri() << '/' << *token;
@@ -116,7 +114,7 @@ namespace tawashi {
 			m_error_message << '\n';
 	}
 
-	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const std::string& parText, uint32_t parExpiry, const boost::string_ref& parLang) const {
+	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang) const {
 		auto& redis = this->redis();
 		if (not redis.is_connected())
 			return boost::optional<std::string>();

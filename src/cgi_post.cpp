@@ -18,7 +18,7 @@
 #include "cgi_post.hpp"
 #include "cgi_env.hpp"
 #include "split_get_vars.hpp"
-#include "curl_wrapper.hpp"
+#include "escapist.hpp"
 #include <iostream>
 #include <iterator>
 #include <algorithm>
@@ -49,9 +49,11 @@ namespace tawashi {
 						std::back_inserter(original_data)
 					);
 
-					CurlWrapper curl;
+					Escapist houdini;
 					for (auto& itm : split_env_vars(original_data)) {
-						map[unescape_string(curl, itm.first)] = unescape_string(curl, itm.second);
+						std::string key(houdini.unescape_url(itm.first));
+						std::string val(houdini.unescape_url(itm.second));
+						map[std::move(key)] = std::move(val);
 					}
 				}
 

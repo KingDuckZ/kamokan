@@ -17,21 +17,30 @@
 
 #pragma once
 
-#include "response.hpp"
-#include <string>
-#include <boost/optional.hpp>
 #include <boost/utility/string_ref.hpp>
+#include <string>
+#include <memory>
 
 namespace tawashi {
-	class SubmitPasteResponse : public Response {
+	namespace implem {
+		//not actually used, only needed to get the size of the actual gh_buf
+		//without including its full header file
+		struct DummyGHBuf{
+			char *ptr;
+			size_t asize, size;
+		};
+	} //namespace implem
+
+	class Escapist {
 	public:
-		explicit SubmitPasteResponse (const Kakoune::SafePtr<SettingsBag>& parSettings);
+		Escapist();
+		~Escapist() noexcept;
+
+		std::string unescape_url (const boost::string_ref& parURL) const;
+		std::string escape_html (const boost::string_ref& parHtml) const;
 
 	private:
-		virtual void on_process() override;
-		virtual void on_send (std::ostream& parStream) override;
-		boost::optional<std::string> submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang) const;
-
-		std::string m_error_message;
+		std::aligned_storage<sizeof(implem::DummyGHBuf), alignof(implem::DummyGHBuf)>::type m_gh_buf_mem;
+		void* m_gh_buf;
 	};
 } //namespace tawashi
