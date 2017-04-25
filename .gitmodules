@@ -7,3 +7,6 @@
 [submodule "lib/mstch"]
 	path = lib/mstch
 	url = https://github.com/KingDuckZ/mstch.git
+[submodule "lib/houdini/houdini"]
+	path = lib/houdini/houdini
+	url = https://github.com/vmg/houdini.git

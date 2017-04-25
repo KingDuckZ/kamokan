@@ -52,6 +52,7 @@ target_link_libraries(${PROJECT_NAME}
 	PRIVATE ${CURL_LIBRARIES}
 	PRIVATE ${SourceHighlight_LIBRARIES}
 	PRIVATE mstch
+	PRIVATE houdini
 )
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1
