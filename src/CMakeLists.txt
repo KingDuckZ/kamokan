@@ -1,4 +1,4 @@
-project(tawashi VERSION 0.1.1 LANGUAGES CXX)
+project(tawashi VERSION 0.1.2 LANGUAGES CXX)
 
 find_package(Boost 1.53.0 REQUIRED COMPONENTS program_options filesystem system)
 find_package(SourceHighlight REQUIRED)
