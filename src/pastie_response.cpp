@@ -18,6 +18,7 @@
 #include "pastie_response.hpp"
 #include "incredis/incredis.hpp"
 #include "settings_bag.hpp"
+#include "escapist.hpp"
 #include <ciso646>
 #include <srchilite/sourcehighlight.h>
 #include <srchilite/langmap.h>
@@ -73,7 +74,8 @@ namespace tawashi {
 			highlighter.setGenerateEntireDoc(false);
 			highlighter.setGenerateLineNumbers(true);
 			const auto lang = m_lang_file;
-			std::istringstream iss(*pastie);
+			Escapist houdini;
+			std::istringstream iss(houdini.escape_html(*pastie));
 
 			highlighter.highlight(iss, parStream, lang);
 		}
