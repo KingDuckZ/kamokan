@@ -110,8 +110,7 @@ namespace tawashi {
 		m_website_root(make_root_path(*parSettings)),
 		m_page_basename(std::move(parPageBaseName)),
 		m_resp_type(parRespType),
-		m_header_sent(false),
-		m_call_derived_on_send(true)
+		m_header_sent(false)
 	{
 		if (parWantRedis) {
 			m_redis = std::make_unique<redis::IncRedis>(make_incredis(*parSettings));
@@ -124,10 +123,6 @@ namespace tawashi {
 	Response::~Response() noexcept = default;
 
 	void Response::on_process() {
-	}
-
-	void Response::on_send (std::ostream& parStream) {
-		parStream << load_mustache();
 	}
 
 	void Response::on_mustache_prepare (mstch::map&) {
@@ -161,16 +156,8 @@ namespace tawashi {
 			break;
 		}
 
-		std::ostringstream stream_out;
-		if (ContentType == m_resp_type) {
-			if (m_call_derived_on_send)
-				this->on_send(stream_out);
-			else
-				Response::on_send(stream_out);
-		}
-
 		std::cout << mstch::render(
-			stream_out.str(),
+			on_mustache_retrieve(),
 			mustache_context,
 			std::bind(
 				&load_whole_file,
@@ -181,6 +168,10 @@ namespace tawashi {
 			)
 		);
 		std::cout.flush();
+	}
+
+	std::string Response::on_mustache_retrieve() {
+		return load_mustache();
 	}
 
 	const cgi::Env& Response::cgi_env() const {
@@ -215,9 +206,5 @@ namespace tawashi {
 	const SettingsBag& Response::settings() const {
 		assert(m_settings);
 		return *m_settings;
-	}
-
-	void Response::call_on_send (bool parCall) {
-		m_call_derived_on_send = parCall;
 	}
 } //namespace tawashi

@@ -51,49 +51,34 @@ namespace tawashi {
 		using opt_string = redis::IncRedis::opt_string;
 		using opt_string_list = redis::IncRedis::opt_string_list;
 
-		if (not m_plain_text) {
-			call_on_send(false);
-
-			auto token = boost::string_ref(cgi_env().path_info()).substr(1);
-			auto& redis = this->redis();
-			opt_string_list pastie_reply = redis.hmget(token, "pastie");
-			opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
-
-			srchilite::SourceHighlight highlighter;
-			highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
-			highlighter.setGenerateEntireDoc(false);
-			highlighter.setGenerateLineNumbers(true);
-			const auto lang = m_lang_file;
-			//Escapist houdini;
-			//std::istringstream iss(houdini.escape_html(*pastie));
-			std::istringstream iss(*pastie);
-
-			std::ostringstream oss;
-			highlighter.highlight(iss, oss, lang);
-
-			parContext["pastie"] = oss.str();
-		}
-	}
-
-	void PastieResponse::on_send (std::ostream& parStream) {
-		using opt_string = redis::IncRedis::opt_string;
-		using opt_string_list = redis::IncRedis::opt_string_list;
-
-		if (cgi_env().path_info().empty()) {
-			return;
-		}
-
-		assert(m_plain_text);
-
 		auto token = boost::string_ref(cgi_env().path_info()).substr(1);
 		auto& redis = this->redis();
 		opt_string_list pastie_reply = redis.hmget(token, "pastie");
 		opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
 
-		if (not pastie) {
-			assert(false);
-		}
+		srchilite::SourceHighlight highlighter;
+		highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
+		highlighter.setGenerateEntireDoc(false);
+		highlighter.setGenerateLineNumbers(true);
+		const auto lang = m_lang_file;
+		//Escapist houdini;
+		//std::istringstream iss(houdini.escape_html(*pastie));
 
-		parStream << *pastie;
+		if (m_plain_text) {
+			parContext["pastie"] = *pastie;
+		}
+		else {
+			std::istringstream iss(*pastie);
+			std::ostringstream oss;
+			highlighter.highlight(iss, oss, lang);
+			parContext["pastie"] = oss.str();
+		}
+	}
+
+	std::string PastieResponse::on_mustache_retrieve() {
+		if (m_plain_text)
+			return "{{pastie}}";
+		else
+			return load_mustache();
 	}
 } //namespace tawashi

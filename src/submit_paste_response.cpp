@@ -108,12 +108,6 @@ namespace tawashi {
 		}
 	}
 
-	void SubmitPasteResponse::on_send (std::ostream& parStream) {
-		assert(not m_error_message.empty());
-		parStream << "something happened? :/\n" <<
-			m_error_message << '\n';
-	}
-
 	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang) const {
 		auto& redis = this->redis();
 		if (not redis.is_connected())

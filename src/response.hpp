@@ -49,15 +49,14 @@ namespace tawashi {
 		void change_type (Types parRespType, std::string&& parValue);
 		const boost::string_ref& base_uri() const;
 		const std::string& page_basename() const;
-		std::string load_mustache() const;
 		redis::IncRedis& redis() const;
 		const SettingsBag& settings() const;
-		void call_on_send (bool parCall);
+		virtual std::string load_mustache() const;
 
 	private:
 		virtual void on_process();
-		virtual void on_send (std::ostream& parStream);
 		virtual void on_mustache_prepare (mstch::map& parContext);
+		virtual std::string on_mustache_retrieve();
 
 		cgi::Env m_cgi_env;
 		std::string m_resp_value;
@@ -67,6 +66,5 @@ namespace tawashi {
 		Types m_resp_type;
 		std::unique_ptr<redis::IncRedis> m_redis;
 		bool m_header_sent;
-		bool m_call_derived_on_send;
 	};
 } //namespace tawashi

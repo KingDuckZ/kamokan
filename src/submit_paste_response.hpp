@@ -29,7 +29,6 @@ namespace tawashi {
 
 	private:
 		virtual void on_process() override;
-		virtual void on_send (std::ostream& parStream) override;
 		boost::optional<std::string> submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang) const;
 
 		std::string m_error_message;
