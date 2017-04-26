@@ -60,6 +60,11 @@ target_compile_options(${PROJECT_NAME}
 	PRIVATE -fdiagnostics-color=always
 )
 
+set_target_properties(
+	${PROJECT_NAME}
+	PROPERTIES SUFFIX .cgi
+)
+
 install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION lib
 	RUNTIME DESTINATION bin
