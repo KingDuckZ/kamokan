@@ -27,6 +27,7 @@ add_executable(${PROJECT_NAME}
 	response_factory.cpp
 	list_highlight_langs.cpp
 	settings_bag.cpp
+	sanitized_utf8.cpp
 )
 
 configure_file(

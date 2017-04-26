@@ -19,6 +19,7 @@
 #include "cgi_env.hpp"
 #include "split_get_vars.hpp"
 #include "escapist.hpp"
+#include "sanitized_utf8.hpp"
 #include <iostream>
 #include <iterator>
 #include <algorithm>
@@ -48,6 +49,7 @@ namespace tawashi {
 						input_len,
 						std::back_inserter(original_data)
 					);
+					original_data = sanitized_utf8(original_data);
 
 					Escapist houdini;
 					for (auto& itm : split_env_vars(original_data)) {
