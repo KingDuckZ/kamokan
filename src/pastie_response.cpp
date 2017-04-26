@@ -34,7 +34,7 @@ namespace tawashi {
 	void PastieResponse::on_process() {
 		auto env = cgi_env().query_string_split();
 		if (env["m"] == "plain" or cgi_env().query_string().empty()) {
-			this->change_type(Response::ContentType, "text/plain");
+			this->change_type(Response::ContentType, "text/plain; charset=utf-8");
 			m_plain_text = true;
 		}
 		else {
