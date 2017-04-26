@@ -43,6 +43,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM
 	PRIVATE ${Boost_INCLUDE_DIRS}
 	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/better-enums
 	PRIVATE ${SourceHighlight_INCLUDE_DIR}
+	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/utf8_v2_3_4/source
 )
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE ${Boost_LIBRARIES}
