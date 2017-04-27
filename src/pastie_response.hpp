@@ -34,5 +34,6 @@ namespace tawashi {
 		std::string m_lang_file;
 		std::string m_langmap_dir;
 		bool m_plain_text;
+		bool m_syntax_highlight;
 	};
 } //namespace tawashi

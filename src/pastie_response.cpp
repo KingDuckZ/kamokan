@@ -18,30 +18,40 @@
 #include "pastie_response.hpp"
 #include "incredis/incredis.hpp"
 #include "settings_bag.hpp"
+#include "escapist.hpp"
 #include <ciso646>
 #include <srchilite/sourcehighlight.h>
 #include <srchilite/langmap.h>
 #include <sstream>
 
 namespace tawashi {
+	namespace {
+		const char g_nolang_token[] = "plaintext";
+	} //unnamed namespace
+
 	PastieResponse::PastieResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
 		Response(Response::ContentType, "text/html", "text", parSettings, true),
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
-		m_plain_text(false)
+		m_plain_text(false),
+		m_syntax_highlight(true)
 	{
 	}
 
 	void PastieResponse::on_process() {
 		auto env = cgi_env().query_string_split();
-		if (env["m"] == "plain" or cgi_env().query_string().empty()) {
+		const std::string& query_str(cgi_env().query_string());
+		if (env["m"] == "plain" or query_str.empty()) {
 			this->change_type(Response::ContentType, "text/plain; charset=utf-8");
 			m_plain_text = true;
+		}
+		else if (query_str == g_nolang_token) {
+			m_syntax_highlight = false;
 		}
 		else {
 			srchilite::LangMap lang_map(m_langmap_dir, "lang.map");
 			lang_map.open();
-			if (not cgi_env().query_string().empty())
-				m_lang_file = lang_map.getFileName(cgi_env().query_string());
+			if (not query_str.empty())
+				m_lang_file = lang_map.getFileName(query_str);
 			else
 				m_lang_file = "default.lang";
 		}
@@ -61,18 +71,24 @@ namespace tawashi {
 		highlighter.setGenerateEntireDoc(false);
 		highlighter.setGenerateLineNumbers(true);
 		const auto lang = m_lang_file;
-		//Escapist houdini;
-		//std::istringstream iss(houdini.escape_html(*pastie));
 
-		if (m_plain_text) {
-			parContext["pastie"] = *pastie;
+		std::string processed_pastie;
+		if (m_syntax_highlight) {
+			processed_pastie = std::move(*pastie);
 		}
 		else {
-			std::istringstream iss(*pastie);
+			Escapist houdini;
+			processed_pastie = houdini.escape_html(*pastie);
+		}
+
+		if (not m_plain_text and m_syntax_highlight) {
+			std::istringstream iss(std::move(processed_pastie));
 			std::ostringstream oss;
 			highlighter.highlight(iss, oss, lang);
-			parContext["pastie"] = oss.str();
+			processed_pastie = oss.str();
 		}
+
+		parContext["pastie"] = std::move(processed_pastie);
 	}
 
 	std::string PastieResponse::on_mustache_retrieve() {
