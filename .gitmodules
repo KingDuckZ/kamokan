@@ -10,3 +10,6 @@
 [submodule "lib/houdini/houdini"]
 	path = lib/houdini/houdini
 	url = https://github.com/vmg/houdini.git
+[submodule "lib/spdlog"]
+	path = lib/spdlog
+	url = https://github.com/gabime/spdlog.git

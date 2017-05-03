@@ -45,6 +45,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM
 	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/better-enums
 	PRIVATE ${SourceHighlight_INCLUDE_DIR}
 	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/utf8_v2_3_4/source
+	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/spdlog/include
 )
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE ${Boost_LIBRARIES}
@@ -52,6 +53,7 @@ target_link_libraries(${PROJECT_NAME}
 	PRIVATE ${SourceHighlight_LIBRARIES}
 	PRIVATE mstch
 	PRIVATE houdini
+	PRIVATE pthread
 )
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1

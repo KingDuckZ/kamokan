@@ -26,7 +26,7 @@
 #include "pathname/pathname.hpp"
 #include "duckhandy/compatibility.h"
 #include "settings_bag.hpp"
-#include <iostream>
+#include <spdlog/spdlog.h>
 #include <string>
 #include <fstream>
 #include <iterator>
@@ -78,9 +78,13 @@ int main() {
 	using tawashi::PastieResponse;
 	using tawashi::Response;
 
-#if !defined(NDEBUG)
-	std::cerr << "Loading config: \"" << config_file_path() << "\"\n";
-#endif
+	//Prepare the logger
+	spdlog::set_pattern("[%Y-%m-%d %T %z] - %v");
+	spdlog::set_level(spdlog::level::debug);
+	auto statuslog = spdlog::stderr_logger_st("statuslog");
+
+	statuslog->debug("Loading config: \"{}\"\n", config_file_path());
+
 	std::ifstream conf(config_file_path());
 	conf >> std::noskipws;
 	auto ini = SafeStackObject<tawashi::IniFile>(std::istream_iterator<char>(conf), std::istream_iterator<char>());
