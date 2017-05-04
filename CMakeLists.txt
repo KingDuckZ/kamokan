@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 project(tawashi_top VERSION 0.1.3 LANGUAGES NONE)
 
+include(CTest)
+
+set(INCREDIS_FORCE_DISABLE_TESTS ON)
 set(TAWASHI_SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 set(TAWASHI_GEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
 set(TAWASHI_CONFIG_PATH "etc" CACHE STRING "Path where config file will be located, absolute or relative to the install prefix")
@@ -19,3 +22,7 @@ add_subdirectory(src/tawashi_implem)
 add_subdirectory(src/tawashi)
 
 install(DIRECTORY html DESTINATION .)
+
+if (BUILD_TESTING)
+	add_subdirectory(test/unit)
+endif()
