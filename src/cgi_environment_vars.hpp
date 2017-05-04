@@ -24,6 +24,7 @@
 namespace tawashi {
 	BETTER_ENUM(CGIVars, std::size_t,
 		AUTH_TYPE = 0,
+		HTTP_USER_AGENT,
 		CONTENT_LENGTH,
 		CONTENT_TYPE,
 		GATEWAY_INTERFACE,
