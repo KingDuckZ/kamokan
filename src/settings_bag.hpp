@@ -51,7 +51,9 @@ namespace tawashi {
 	}
 
 	inline const boost::string_ref& SettingsBag::at (boost::string_ref parIndex) const {
+#if defined(SPDLOG_DEBUG_ON)
 		SPDLOG_DEBUG(spdlog::get("statuslog"), "Retrieving setting \"{}\"", std::string(parIndex.data(), parIndex.size()));
+#endif
 		return (*this)[parIndex];
 	}
 } //namespace tawashi
