@@ -23,6 +23,9 @@
 #include <boost/utility/string_ref.hpp>
 #include <functional>
 #include <string>
+#if defined(SPDLOG_DEBUG_ON)
+#	include <spdlog/spdlog.h>
+#endif
 
 namespace tawashi {
 	class SettingsBag : public Kakoune::SafeCountable {
@@ -48,6 +51,7 @@ namespace tawashi {
 	}
 
 	inline const boost::string_ref& SettingsBag::at (boost::string_ref parIndex) const {
+		SPDLOG_DEBUG(spdlog::get("statuslog"), "Retrieving setting \"{}\"", std::string(parIndex.data(), parIndex.size()));
 		return (*this)[parIndex];
 	}
 } //namespace tawashi

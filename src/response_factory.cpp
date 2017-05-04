@@ -34,12 +34,13 @@ namespace tawashi {
 		m_local_data(std::make_unique<LocalData>())
 	{
 		m_local_data->settings = parSettings;
-
 	}
 
 	ResponseFactory::~ResponseFactory() noexcept = default;
 
 	std::unique_ptr<Response> ResponseFactory::make_response (const boost::string_ref& parName) {
+		//spdlog::get("statuslog")->info("making response object for \"{}\"", parName);
+
 		auto maker_it = m_local_data->makers.find(std::string(parName.data(), parName.size()));
 		if (m_local_data->makers.end() != maker_it) {
 			return maker_it->second(m_local_data->settings);

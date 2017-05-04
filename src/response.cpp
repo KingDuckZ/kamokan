@@ -29,6 +29,7 @@
 #include <functional>
 #include <boost/optional.hpp>
 #include <cstdint>
+#include <spdlog/spdlog.h>
 
 namespace tawashi {
 	namespace {
@@ -74,7 +75,7 @@ namespace tawashi {
 		boost::optional<std::string> load_whole_file (const std::string& parWebsiteRoot, const char* parSuffix, const std::string& parName, bool parThrow) {
 			std::ostringstream oss;
 			oss << parWebsiteRoot << parName << parSuffix;
-			std::cerr << "Trying to load \"" << oss.str() << "\"\n";
+			spdlog::get("statuslog")->debug("Trying to load \"{}\"", oss.str());
 			std::ifstream if_mstch(oss.str(), std::ios::binary | std::ios::in);
 
 			if (not if_mstch) {
@@ -118,6 +119,14 @@ namespace tawashi {
 		}
 
 		mstch::config::escape = &disable_mstch_escaping;
+
+		auto statuslog = spdlog::get("statuslog");
+		assert(statuslog);
+		statuslog->info("Preparing Response for {} request to {}; size: {}",
+			cgi_env().request_method(),
+			cgi_env().query_string(),
+			cgi_env().content_length()
+		);
 	}
 
 	Response::~Response() noexcept = default;
@@ -129,6 +138,11 @@ namespace tawashi {
 	}
 
 	void Response::send() {
+		auto statuslog = spdlog::get("statuslog");
+		assert(statuslog);
+
+		statuslog->info("Sending response");
+		SPDLOG_TRACE(statuslog, "Preparing mustache dictionary");
 		mstch::map mustache_context {
 			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
 			{"base_uri", m_settings->as<std::string>("base_uri")},
@@ -136,6 +150,7 @@ namespace tawashi {
 		};
 
 		if (m_redis) {
+			SPDLOG_TRACE(statuslog, "Finalizing redis connection");
 			m_redis->wait_for_connect();
 			auto batch = m_redis->make_batch();
 			batch.select(m_settings->as<uint32_t>("redis_db"));
@@ -143,19 +158,24 @@ namespace tawashi {
 			batch.throw_if_failed();
 		}
 
+		SPDLOG_TRACE(statuslog, "Raising event on_process");
 		this->on_process();
+		SPDLOG_TRACE(statuslog, "Raising event on_mustache_prepare");
 		this->on_mustache_prepare(mustache_context);
 
 		m_header_sent = true;
 		switch (m_resp_type) {
 		case ContentType:
+			SPDLOG_TRACE(statuslog, "Response is a Content-type (data)");
 			std::cout << "Content-type: " << m_resp_value << "\n\n";
 			break;
 		case Location:
+			SPDLOG_TRACE(statuslog, "Response is a Location (redirect)");
 			std::cout << "Location: " << m_resp_value << "\n\n";
 			break;
 		}
 
+		SPDLOG_TRACE(statuslog, "Rendering in mustache");
 		std::cout << mstch::render(
 			on_mustache_retrieve(),
 			mustache_context,
@@ -167,6 +187,7 @@ namespace tawashi {
 				false
 			)
 		);
+		SPDLOG_TRACE(statuslog, "Flushing output");
 		std::cout.flush();
 	}
 

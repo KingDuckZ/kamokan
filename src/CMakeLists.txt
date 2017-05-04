@@ -57,6 +57,8 @@ target_link_libraries(${PROJECT_NAME}
 )
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1
+	PRIVATE $<$<CONFIG:Debug>:SPDLOG_DEBUG_ON>
+	PRIVATE $<$<CONFIG:Debug>:SPDLOG_TRACE_ON>
 )
 target_compile_options(${PROJECT_NAME}
 	PRIVATE -fdiagnostics-color=always

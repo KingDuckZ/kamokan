@@ -85,7 +85,7 @@ int main() {
 	spdlog::set_level(spdlog::level::trace); //set to maximum possible here
 	auto statuslog = spdlog::stderr_logger_st("statuslog");
 
-	statuslog->debug("Loading config: \"{}\"\n", config_file_path());
+	statuslog->info("Loading config: \"{}\"", config_file_path());
 
 	std::ifstream conf(config_file_path());
 	conf >> std::noskipws;
@@ -102,6 +102,7 @@ int main() {
 
 	tawashi::cgi::Env cgi_env;
 	tawashi::ResponseFactory resp_factory(settings);
+	SPDLOG_TRACE(statuslog, "Registering makers in the response factory");
 	resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);
 	resp_factory.register_maker("", &make_response<IndexResponse>);
 	resp_factory.register_maker("paste.cgi", &make_response<SubmitPasteResponse>);
