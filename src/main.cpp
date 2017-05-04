@@ -26,6 +26,7 @@
 #include "pathname/pathname.hpp"
 #include "duckhandy/compatibility.h"
 #include "settings_bag.hpp"
+#include "logging_levels.hpp"
 #include <spdlog/spdlog.h>
 #include <string>
 #include <fstream>
@@ -68,6 +69,7 @@ namespace {
 		parSettings.add_default("min_pastie_size", "10");
 		parSettings.add_default("max_pastie_size", "10000");
 		parSettings.add_default("truncate_long_pasties", "false");
+		parSettings.add_default("logging_level", "err");
 	}
 } //unnamed namespace
 
@@ -80,7 +82,7 @@ int main() {
 
 	//Prepare the logger
 	spdlog::set_pattern("[%Y-%m-%d %T %z] - %v");
-	spdlog::set_level(spdlog::level::debug);
+	spdlog::set_level(spdlog::level::trace); //set to maximum possible here
 	auto statuslog = spdlog::stderr_logger_st("statuslog");
 
 	statuslog->debug("Loading config: \"{}\"\n", config_file_path());
@@ -92,6 +94,11 @@ int main() {
 
 	auto settings = SafeStackObject<tawashi::SettingsBag>(ini);
 	fill_defaults(*settings);
+
+	{
+		auto logging_level = tawashi::LoggingLevels::_from_string_nocase(settings->as<std::string>("logging_level").c_str());
+		spdlog::set_level(static_cast<decltype(spdlog::level::trace)>(logging_level._to_integral()));
+	}
 
 	tawashi::cgi::Env cgi_env;
 	tawashi::ResponseFactory resp_factory(settings);
