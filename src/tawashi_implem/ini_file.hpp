@@ -22,6 +22,7 @@
 #include <iterator>
 #include <boost/utility/string_ref.hpp>
 #include <string>
+#include <cassert>
 
 namespace tawashi {
 	class IniFile : public Kakoune::SafeCountable {
@@ -38,10 +39,20 @@ namespace tawashi {
 		IniFile& operator== (IniFile&&) = delete;
 		IniFile& operator== (const IniFile&) = delete;
 
-		const IniMapType& parsed() const { return m_map; }
+		bool parse_success() const { return m_parse_ok; }
+		int parsed_characters() const { return m_parsed_chars; }
+
+		const IniMapType& parsed() const;
 
 	private:
 		std::string m_raw_ini;
 		IniMapType m_map;
+		int m_parsed_chars;
+		bool m_parse_ok;
 	};
+
+	inline const IniFile::IniMapType& IniFile::parsed() const {
+		assert(parse_success());
+		return m_map;
+	}
 } //namespace tawashi

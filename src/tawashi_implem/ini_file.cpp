@@ -35,6 +35,7 @@
 #include <boost/phoenix/bind/bind_member_variable.hpp>
 #include <boost/fusion/adapted/std_pair.hpp>
 #include <type_traits>
+#include <iterator>
 
 namespace tawashi {
 	namespace {
@@ -89,15 +90,18 @@ namespace tawashi {
 			start = *(section_head >> key_values);
 		}
 
-		IniFile::IniMapType parse_ini (const std::string* parIni) {
+		IniFile::IniMapType parse_ini (const std::string* parIni, bool& parParseOk, int& parParsedCharCount) {
 			using boost::spirit::qi::blank;
 			using boost::spirit::qi::blank_type;
 
 			IniGrammar<std::string::const_iterator, blank_type> gramm(parIni);
 			IniFile::IniMapType result;
 
+			parParseOk = false;
+			parParsedCharCount = 0;
+
 			std::string::const_iterator start_it = parIni->cbegin();
-			/*const bool parse_ok =*/ boost::spirit::qi::phrase_parse(
+			const bool parse_ok = boost::spirit::qi::phrase_parse(
 				start_it,
 				parIni->cend(),
 				gramm,
@@ -105,7 +109,8 @@ namespace tawashi {
 				result
 			);
 
-			//assert(parse_ok and (parIni->cend() == start_it));
+			parParseOk = parse_ok and (parIni->cend() == start_it);
+			parParsedCharCount = std::distance(parIni->cbegin(), start_it);
 			return result;
 		}
 	} //unnamed namespace
@@ -117,7 +122,7 @@ namespace tawashi {
 
 	IniFile::IniFile (std::string&& parIniData) :
 		m_raw_ini(std::move(parIniData)),
-		m_map(parse_ini(&m_raw_ini))
+		m_map(parse_ini(&m_raw_ini, m_parse_ok, m_parsed_chars))
 	{
 	}
 
@@ -127,7 +132,7 @@ namespace tawashi {
 		if (m_raw_ini.data() == old_data_ptr)
 			m_map = std::move(parOther.m_map);
 		else
-			m_map = parse_ini(&m_raw_ini);
+			m_map = parse_ini(&m_raw_ini, m_parse_ok, m_parsed_chars);
 	}
 
 	IniFile::~IniFile() noexcept {
