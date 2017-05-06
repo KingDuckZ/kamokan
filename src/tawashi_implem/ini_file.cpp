@@ -18,18 +18,19 @@
 #include "ini_file.hpp"
 #include <utility>
 #include <boost/spirit/include/qi_core.hpp>
+#include <boost/spirit/include/qi_sequence.hpp>
 #include <boost/spirit/include/qi_plus.hpp>
+#include <boost/spirit/include/qi_difference.hpp>
 #include <boost/spirit/include/qi_raw.hpp>
 #include <boost/spirit/include/qi_lit.hpp>
-#include <boost/spirit/include/qi_char_.hpp>
 #include <boost/spirit/include/qi_kleene.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
-#include <boost/spirit/include/qi_as_string.hpp>
 #include <boost/spirit/include/qi_eol.hpp>
-#include <boost/spirit/include/qi_eoi.hpp>
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_hold.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
+#include <boost/spirit/include/qi_list.hpp>
+#include <boost/spirit/include/qi_optional.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_bind.hpp>
@@ -67,7 +68,6 @@ namespace tawashi {
 			using boost::spirit::qi::_val;
 			using boost::spirit::_1;
 			using boost::spirit::qi::eol;
-			using boost::spirit::qi::eoi;
 			using boost::spirit::qi::raw;
 			using boost::string_ref;
 			using boost::spirit::qi::hold;
@@ -80,20 +80,20 @@ namespace tawashi {
 					&string_ref::substr,
 					px::construct<string_ref>(px::ref(*m_master_string)),
 					px::begin(_1) - px::ref(m_begin), px::size(_1)
-				)] >> ']' >> (+eol | eoi);
-			key = raw[+(graph - '=') >> *(hold[+blank >> +(graph - '=')])][_val = px::bind(
+				)] >> ']';
+			key = raw[(graph - '[' - '=') >> *(graph - '=') >> *(hold[+blank >> +(graph - '=')])][_val = px::bind(
 				&string_ref::substr,
 				px::construct<string_ref>(px::ref(*m_master_string)),
 				px::begin(_1) - px::ref(m_begin), px::size(_1)
 			)];
 			key_value = key[px::bind(&refpair::first, _val) = _1] >> '=' >>
-				raw[*graph >> *(hold[+blank >> +graph])][px::bind(&refpair::second, _val) = px::bind(
+				raw[*(graph - eol) >> *(hold[+blank >> +(graph - eol)])][px::bind(&refpair::second, _val) = px::bind(
 					&string_ref::substr,
 					px::construct<string_ref>(px::ref(*m_master_string)),
 					px::begin(_1) - px::ref(m_begin), px::size(_1)
-			)] >> (+eol | eoi);
-			key_values = *key_value;
-			start = *(section >> key_values);
+			)];
+			key_values = -(key_value % (+eol));
+			start = *(*eol >> section >> +eol >> key_values >> *eol);
 		}
 
 		IniFile::IniMapType parse_ini (const std::string* parIni, bool& parParseOk, int& parParsedCharCount) {
@@ -117,6 +117,7 @@ namespace tawashi {
 
 			parParseOk = parse_ok and (parIni->cend() == start_it);
 			parParsedCharCount = std::distance(parIni->cbegin(), start_it);
+			assert(parParsedCharCount >= 0);
 			return result;
 		}
 	} //unnamed namespace
