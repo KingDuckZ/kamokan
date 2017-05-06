@@ -23,3 +23,10 @@
 #define VERSION_MAJOR @PROJECT_VERSION_MAJOR@
 #define VERSION_MINOR @PROJECT_VERSION_MINOR@
 #define VERSION_PATCH @PROJECT_VERSION_PATCH@
+#cmakedefine BUILD_TESTING
+
+#if defined(BUILD_TESTING)
+#	define virtual_testing virtual
+#else
+#	define virtual_testing
+#endif

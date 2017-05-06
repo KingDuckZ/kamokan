@@ -8,6 +8,8 @@ add_executable(${PROJECT_NAME}
 )
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE tawashi_implem
+	#hack - add duckhandy to the project instead of picking from inside redis
+	PRIVATE duckhandy
 )
 
 set_target_properties(
@@ -17,8 +19,6 @@ set_target_properties(
 
 target_include_directories(${PROJECT_NAME}
 	PRIVATE ${TAWASHI_GEN_INCLUDE_DIR}
-	#hack - add duckhandy to the project instead of picking from inside redis
-	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/incredis/lib/duckhandy/include
 )
 install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION lib
