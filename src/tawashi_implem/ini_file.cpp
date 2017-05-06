@@ -107,6 +107,7 @@ namespace tawashi {
 			parParsedCharCount = 0;
 
 			std::string::const_iterator start_it = parIni->cbegin();
+			//TODO: make a skipper that also skips comments eg: blank | lit("//") >> *(char_ - eol)
 			const bool parse_ok = boost::spirit::qi::phrase_parse(
 				start_it,
 				parIni->cend(),
