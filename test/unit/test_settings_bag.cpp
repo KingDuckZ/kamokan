@@ -23,6 +23,7 @@
 #include <sstream>
 #include <cstdint>
 #include <spdlog/spdlog.h>
+#include <stdexcept>
 
 TEST_CASE ("Add and retrieve values from SettingsBag", "[settings][ini]") {
 	using tawashi::SettingsBag;
@@ -57,6 +58,9 @@ TEST_CASE ("Add and retrieve values from SettingsBag", "[settings][ini]") {
 	CHECK(settings.as<uint32_t>("int_num") == 42);
 	CHECK(settings.as<std::string>("redis_mode") == "inet");
 	CHECK(settings["base_uri"] == "http://127.0.0.1:8080");
+
+	CHECK_THROWS_AS(settings["not_in_ini"], std::out_of_range);
+	CHECK_THROWS_AS(settings.at("not_in_ini"), std::out_of_range);
 
 	settings.add_default("redis_server", "192.168.0.5");
 	settings.add_default("not_in_ini_empty", "");
