@@ -26,6 +26,9 @@ namespace tawashi {
 	public:
 		explicit PastieResponse (const Kakoune::SafePtr<SettingsBag>& parSettings);
 
+	protected:
+		virtual boost::string_ref page_basename() const override { return boost::string_ref("text"); }
+
 	private:
 		virtual void on_process() override;
 		virtual void on_mustache_prepare (mstch::map& parContext) override;

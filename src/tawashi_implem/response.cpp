@@ -72,7 +72,7 @@ namespace tawashi {
 			}
 		}
 
-		boost::optional<std::string> load_whole_file (const std::string& parWebsiteRoot, const char* parSuffix, const std::string& parName, bool parThrow) {
+		boost::optional<std::string> load_whole_file (const std::string& parWebsiteRoot, const char* parSuffix, const boost::string_ref& parName, bool parThrow) {
 			std::ostringstream oss;
 			oss << parWebsiteRoot << parName << parSuffix;
 			spdlog::get("statuslog")->debug("Trying to load \"{}\"", oss.str());
@@ -104,12 +104,11 @@ namespace tawashi {
 		};
 	} //unnamed namespace
 
-	Response::Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const Kakoune::SafePtr<SettingsBag>& parSettings, bool parWantRedis) :
+	Response::Response (Types parRespType, std::string&& parValue, const Kakoune::SafePtr<SettingsBag>& parSettings, bool parWantRedis) :
 		m_resp_value(std::move(parValue)),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
 		m_settings(parSettings),
 		m_website_root(make_root_path(*parSettings)),
-		m_page_basename(std::move(parPageBaseName)),
 		m_resp_type(parRespType),
 		m_header_sent(false)
 	{
@@ -208,10 +207,6 @@ namespace tawashi {
 
 	const boost::string_ref& Response::base_uri() const {
 		return m_settings->at("base_uri");
-	}
-
-	const std::string& Response::page_basename() const {
-		return m_page_basename;
 	}
 
 	std::string Response::load_mustache() const {

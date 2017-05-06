@@ -20,7 +20,7 @@
 
 namespace tawashi {
 	IndexResponse::IndexResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
-		Response(Response::ContentType, "text/html", "index", parSettings, false)
+		Response(Response::ContentType, "text/html", parSettings, false)
 	{
 	}
 } //namespace tawashi

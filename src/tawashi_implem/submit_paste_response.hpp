@@ -27,6 +27,9 @@ namespace tawashi {
 	public:
 		explicit SubmitPasteResponse (const Kakoune::SafePtr<SettingsBag>& parSettings);
 
+	protected:
+		virtual boost::string_ref page_basename() const override { return boost::string_ref("paste"); }
+
 	private:
 		virtual void on_process() override;
 		boost::optional<std::string> submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang) const;

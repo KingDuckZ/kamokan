@@ -25,6 +25,9 @@ namespace tawashi {
 	public:
 		explicit IndexResponse (const Kakoune::SafePtr<SettingsBag>& parSettings);
 
+	protected:
+		virtual boost::string_ref page_basename() const override { return boost::string_ref("index"); }
+
 	private:
 	};
 } //namespace tawashi

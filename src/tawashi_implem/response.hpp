@@ -44,11 +44,16 @@ namespace tawashi {
 			Location
 		};
 
-		Response (Types parRespType, std::string&& parValue, std::string&& parPageBaseName, const Kakoune::SafePtr<SettingsBag>& parSettings, bool parWantRedis);
+		Response (
+			Types parRespType,
+			std::string&& parValue,
+			const Kakoune::SafePtr<SettingsBag>& parSettings,
+			bool parWantRedis
+		);
 		const cgi::Env& cgi_env() const;
 		void change_type (Types parRespType, std::string&& parValue);
 		const boost::string_ref& base_uri() const;
-		const std::string& page_basename() const;
+		virtual boost::string_ref page_basename() const = 0;
 		redis::IncRedis& redis() const;
 		const SettingsBag& settings() const;
 		virtual std::string load_mustache() const;
@@ -62,7 +67,6 @@ namespace tawashi {
 		std::string m_resp_value;
 		Kakoune::SafePtr<SettingsBag> m_settings;
 		std::string m_website_root;
-		std::string m_page_basename;
 		Types m_resp_type;
 		std::unique_ptr<redis::IncRedis> m_redis;
 		bool m_header_sent;

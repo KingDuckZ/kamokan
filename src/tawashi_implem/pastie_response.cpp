@@ -30,7 +30,7 @@ namespace tawashi {
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
-		Response(Response::ContentType, "text/html", "text", parSettings, true),
+		Response(Response::ContentType, "text/html", parSettings, true),
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false),
 		m_syntax_highlight(true)

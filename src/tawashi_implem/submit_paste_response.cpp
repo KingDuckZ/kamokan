@@ -61,7 +61,7 @@ namespace tawashi {
 	} //unnamed namespace
 
 	SubmitPasteResponse::SubmitPasteResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
-		Response(Response::ContentType, "text/plain", "paste", parSettings, true)
+		Response(Response::ContentType, "text/plain", parSettings, true)
 	{
 	}
 
