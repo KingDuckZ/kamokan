@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "cgi_env.hpp"
 #include "mstch/mstch.hpp"
 #include "kakoune/safe_ptr.hh"
 #include <string>
@@ -31,6 +30,10 @@ namespace redis {
 
 namespace tawashi {
 	class SettingsBag;
+
+	namespace cgi {
+		class Env;
+	} //namespace cgi
 
 	class Response {
 	public:
@@ -48,6 +51,8 @@ namespace tawashi {
 			Types parRespType,
 			std::string&& parValue,
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
+			std::ostream* parStreamOut,
+			const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
 			bool parWantRedis
 		);
 		const cgi::Env& cgi_env() const;
@@ -63,12 +68,13 @@ namespace tawashi {
 		virtual void on_mustache_prepare (mstch::map& parContext);
 		virtual std::string on_mustache_retrieve();
 
-		cgi::Env m_cgi_env;
 		std::string m_resp_value;
+		Kakoune::SafePtr<cgi::Env> m_cgi_env;
 		Kakoune::SafePtr<SettingsBag> m_settings;
 		std::string m_website_root;
 		Types m_resp_type;
 		std::unique_ptr<redis::IncRedis> m_redis;
+		std::ostream* m_stream_out;
 		bool m_header_sent;
 	};
 } //namespace tawashi

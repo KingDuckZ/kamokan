@@ -19,6 +19,7 @@
 #include "incredis/incredis.hpp"
 #include "settings_bag.hpp"
 #include "escapist.hpp"
+#include "cgi_env.hpp"
 #include <ciso646>
 #include <srchilite/sourcehighlight.h>
 #include <srchilite/langmap.h>
@@ -29,8 +30,12 @@ namespace tawashi {
 		const char g_nolang_token[] = "plaintext";
 	} //unnamed namespace
 
-	PastieResponse::PastieResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
-		Response(Response::ContentType, "text/html", parSettings, true),
+	PastieResponse::PastieResponse (
+		const Kakoune::SafePtr<SettingsBag>& parSettings,
+		std::ostream* parStreamOut,
+		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
+	) :
+		Response(Response::ContentType, "text/html", parSettings, parStreamOut, parCgiEnv, true),
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false),
 		m_syntax_highlight(true)

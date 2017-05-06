@@ -60,8 +60,12 @@ namespace tawashi {
 		}
 	} //unnamed namespace
 
-	SubmitPasteResponse::SubmitPasteResponse (const Kakoune::SafePtr<SettingsBag>& parSettings) :
-		Response(Response::ContentType, "text/plain", parSettings, true)
+	SubmitPasteResponse::SubmitPasteResponse (
+		const Kakoune::SafePtr<SettingsBag>& parSettings,
+		std::ostream* parStreamOut,
+		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
+	) :
+		Response(Response::ContentType, "text/plain", parSettings, parStreamOut, parCgiEnv, true)
 	{
 	}
 

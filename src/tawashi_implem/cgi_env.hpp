@@ -20,6 +20,7 @@
 #include "split_get_vars.hpp"
 #include "duckhandy/compatibility.h"
 #include "escapist.hpp"
+#include "kakoune/safe_ptr.hh"
 #include <vector>
 #include <string>
 #include <boost/utility/string_ref.hpp>
@@ -30,7 +31,7 @@
 
 namespace tawashi {
 	namespace cgi {
-		class Env {
+		class Env : public Kakoune::SafeCountable {
 		public:
 			struct VersionInfo {
 				boost::string_ref name;

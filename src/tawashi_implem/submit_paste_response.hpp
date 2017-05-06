@@ -25,7 +25,11 @@
 namespace tawashi {
 	class SubmitPasteResponse : public Response {
 	public:
-		explicit SubmitPasteResponse (const Kakoune::SafePtr<SettingsBag>& parSettings);
+		SubmitPasteResponse (
+			const Kakoune::SafePtr<SettingsBag>& parSettings,
+			std::ostream* parStreamOut,
+			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
+		);
 
 	protected:
 		virtual boost::string_ref page_basename() const override { return boost::string_ref("paste"); }

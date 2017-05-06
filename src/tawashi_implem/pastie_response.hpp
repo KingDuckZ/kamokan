@@ -24,7 +24,11 @@
 namespace tawashi {
 	class PastieResponse : public Response {
 	public:
-		explicit PastieResponse (const Kakoune::SafePtr<SettingsBag>& parSettings);
+		PastieResponse (
+			const Kakoune::SafePtr<SettingsBag>& parSettings,
+			std::ostream* parStreamOut,
+			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
+		);
 
 	protected:
 		virtual boost::string_ref page_basename() const override { return boost::string_ref("text"); }

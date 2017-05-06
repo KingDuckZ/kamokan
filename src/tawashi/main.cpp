@@ -32,6 +32,7 @@
 #include <fstream>
 #include <iterator>
 #include <ciso646>
+#include <iostream>
 
 //www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4150.pdf
 
@@ -53,8 +54,8 @@ namespace {
 	}
 
 	template <typename T>
-	std::unique_ptr<tawashi::Response> make_response (const Kakoune::SafePtr<tawashi::SettingsBag>& parSettings) {
-		return static_cast<std::unique_ptr<tawashi::Response>>(std::make_unique<T>(parSettings));
+	std::unique_ptr<tawashi::Response> make_response (const Kakoune::SafePtr<tawashi::SettingsBag>& parSettings, const Kakoune::SafePtr<tawashi::cgi::Env>& parCgiEnv) {
+		return static_cast<std::unique_ptr<tawashi::Response>>(std::make_unique<T>(parSettings, &std::cout, parCgiEnv));
 	}
 
 	void fill_defaults (tawashi::SettingsBag& parSettings) {
@@ -100,15 +101,15 @@ int main() {
 		spdlog::set_level(static_cast<decltype(spdlog::level::trace)>(logging_level._to_integral()));
 	}
 
-	tawashi::cgi::Env cgi_env;
-	tawashi::ResponseFactory resp_factory(settings);
+	auto cgi_env = SafeStackObject<tawashi::cgi::Env>();
+	tawashi::ResponseFactory resp_factory(settings, cgi_env);
 	SPDLOG_TRACE(statuslog, "Registering makers in the response factory");
 	resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);
 	resp_factory.register_maker("", &make_response<IndexResponse>);
 	resp_factory.register_maker("paste.cgi", &make_response<SubmitPasteResponse>);
 	resp_factory.register_jolly_maker(&make_response<PastieResponse>);
 
-	std::unique_ptr<Response> response = resp_factory.make_response(cgi_env.path_info().substr(1));
+	std::unique_ptr<Response> response = resp_factory.make_response(cgi_env->path_info().substr(1));
 	response->send();
 
 	return 0;

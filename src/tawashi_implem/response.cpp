@@ -22,6 +22,7 @@
 #include "duckhandy/stringize.h"
 #include "pathname/pathname.hpp"
 #include "list_highlight_langs.hpp"
+#include "cgi_env.hpp"
 #include <utility>
 #include <cassert>
 #include <fstream>
@@ -104,14 +105,26 @@ namespace tawashi {
 		};
 	} //unnamed namespace
 
-	Response::Response (Types parRespType, std::string&& parValue, const Kakoune::SafePtr<SettingsBag>& parSettings, bool parWantRedis) :
+	Response::Response (
+		Types parRespType,
+		std::string&& parValue,
+		const Kakoune::SafePtr<SettingsBag>& parSettings,
+		std::ostream* parStreamOut,
+		const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
+		bool parWantRedis
+	) :
 		m_resp_value(std::move(parValue)),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
+		m_cgi_env(parCgiEnv),
 		m_settings(parSettings),
 		m_website_root(make_root_path(*parSettings)),
 		m_resp_type(parRespType),
+		m_stream_out(parStreamOut),
 		m_header_sent(false)
 	{
+		assert(m_cgi_env);
+		assert(m_stream_out);
+
 		if (parWantRedis) {
 			m_redis = std::make_unique<redis::IncRedis>(make_incredis(*parSettings));
 			m_redis->connect();
@@ -166,16 +179,16 @@ namespace tawashi {
 		switch (m_resp_type) {
 		case ContentType:
 			SPDLOG_TRACE(statuslog, "Response is a Content-type (data)");
-			std::cout << "Content-type: " << m_resp_value << "\n\n";
+			*m_stream_out << "Content-type: " << m_resp_value << "\n\n";
 			break;
 		case Location:
 			SPDLOG_TRACE(statuslog, "Response is a Location (redirect)");
-			std::cout << "Location: " << m_resp_value << "\n\n";
+			*m_stream_out << "Location: " << m_resp_value << "\n\n";
 			break;
 		}
 
 		SPDLOG_TRACE(statuslog, "Rendering in mustache");
-		std::cout << mstch::render(
+		*m_stream_out << mstch::render(
 			on_mustache_retrieve(),
 			mustache_context,
 			std::bind(
@@ -187,7 +200,7 @@ namespace tawashi {
 			)
 		);
 		SPDLOG_TRACE(statuslog, "Flushing output");
-		std::cout.flush();
+		m_stream_out->flush();
 	}
 
 	std::string Response::on_mustache_retrieve() {
@@ -195,7 +208,7 @@ namespace tawashi {
 	}
 
 	const cgi::Env& Response::cgi_env() const {
-		return m_cgi_env;
+		return *m_cgi_env;
 	}
 
 	void Response::change_type (Types parRespType, std::string&& parValue) {

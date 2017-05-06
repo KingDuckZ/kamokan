@@ -17,6 +17,7 @@
 
 #include "response_factory.hpp"
 #include "settings_bag.hpp"
+#include "cgi_env.hpp"
 #include <functional>
 #include <boost/container/flat_map.hpp>
 
@@ -28,12 +29,14 @@ namespace tawashi {
 		Kakoune::SafePtr<SettingsBag> settings;
 		boost::container::flat_map<std::string, ResponseMakerFunc> makers;
 		ResponseMakerFunc jolly_maker;
+		Kakoune::SafePtr<cgi::Env> cgi_env;
 	};
 
-	ResponseFactory::ResponseFactory (const Kakoune::SafePtr<SettingsBag>& parSettings) :
+	ResponseFactory::ResponseFactory (const Kakoune::SafePtr<SettingsBag>& parSettings, const Kakoune::SafePtr<cgi::Env>& parCgiEnv) :
 		m_local_data(std::make_unique<LocalData>())
 	{
 		m_local_data->settings = parSettings;
+		m_local_data->cgi_env = parCgiEnv;
 	}
 
 	ResponseFactory::~ResponseFactory() noexcept = default;
@@ -43,10 +46,10 @@ namespace tawashi {
 
 		auto maker_it = m_local_data->makers.find(std::string(parName.data(), parName.size()));
 		if (m_local_data->makers.end() != maker_it) {
-			return maker_it->second(m_local_data->settings);
+			return maker_it->second(m_local_data->settings, m_local_data->cgi_env);
 		}
 		else if (m_local_data->jolly_maker) {
-			return m_local_data->jolly_maker(m_local_data->settings);
+			return m_local_data->jolly_maker(m_local_data->settings, m_local_data->cgi_env);
 		}
 		else {
 			assert(false);
