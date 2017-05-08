@@ -55,9 +55,10 @@ namespace tawashi {
 		else {
 			srchilite::LangMap lang_map(m_langmap_dir, "lang.map");
 			lang_map.open();
+			m_lang_file.clear();
 			if (not query_str.empty())
 				m_lang_file = lang_map.getFileName(query_str);
-			else
+			if (m_lang_file.empty())
 				m_lang_file = "default.lang";
 		}
 	}
@@ -75,7 +76,6 @@ namespace tawashi {
 		highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
 		highlighter.setGenerateEntireDoc(false);
 		highlighter.setGenerateLineNumbers(true);
-		const auto lang = m_lang_file;
 
 		std::string processed_pastie;
 		if (m_syntax_highlight) {
@@ -89,7 +89,7 @@ namespace tawashi {
 		if (not m_plain_text and m_syntax_highlight) {
 			std::istringstream iss(std::move(processed_pastie));
 			std::ostringstream oss;
-			highlighter.highlight(iss, oss, lang);
+			highlighter.highlight(iss, oss, m_lang_file);
 			processed_pastie = oss.str();
 		}
 
