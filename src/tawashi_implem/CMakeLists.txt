@@ -10,7 +10,6 @@ add_library(${PROJECT_NAME} STATIC
 	split_get_vars.cpp
 	response.cpp
 	submit_paste_response.cpp
-	get_env.cpp
 	cgi_environment_vars.cpp
 	cgi_env.cpp
 	num_to_token.cpp

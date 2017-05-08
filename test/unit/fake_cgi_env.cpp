@@ -19,9 +19,14 @@
 #include "duckhandy/lexical_cast.hpp"
 #include <cassert>
 
+namespace {
+	const char* const g_dummy_env_list[] = { nullptr };
+} //unnamed namespace
+
 namespace tawashi {
 	namespace cgi {
 		FakeEnv::FakeEnv (std::string&& parVariablesIni) :
+			Env(g_dummy_env_list),
 			m_variables(std::move(parVariablesIni)),
 			m_auth_type(m_variables.parsed().at("fake_env").at("auth_type")),
 			m_content_type(m_variables.parsed().at("fake_env").at("content_type")),

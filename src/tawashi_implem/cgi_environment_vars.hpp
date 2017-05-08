@@ -43,5 +43,5 @@ namespace tawashi {
 		SERVER_SOFTWARE
 	);
 
-	std::vector<std::string> cgi_environment_vars();
+	std::vector<std::string> cgi_environment_vars (const char* const* parEnvList);
 } //namespace tawashi

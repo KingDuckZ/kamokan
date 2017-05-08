@@ -81,8 +81,8 @@ namespace cgi {
 		}
 	} //unnamed namespace
 
-	Env::Env() :
-		m_cgi_env(cgi_environment_vars())
+	Env::Env(const char* const* parEnvList) :
+		m_cgi_env(cgi_environment_vars(parEnvList))
 	{
 	}
 

@@ -74,7 +74,7 @@ namespace {
 	}
 } //unnamed namespace
 
-int main() {
+int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	using curry::SafeStackObject;
 	using tawashi::IndexResponse;
 	using tawashi::SubmitPasteResponse;
@@ -101,7 +101,7 @@ int main() {
 		spdlog::set_level(static_cast<decltype(spdlog::level::trace)>(logging_level._to_integral()));
 	}
 
-	auto cgi_env = SafeStackObject<tawashi::cgi::Env>();
+	auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp);
 	tawashi::ResponseFactory resp_factory(settings, cgi_env);
 	SPDLOG_TRACE(statuslog, "Registering makers in the response factory");
 	resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);

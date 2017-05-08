@@ -42,7 +42,7 @@ namespace tawashi {
 
 			typedef boost::container::flat_map<std::string, std::string> GetMapType;
 
-			Env();
+			explicit Env (const char* const* parEnvList);
 			virtual_testing ~Env() noexcept;
 
 			virtual_testing const std::string& auth_type() const;
