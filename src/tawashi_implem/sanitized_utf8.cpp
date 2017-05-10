@@ -16,14 +16,47 @@
  */
 
 #include "sanitized_utf8.hpp"
-#include "utf8.h"
 #include <iterator>
+
+#define SANITIZE_WITH_UTFCPP
+
+#if defined(SANITIZE_WITH_UTFCPP)
+#	include "utf8.h"
+#	include <algorithm>
+#else
+#	include <glib.h>
+#	include <cassert>
+#	include <array>
+#endif
 
 namespace tawashi {
 	std::string sanitized_utf8 (const boost::string_ref& parStr) {
 		std::string sanitized;
 		sanitized.reserve(parStr.size());
-		utf8::replace_invalid(parStr.begin(), parStr.end(), std::back_inserter(sanitized));
+#if defined(SANITIZE_WITH_UTFCPP)
+		utf8::replace_invalid(parStr.begin(), parStr.end(), std::back_inserter(sanitized), 0xFFFD);
+		std::replace(sanitized.begin(), sanitized.end(), '\0', '#');
+#else
+#	error "untested code, don't enable in final builds"
+		std::array<char, 6> replacement;
+		const int replacement_len = g_unichar_to_utf8(0xFFFD, replacement.data());
+
+		std::size_t beg_offset = 0;
+		const char* end;
+		while (not g_utf8_validate(parStr.data() + beg_offset, parStr.size() - beg_offset, &end)) {
+			assert(beg_offset < parStr.size());
+			const std::size_t valid_chunk_size = end - (parStr.data() + beg_offset);
+			sanitized.append(parStr.data() + beg_offset, end);
+			if (*end)
+				sanitized.append(replacement.data(), replacement_len);
+			else
+				sanitized.append({ '#' });
+			beg_offset += valid_chunk_size + 1;
+			assert(beg_offset <= parStr.size());
+		}
+		sanitized.append(parStr.data() + beg_offset, end);
+		assert(g_utf8_validate(sanitized.data(), sanitized.size(), nullptr));
+#endif
 		return sanitized;
 	}
 } //namespace tawashi
