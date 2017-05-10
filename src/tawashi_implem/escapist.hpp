@@ -37,6 +37,7 @@ namespace tawashi {
 		~Escapist() noexcept;
 
 		std::string unescape_url (const boost::string_ref& parURL) const;
+		std::string escape_url (const boost::string_ref& parURL) const;
 		std::string escape_html (const boost::string_ref& parHtml) const;
 
 	private:

@@ -53,6 +53,24 @@ namespace tawashi {
 			return std::string(buf->ptr, buf->size);
 	}
 
+	std::string Escapist::escape_url (const boost::string_ref& parURL) const {
+		if (parURL.empty())
+			return std::string();
+
+		assert(m_gh_buf);
+		gh_buf* const buf = static_cast<gh_buf*>(m_gh_buf);
+
+		const int escaped = houdini_escape_url(
+			buf,
+			reinterpret_cast<const uint8_t*>(parURL.data()),
+			parURL.size()
+		);
+		if (0 == escaped)
+			return std::string(parURL.data(), parURL.size());
+		else
+			return std::string(buf->ptr, buf->size);
+	}
+
 	std::string Escapist::escape_html (const boost::string_ref& parHtml) const {
 		if (parHtml.empty())
 			return std::string();
