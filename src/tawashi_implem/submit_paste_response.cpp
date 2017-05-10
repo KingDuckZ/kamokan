@@ -70,7 +70,7 @@ namespace tawashi {
 	}
 
 	void SubmitPasteResponse::on_process() {
-		auto post = cgi::read_post(cgi_env());
+		auto post = cgi::read_post(std::cin, cgi_env());
 		boost::string_ref pastie;
 		boost::string_ref lang;
 		boost::string_ref duration;

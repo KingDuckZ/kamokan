@@ -32,7 +32,7 @@ namespace tawashi {
 		namespace {
 		} //unnamed namespace
 
-		const PostMapType& read_post (const Env& parEnv) {
+		const PostMapType& read_post (std::istream& parSrc, const Env& parEnv) {
 			static bool already_read = false;
 			static PostMapType map;
 			static std::string original_data;
@@ -45,7 +45,7 @@ namespace tawashi {
 				if (input_len > 0) {
 					original_data.reserve(input_len);
 					std::copy_n(
-						std::istream_iterator<char>(std::cin),
+						std::istream_iterator<char>(parSrc),
 						input_len,
 						std::back_inserter(original_data)
 					);

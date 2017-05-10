@@ -19,6 +19,7 @@
 
 #include <boost/container/flat_map.hpp>
 #include <string>
+#include <istream>
 
 namespace tawashi {
 
@@ -27,6 +28,6 @@ namespace tawashi {
 
 		typedef boost::container::flat_map<std::string, std::string> PostMapType;
 
-		const PostMapType& read_post (const Env& parEnv);
+		const PostMapType& read_post (std::istream& parSrc, const Env& parEnv);
 	} //namespace cgi
 } //namespace tawashi
