@@ -1,4 +1,4 @@
-project(tawashi_implem LANGUAGES CXX)
+project(tawashi_implem LANGUAGES CXX C)
 
 find_package(Boost 1.53.0 REQUIRED COMPONENTS program_options filesystem system)
 find_package(SourceHighlight REQUIRED)
@@ -23,6 +23,7 @@ add_library(${PROJECT_NAME} STATIC
 	list_highlight_langs.cpp
 	settings_bag.cpp
 	sanitized_utf8.cpp
+	tiger.c
 )
 
 target_include_directories(${PROJECT_NAME}

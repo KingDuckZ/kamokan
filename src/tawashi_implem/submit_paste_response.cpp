@@ -18,15 +18,20 @@
 #include "submit_paste_response.hpp"
 #include "incredis/incredis.hpp"
 #include "cgi_post.hpp"
+#include "cgi_env.hpp"
 #include "num_to_token.hpp"
 #include "settings_bag.hpp"
 #include "duckhandy/compatibility.h"
 #include "duckhandy/lexical_cast.hpp"
+#include "duckhandy/int_to_string_ary.hpp"
 #include <ciso646>
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
+#include <cstdint>
+
+extern "C" void tiger (const char* parStr, uint64_t parLength, uint64_t parHash[3], char parPadding);
 
 namespace tawashi {
 	namespace {
@@ -57,6 +62,25 @@ namespace tawashi {
 				throw MissingPostVarError(oss.str());
 			}
 			return post_data_it->second;
+		}
+
+		std::string hashed_ip (const std::string& parIP) {
+			uint64_t hash[3];
+			tiger(parIP.data(), parIP.size(), hash, 0x80);
+
+			auto h1 = dhandy::int_to_string_ary<char>(hash[0]);
+			auto h2 = dhandy::int_to_string_ary<char>(hash[1]);
+			auto h3 = dhandy::int_to_string_ary<char>(hash[2]);
+
+			std::string retval(2 * sizeof(uint64_t) * 3, '0');
+			assert(h1.size() <= 2 * sizeof(uint64_t));
+			std::copy(h1.begin(), h1.end(), retval.begin() + 2 * sizeof(uint64_t) * 0 + 2 * sizeof(uint64_t) - h1.size());
+			assert(h2.size() <= 2 * sizeof(uint64_t));
+			std::copy(h2.begin(), h2.end(), retval.begin() + 2 * sizeof(uint64_t) * 1 +  2 * sizeof(uint64_t) - h2.size());
+			assert(h3.size() <= 2 * sizeof(uint64_t));
+			std::copy(h3.begin(), h3.end(), retval.begin() + 2 * sizeof(uint64_t) * 2 +  2 * sizeof(uint64_t) - h3.size());
+
+			return retval;
 		}
 	} //unnamed namespace
 
@@ -117,6 +141,12 @@ namespace tawashi {
 		if (not redis.is_connected())
 			return boost::optional<std::string>();
 
+		std::string ip_hash = hashed_ip(cgi_env().remote_addr());
+		if (redis.get(ip_hash)) {
+			//please wait and submit again
+			return boost::optional<std::string>();
+		}
+
 		const auto next_id = redis.incr("paste_counter");
 		const std::string token = num_to_token(next_id);
 		assert(not token.empty());
@@ -125,6 +155,8 @@ namespace tawashi {
 			"max_ttl", dhandy::lexical_cast<std::string>(parExpiry),
 			"lang", parLang)
 		) {
+			redis.set(ip_hash, "");
+			redis.expire(ip_hash, settings().as<uint32_t>("submit_min_wait"));
 			if (redis.expire(token, parExpiry))
 				return boost::make_optional(token);
 		}
