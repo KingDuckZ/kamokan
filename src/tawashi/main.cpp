@@ -71,7 +71,7 @@ namespace {
 		parSettings.add_default("max_pastie_size", "10000");
 		parSettings.add_default("truncate_long_pasties", "false");
 		parSettings.add_default("logging_level", "err");
-		parSettings.add_default("submit_min_wait", "10");
+		parSettings.add_default("resubmit_wait", "10");
 	}
 } //unnamed namespace
 
