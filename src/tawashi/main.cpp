@@ -54,14 +54,8 @@ namespace {
 	}
 
 	template <typename T>
-	std::unique_ptr<tawashi::Response> make_response (
-		const Kakoune::SafePtr<tawashi::ResponseFactory>& parFactory,
-		const Kakoune::SafePtr<tawashi::SettingsBag>& parSettings,
-		const Kakoune::SafePtr<tawashi::cgi::Env>& parCgiEnv
-	) {
-		return static_cast<std::unique_ptr<tawashi::Response>>(
-			std::make_unique<T>(parFactory, parSettings, &std::cout, parCgiEnv)
-		);
+	std::unique_ptr<tawashi::Response> make_response (const Kakoune::SafePtr<tawashi::SettingsBag>& parSettings, const Kakoune::SafePtr<tawashi::cgi::Env>& parCgiEnv) {
+		return static_cast<std::unique_ptr<tawashi::Response>>(std::make_unique<T>(parSettings, &std::cout, parCgiEnv));
 	}
 
 	void fill_defaults (tawashi::SettingsBag& parSettings) {

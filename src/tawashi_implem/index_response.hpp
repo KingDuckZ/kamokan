@@ -24,7 +24,6 @@ namespace tawashi {
 	class IndexResponse : public Response {
 	public:
 		IndexResponse (
-			const Kakoune::SafePtr<ResponseFactory>& parFactory,
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv

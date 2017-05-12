@@ -30,7 +30,6 @@ namespace redis {
 
 namespace tawashi {
 	class SettingsBag;
-	class ResponseFactory;
 
 	namespace cgi {
 		class Env;
@@ -49,7 +48,6 @@ namespace tawashi {
 		};
 
 		Response (
-			const Kakoune::SafePtr<ResponseFactory>& parFactory,
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
@@ -69,7 +67,6 @@ namespace tawashi {
 		virtual std::string on_mustache_retrieve();
 
 		std::string m_resp_value;
-		Kakoune::SafePtr<ResponseFactory> m_factory;
 		Kakoune::SafePtr<cgi::Env> m_cgi_env;
 		Kakoune::SafePtr<SettingsBag> m_settings;
 		std::string m_website_root;

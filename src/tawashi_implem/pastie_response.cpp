@@ -31,12 +31,11 @@ namespace tawashi {
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (
-		const Kakoune::SafePtr<ResponseFactory>& parFactory,
 		const Kakoune::SafePtr<SettingsBag>& parSettings,
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		Response(parFactory, parSettings, parStreamOut, parCgiEnv, true),
+		Response(parSettings, parStreamOut, parCgiEnv, true),
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false),
 		m_syntax_highlight(true)

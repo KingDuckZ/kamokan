@@ -25,7 +25,6 @@ namespace tawashi {
 	class PastieResponse : public Response {
 	public:
 		PastieResponse (
-			const Kakoune::SafePtr<ResponseFactory>& parFactory,
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv

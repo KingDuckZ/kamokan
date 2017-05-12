@@ -28,13 +28,9 @@ namespace tawashi {
 		class Env;
 	} //namespace cgi
 
-	class ResponseFactory : public Kakoune::SafeCountable {
+	class ResponseFactory {
 	public:
-		typedef std::function<std::unique_ptr<Response>(
-			const Kakoune::SafePtr<ResponseFactory>&,
-			const Kakoune::SafePtr<SettingsBag>&,
-			const Kakoune::SafePtr<cgi::Env>&
-		)> ResponseMakerFunc;
+		typedef std::function<std::unique_ptr<Response>(const Kakoune::SafePtr<SettingsBag>&, const Kakoune::SafePtr<cgi::Env>& parCgiEnv)> ResponseMakerFunc;
 
 		explicit ResponseFactory (const Kakoune::SafePtr<SettingsBag>& parSettings, const Kakoune::SafePtr<cgi::Env>& parCgiEnv);
 		~ResponseFactory() noexcept;
