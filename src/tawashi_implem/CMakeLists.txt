@@ -24,6 +24,7 @@ add_library(${PROJECT_NAME} STATIC
 	settings_bag.cpp
 	sanitized_utf8.cpp
 	tiger.c
+	error_response.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

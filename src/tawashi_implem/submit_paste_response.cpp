@@ -123,16 +123,20 @@ namespace tawashi {
 		if (pastie.size() < settings.as<uint32_t>("min_pastie_size"))
 			return;
 		if (max_sz and pastie.size() > max_sz) {
-			if (settings.as<bool>("truncate_long_pasties"))
+			if (settings.as<bool>("truncate_long_pasties")) {
 				pastie = pastie.substr(0, max_sz);
-			else
+			}
+			else {
+				error_redirect(1, ErrorReasons::PostLengthNotInRange);
 				return;
+			}
 		}
 
 		//TODO: replace boost's lexical_cast with mine when I have some checks
 		//over invalid inputs
 		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
 		boost::optional<std::string> token = submit_to_redis(pastie, duration_int, lang);
+
 		if (token) {
 			std::ostringstream oss;
 			oss << base_uri() << '/' << *token;
@@ -140,9 +144,12 @@ namespace tawashi {
 				oss << '?' << lang;
 			this->change_type(Response::Location, oss.str());
 		}
+		else {
+			return;
+		}
 	}
 
-	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang) const {
+	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang) {
 		auto& redis = this->redis();
 		if (not redis.is_connected())
 			return boost::optional<std::string>();
@@ -150,6 +157,7 @@ namespace tawashi {
 		std::string ip_hash = hashed_ip(cgi_env().remote_addr());
 		if (redis.get(ip_hash)) {
 			//please wait and submit again
+			error_redirect(1, ErrorReasons::UserFlooding);
 			return boost::optional<std::string>();
 		}
 
@@ -167,6 +175,13 @@ namespace tawashi {
 				return boost::make_optional(token);
 		}
 
+		error_redirect(1, ErrorReasons::PastieNotSaved);
 		return boost::optional<std::string>();
+	}
+
+	void SubmitPasteResponse::error_redirect (int parCode, ErrorReasons parReason) {
+		std::ostringstream oss;
+		oss << base_uri() << "/error.cgi?code=" << parCode << "&reason=" << parReason;
+		this->change_type(Response::Location, oss.str());
 	}
 } //namespace tawashi

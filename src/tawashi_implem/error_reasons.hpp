@@ -17,29 +17,10 @@
 
 #pragma once
 
-#include "response.hpp"
-#include "error_reasons.hpp"
-#include <string>
-#include <boost/optional.hpp>
-#include <boost/utility/string_ref.hpp>
-
 namespace tawashi {
-	class SubmitPasteResponse : public Response {
-	public:
-		SubmitPasteResponse (
-			const Kakoune::SafePtr<SettingsBag>& parSettings,
-			std::ostream* parStreamOut,
-			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
-		);
-
-	protected:
-		virtual boost::string_ref page_basename() const override { return boost::string_ref("paste"); }
-
-	private:
-		virtual void on_process() override;
-		boost::optional<std::string> submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
-		void error_redirect (int parCode, ErrorReasons parReason);
-
-		std::string m_error_message;
+	enum ErrorReasons : int {
+		PostLengthNotInRange,
+		PastieNotSaved,
+		UserFlooding
 	};
 } //namespace tawashi

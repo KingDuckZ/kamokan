@@ -18,28 +18,22 @@
 #pragma once
 
 #include "response.hpp"
-#include "error_reasons.hpp"
-#include <string>
-#include <boost/optional.hpp>
 #include <boost/utility/string_ref.hpp>
 
 namespace tawashi {
-	class SubmitPasteResponse : public Response {
+	class ErrorResponse : public Response {
 	public:
-		SubmitPasteResponse (
+		ErrorResponse (
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 		);
 
 	protected:
-		virtual boost::string_ref page_basename() const override { return boost::string_ref("paste"); }
+		virtual boost::string_ref page_basename() const override { return boost::string_ref("error"); }
 
 	private:
-		virtual void on_process() override;
-		boost::optional<std::string> submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
-		void error_redirect (int parCode, ErrorReasons parReason);
-
-		std::string m_error_message;
+		virtual void on_mustache_prepare (mstch::map& parContext) override;
 	};
 } //namespace tawashi
+

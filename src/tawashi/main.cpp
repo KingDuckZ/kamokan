@@ -19,6 +19,7 @@
 #include "submit_paste_response.hpp"
 #include "pastie_response.hpp"
 #include "index_response.hpp"
+#include "error_response.hpp"
 #include "response_factory.hpp"
 #include "cgi_env.hpp"
 #include "ini_file.hpp"
@@ -54,8 +55,13 @@ namespace {
 	}
 
 	template <typename T>
-	std::unique_ptr<tawashi::Response> make_response (const Kakoune::SafePtr<tawashi::SettingsBag>& parSettings, const Kakoune::SafePtr<tawashi::cgi::Env>& parCgiEnv) {
-		return static_cast<std::unique_ptr<tawashi::Response>>(std::make_unique<T>(parSettings, &std::cout, parCgiEnv));
+	std::unique_ptr<tawashi::Response> make_response (
+		const Kakoune::SafePtr<tawashi::SettingsBag>& parSettings,
+		const Kakoune::SafePtr<tawashi::cgi::Env>& parCgiEnv
+	) {
+		return static_cast<std::unique_ptr<tawashi::Response>>(
+			std::make_unique<T>(parSettings, &std::cout, parCgiEnv)
+		);
 	}
 
 	void fill_defaults (tawashi::SettingsBag& parSettings) {
@@ -80,6 +86,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	using tawashi::IndexResponse;
 	using tawashi::SubmitPasteResponse;
 	using tawashi::PastieResponse;
+	using tawashi::ErrorResponse;
 	using tawashi::Response;
 
 	//Prepare the logger
@@ -108,6 +115,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);
 	resp_factory.register_maker("", &make_response<IndexResponse>);
 	resp_factory.register_maker("paste.cgi", &make_response<SubmitPasteResponse>);
+	resp_factory.register_maker("error.cgi", &make_response<ErrorResponse>);
 	resp_factory.register_jolly_maker(&make_response<PastieResponse>);
 
 	std::unique_ptr<Response> response = resp_factory.make_response(cgi_env->path_info().substr(1));

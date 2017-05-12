@@ -53,8 +53,10 @@ namespace tawashi {
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
 			bool parWantRedis
 		);
-		const cgi::Env& cgi_env() const;
+
 		void change_type (Types parRespType, std::string&& parValue);
+
+		const cgi::Env& cgi_env() const;
 		const boost::string_ref& base_uri() const;
 		virtual boost::string_ref page_basename() const = 0;
 		redis::IncRedis& redis() const;

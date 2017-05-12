@@ -1,0 +1,13 @@
+{{> head}}
+<body>
+	<form action="{{base_uri}}/paste.cgi" method="post" accept-charset="UTF-8">
+
+	{{> topbar}}
+
+	<p>An error occurred: {{error_message}}</p>
+
+</form>
+
+
+</body>
+</html>
