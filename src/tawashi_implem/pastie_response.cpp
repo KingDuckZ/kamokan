@@ -35,7 +35,7 @@ namespace tawashi {
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		Response(Response::ContentType, "text/html", parSettings, parStreamOut, parCgiEnv, true),
+		Response(parSettings, parStreamOut, parCgiEnv, true),
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false),
 		m_syntax_highlight(true)

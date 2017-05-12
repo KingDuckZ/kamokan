@@ -34,6 +34,8 @@
 
 namespace tawashi {
 	namespace {
+		const char g_def_response_type[] = "text/html";
+
 		//boost::string_ref fetch_page_basename (const cgi::Env& parEnv) {
 		//	const boost::string_ref& path = parEnv.path_info();
 
@@ -106,19 +108,17 @@ namespace tawashi {
 	} //unnamed namespace
 
 	Response::Response (
-		Types parRespType,
-		std::string&& parValue,
 		const Kakoune::SafePtr<SettingsBag>& parSettings,
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
 		bool parWantRedis
 	) :
-		m_resp_value(std::move(parValue)),
+		m_resp_value(g_def_response_type),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
 		m_cgi_env(parCgiEnv),
 		m_settings(parSettings),
 		m_website_root(make_root_path(*parSettings)),
-		m_resp_type(parRespType),
+		m_resp_type(ContentType),
 		m_stream_out(parStreamOut),
 		m_header_sent(false)
 	{

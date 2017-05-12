@@ -24,7 +24,7 @@ namespace tawashi {
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		Response(Response::ContentType, "text/html", parSettings, parStreamOut, parCgiEnv, false)
+		Response(parSettings, parStreamOut, parCgiEnv, false)
 	{
 	}
 } //namespace tawashi

@@ -48,8 +48,6 @@ namespace tawashi {
 		};
 
 		Response (
-			Types parRespType,
-			std::string&& parValue,
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv,

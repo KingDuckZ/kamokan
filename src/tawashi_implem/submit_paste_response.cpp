@@ -94,8 +94,9 @@ namespace tawashi {
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		Response(Response::ContentType, "text/plain", parSettings, parStreamOut, parCgiEnv, true)
+		Response(parSettings, parStreamOut, parCgiEnv, true)
 	{
+		this->change_type(Response::ContentType, "text/plain");
 	}
 
 	void SubmitPasteResponse::on_process() {
