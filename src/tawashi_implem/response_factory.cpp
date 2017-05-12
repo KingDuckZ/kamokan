@@ -45,11 +45,12 @@ namespace tawashi {
 		//spdlog::get("statuslog")->info("making response object for \"{}\"", parName);
 
 		auto maker_it = m_local_data->makers.find(std::string(parName.data(), parName.size()));
+		Kakoune::SafePtr<ResponseFactory> self(this);
 		if (m_local_data->makers.end() != maker_it) {
-			return maker_it->second(m_local_data->settings, m_local_data->cgi_env);
+			return maker_it->second(self, m_local_data->settings, m_local_data->cgi_env);
 		}
 		else if (m_local_data->jolly_maker) {
-			return m_local_data->jolly_maker(m_local_data->settings, m_local_data->cgi_env);
+			return m_local_data->jolly_maker(self, m_local_data->settings, m_local_data->cgi_env);
 		}
 		else {
 			assert(false);

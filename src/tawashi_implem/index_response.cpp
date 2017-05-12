@@ -20,11 +20,12 @@
 
 namespace tawashi {
 	IndexResponse::IndexResponse (
+		const Kakoune::SafePtr<ResponseFactory>& parFactory,
 		const Kakoune::SafePtr<SettingsBag>& parSettings,
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		Response(parSettings, parStreamOut, parCgiEnv, false)
+		Response(parFactory, parSettings, parStreamOut, parCgiEnv, false)
 	{
 	}
 } //namespace tawashi

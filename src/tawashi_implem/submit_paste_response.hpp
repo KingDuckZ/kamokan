@@ -26,6 +26,7 @@ namespace tawashi {
 	class SubmitPasteResponse : public Response {
 	public:
 		SubmitPasteResponse (
+			const Kakoune::SafePtr<ResponseFactory>& parFactory,
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv

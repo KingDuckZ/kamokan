@@ -23,6 +23,7 @@
 #include "pathname/pathname.hpp"
 #include "list_highlight_langs.hpp"
 #include "cgi_env.hpp"
+#include "response_factory.hpp"
 #include <utility>
 #include <cassert>
 #include <fstream>
@@ -108,12 +109,14 @@ namespace tawashi {
 	} //unnamed namespace
 
 	Response::Response (
+		const Kakoune::SafePtr<ResponseFactory>& parFactory,
 		const Kakoune::SafePtr<SettingsBag>& parSettings,
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
 		bool parWantRedis
 	) :
 		m_resp_value(g_def_response_type),
+		m_factory(parFactory),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
 		m_cgi_env(parCgiEnv),
 		m_settings(parSettings),
@@ -124,6 +127,7 @@ namespace tawashi {
 	{
 		assert(m_cgi_env);
 		assert(m_stream_out);
+		assert(m_factory);
 
 		if (parWantRedis) {
 			m_redis = std::make_unique<redis::IncRedis>(make_incredis(*parSettings));

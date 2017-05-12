@@ -21,6 +21,7 @@
 #include "ini_file.hpp"
 #include "settings_bag.hpp"
 #include "safe_stack_object.hpp"
+#include "response_factory.hpp"
 #include <sstream>
 #include <utility>
 #include <string>
@@ -57,11 +58,12 @@ namespace tawashi {
 	class IndexResponseCustomMustache : public IndexResponse {
 	public:
 		IndexResponseCustomMustache (
+			const Kakoune::SafePtr<ResponseFactory>& parFactory,
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 		) :
-			IndexResponse(parSettings, parStreamOut, parCgiEnv)
+			IndexResponse(parFactory, parSettings, parStreamOut, parCgiEnv)
 		{
 		}
 
@@ -106,7 +108,8 @@ TEST_CASE ("Index response", "[index][response]") {
 
 	std::stringstream response_stream;
 
-	tawashi::IndexResponseCustomMustache response(settings, &response_stream, fake_env);
+	SafeStackObject<tawashi::ResponseFactory> resp_factory(settings, fake_env);
+	tawashi::IndexResponseCustomMustache response(resp_factory, settings, &response_stream, fake_env);
 	response.send();
 
 	response_stream.seekg(0);
