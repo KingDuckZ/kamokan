@@ -21,7 +21,7 @@ add_subdirectory(lib/houdini)
 add_subdirectory(src/tawashi_implem)
 add_subdirectory(src/tawashi)
 
-install(DIRECTORY html DESTINATION .)
+install(DIRECTORY html/website/ DESTINATION html)
 
 if (BUILD_TESTING)
 	add_subdirectory(test/unit)
