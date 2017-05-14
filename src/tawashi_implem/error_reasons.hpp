@@ -17,10 +17,14 @@
 
 #pragma once
 
+#include "enum.h"
+
 namespace tawashi {
-	enum ErrorReasons : int {
+	BETTER_ENUM(ErrorReasons, int,
 		PostLengthNotInRange,
 		PastieNotSaved,
-		UserFlooding
-	};
+		UserFlooding,
+		UnkownReason,
+		RedisDisconnected
+	)
 } //namespace tawashi

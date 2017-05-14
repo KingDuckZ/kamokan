@@ -16,7 +16,12 @@
  */
 
 #include "error_response.hpp"
+#include "error_reasons.hpp"
+#include "cgi_env.hpp"
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/lexical_cast.hpp>
+#include <ciso646>
+#include <string>
 
 namespace tawashi {
 	ErrorResponse::ErrorResponse (
@@ -29,6 +34,15 @@ namespace tawashi {
 	}
 
 	void ErrorResponse::on_mustache_prepare (mstch::map& parContext) {
+		auto get = cgi_env().query_string_split();
+		auto err_code = boost::lexical_cast<int>(get["code"]);
+		const int reason_int = boost::lexical_cast<int>(get["reason"]);
+		ErrorReasons reason_code(ErrorReasons::UnkownReason);
+		if (reason_int >= 0 and reason_int < ErrorReasons::_size())
+			reason_code = ErrorReasons::_from_integral(reason_int);
+
 		parContext["error_message"] = "No error";
+		parContext["error_code"] = std::to_string(err_code);
+		parContext["error_id"] = std::to_string(reason_code);
 	}
 } //namespace tawashi

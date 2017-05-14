@@ -127,7 +127,7 @@ namespace tawashi {
 				pastie = pastie.substr(0, max_sz);
 			}
 			else {
-				error_redirect(1, ErrorReasons::PostLengthNotInRange);
+				error_redirect(431, ErrorReasons::PostLengthNotInRange);
 				return;
 			}
 		}
@@ -151,13 +151,15 @@ namespace tawashi {
 
 	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang) {
 		auto& redis = this->redis();
-		if (not redis.is_connected())
+		if (not redis.is_connected()) {
+			error_redirect(503, ErrorReasons::RedisDisconnected);
 			return boost::optional<std::string>();
+		}
 
 		std::string ip_hash = hashed_ip(cgi_env().remote_addr());
 		if (redis.get(ip_hash)) {
 			//please wait and submit again
-			error_redirect(1, ErrorReasons::UserFlooding);
+			error_redirect(429, ErrorReasons::UserFlooding);
 			return boost::optional<std::string>();
 		}
 
@@ -175,7 +177,7 @@ namespace tawashi {
 				return boost::make_optional(token);
 		}
 
-		error_redirect(1, ErrorReasons::PastieNotSaved);
+		error_redirect(500, ErrorReasons::PastieNotSaved);
 		return boost::optional<std::string>();
 	}
 

@@ -43,9 +43,9 @@ namespace tawashi {
 	}
 
 	void PastieResponse::on_process() {
-		auto env = cgi_env().query_string_split();
+		auto get = cgi_env().query_string_split();
 		const std::string& query_str(cgi_env().query_string());
-		if (env["m"] == "plain" or query_str.empty()) {
+		if (get["m"] == "plain" or query_str.empty()) {
 			this->change_type(Response::ContentType, "text/plain; charset=utf-8");
 			m_plain_text = true;
 		}
