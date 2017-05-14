@@ -24,23 +24,33 @@
 namespace tawashi {
 	BETTER_ENUM(CGIVars, std::size_t,
 		AUTH_TYPE = 0,
-		HTTP_USER_AGENT,
 		CONTENT_LENGTH,
 		CONTENT_TYPE,
+		DOCUMENT_ROOT, //The root directory of your server
 		GATEWAY_INTERFACE,
+		HTTP_COOKIE, //The visitor's cookie, if one is set
+		HTTP_HOST, //The hostname of your server
+		HTTP_REFERER, //The URL of the page that called your script
+		HTTPS, //"on" if the script is being called through a secure server
+		HTTP_USER_AGENT, //The browser type of your visitor
+		PATH, //The system path your server is running under
 		PATH_INFO,
 		PATH_TRANSLATED,
-		QUERY_STRING,
-		REMOTE_ADDR,
-		REMOTE_HOST,
+		QUERY_STRING, //The query string (see GET, below)
+		REMOTE_ADDR, //The IP address of the visitor
+		REMOTE_HOST, //The hostname of the visitor (if your server has reverse-name-lookups on; otherwise this is the IP address again)
 		REMOTE_IDENT,
-		REMOTE_USER,
-		REQUEST_METHOD,
-		SCRIPT_NAME,
-		SERVER_NAME,
-		SERVER_PORT,
+		REMOTE_PORT, //The port the visitor is connected to on the web server
+		REMOTE_USER, //The visitor's user name (for .htaccess-protected pages)
+		REQUEST_METHOD, //GET or POST
+		REQUEST_URI, //The interpreted pathname of the requested document or CGI (relative to the document root)
+		SCRIPT_FILENAME, //The full pathname of the current CGI
+		SCRIPT_NAME, //The interpreted pathname of the current CGI (relative to the document root)
+		SERVER_ADMIN, //The email address for your server's webmaster
+		SERVER_NAME, //Your server's fully qualified domain name (eg: www.example.com)
+		SERVER_PORT, //The port number your server is listening on
 		SERVER_PROTOCOL,
-		SERVER_SOFTWARE
+		SERVER_SOFTWARE //The server software you're using (such as Apache 1.3)
 	);
 
 	std::vector<std::string> cgi_environment_vars (const char* const* parEnvList);
