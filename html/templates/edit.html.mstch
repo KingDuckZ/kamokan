@@ -1,11 +1,13 @@
-{{>head}}
+
+{{> head}}
 <body>
 
 	{{> topbar}}
 
 	<div id="content">
-		{{pastie}}
+		<p>{{pastie}}</p>
 	</div>
 
 </body>
 </html>
+

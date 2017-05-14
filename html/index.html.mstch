@@ -11,7 +11,7 @@
 	<div>
 		<p class="title">Syntax Highlighting:</p>
 			<select name="lang" class="selectBox">
-				<option value="plaintext" selected="selected">None  </option>
+				<option value="" selected="selected">None  </option>
 				{{#languages}}
 				<option value="{{language_name}}">{{language_name}}</option>
 				{{/languages}}
