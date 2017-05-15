@@ -49,7 +49,7 @@ namespace tawashi {
 			"Unable to connect to Redis."
 		};
 
-		parContext["error_message"] = err_descs[reason_code];
+		parContext["error_message"] = std::string(err_descs[reason_code]);
 		parContext["error_code"] = std::to_string(err_code);
 		parContext["error_id"] = std::to_string(reason_code);
 	}

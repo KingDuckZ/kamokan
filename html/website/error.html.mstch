@@ -3,8 +3,8 @@
 
 <div id="content" class="error">
 
-	{{> error_code}}
-	{{> error_message}}
+	{{error_code}}
+	{{error_message}}
 
 	</div>
 
