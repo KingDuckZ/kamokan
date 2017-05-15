@@ -78,7 +78,7 @@ namespace tawashi {
 		boost::optional<std::string> load_whole_file (const std::string& parWebsiteRoot, const char* parSuffix, const boost::string_ref& parName, bool parThrow) {
 			std::ostringstream oss;
 			oss << parWebsiteRoot << parName << parSuffix;
-			spdlog::get("statuslog")->debug("Trying to load \"{}\"", oss.str());
+			spdlog::get("statuslog")->info("Trying to load \"{}\"", oss.str());
 			std::ifstream if_mstch(oss.str(), std::ios::binary | std::ios::in);
 
 			if (not if_mstch) {
