@@ -17,12 +17,17 @@
 
 #include "cgi_environment_vars.hpp"
 #include "sanitized_utf8.hpp"
+#include "string_lengths.hpp"
 #include <utility>
 #include <unordered_map>
 #include <boost/utility/string_ref.hpp>
 #include <cassert>
 #include <cstring>
 #include <boost/functional/hash.hpp>
+#include <cstddef>
+#if !defined(NDEBUG)
+#	include <cstring>
+#endif
 
 namespace std {
 	template<>
@@ -67,13 +72,19 @@ namespace tawashi {
 		retlist.reserve(CGIVars::_size());
 
 		auto unrefined_env_vars = get_unrefined_env_vars(parEnvList);
+		auto enum_str_lengths = string_lengths<CGIVars>();
 
+		std::size_t z = 0;
 		for (CGIVars var : CGIVars::_values()) {
-			auto it_found = unrefined_env_vars.find(var._to_string());
+#if !defined(NDEBUG)
+			assert(std::strlen(var._to_string()) == enum_str_lengths[z]);
+#endif
+			auto it_found = unrefined_env_vars.find(boost::string_ref(var._to_string(), enum_str_lengths[z]));
 			if (unrefined_env_vars.cend() != it_found)
 				retlist.push_back(sanitized_utf8(it_found->second));
 			else
 				retlist.push_back(std::string());
+			++z;
 		}
 		return retlist;
 	}
