@@ -21,36 +21,39 @@
 #include "sprout/cstring/strlen.hpp"
 #include "duckhandy/sequence_bt.hpp"
 #include <cstddef>
+#include <cstdint>
 
 namespace tawashi {
+	typedef uint16_t string_length_type;
+
 	namespace implem {
 		template <std::size_t I, std::size_t S>
-		inline constexpr std::size_t string_length_at_index (const sprout::array<const char*, S>& parStrings) {
-			return sprout::strlen(parStrings[I]);
+		inline constexpr string_length_type string_length_at_index (const sprout::array<const char*, S>& parStrings) {
+			return static_cast<string_length_type>(sprout::strlen(parStrings[I]));
 		}
 
 		template <std::size_t... Indices>
-		inline constexpr sprout::array<std::size_t, sizeof...(Indices)> string_lengths (const sprout::array<const char*, sizeof...(Indices)>& parStrings, dhandy::bt::index_seq<Indices...>) {
-			return sprout::array<std::size_t, sizeof...(Indices)> {
+		inline constexpr sprout::array<string_length_type, sizeof...(Indices)> string_lengths (const sprout::array<const char*, sizeof...(Indices)>& parStrings, dhandy::bt::index_seq<Indices...>) {
+			return sprout::array<string_length_type, sizeof...(Indices)> {
 				string_length_at_index<Indices>(parStrings)...
 			};
 		}
 
 		template <typename Enum, std::size_t... Indices>
-		inline constexpr sprout::array<std::size_t, Enum::_size()> string_lengths (const typename Enum::_name_iterable& parEnumIterable, dhandy::bt::index_seq<Indices...>) {
-			return sprout::array<std::size_t, Enum::_size()> {
-				sprout::strlen(parEnumIterable[Indices])...
+		inline constexpr sprout::array<string_length_type, Enum::_size()> string_lengths (const typename Enum::_name_iterable& parEnumIterable, dhandy::bt::index_seq<Indices...>) {
+			return sprout::array<string_length_type, Enum::_size()> {
+				static_cast<string_length_type>(sprout::strlen(parEnumIterable[Indices]))...
 			};
 		}
 	} //namespace implem
 
 	template <std::size_t S>
-	inline constexpr sprout::array<std::size_t, S> string_lengths (const sprout::array<const char*, S>& parStrings) {
+	inline constexpr sprout::array<string_length_type, S> string_lengths (const sprout::array<const char*, S>& parStrings) {
 		return implem::string_lengths(parStrings, dhandy::bt::index_range<0, S>());
 	}
 
 	template <typename Enum>
-	inline constexpr sprout::array<std::size_t, Enum::_size()> string_lengths() {
+	inline constexpr sprout::array<string_length_type, Enum::_size()> string_lengths() {
 		return implem::string_lengths<Enum>(Enum::_names(), dhandy::bt::index_range<0, Enum::_size()>());
 	}
 } //namespace tawashi
