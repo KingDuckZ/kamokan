@@ -14,6 +14,10 @@ configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/tawashiConfig.h.in"
 	"${TAWASHI_GEN_INCLUDE_DIR}/tawashiConfig.h"
 )
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config/debug_tawashi.ini.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/tawashi.ini"
+)
 
 add_subdirectory(lib/incredis)
 add_subdirectory(lib/mstch)
