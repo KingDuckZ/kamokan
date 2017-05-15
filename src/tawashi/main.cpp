@@ -79,6 +79,23 @@ namespace {
 		parSettings.add_default("logging_level", "err");
 		parSettings.add_default("resubmit_wait", "10");
 	}
+
+	void print_buildtime_info() {
+		std::cout << "NDEBUG defined: ";
+#if defined(NDEBUG)
+		std::cout << "yes (Release build)";
+#else
+		std::cout << "no (Debug build)";
+#endif
+		std::cout << '\n';
+		std::cout << "TAWASHI_CONFIG_FILE: \"" << TAWASHI_CONFIG_FILE << "\"\n";
+		std::cout << "TAWASHI_CONFIG_PATH: \"" << TAWASHI_CONFIG_PATH << "\"\n";
+		std::cout << "TAWASHI_PATH_PREFIX: \"" << TAWASHI_PATH_PREFIX << "\"\n";
+		std::cout << "VERSION_MAJOR: " << VERSION_MAJOR << '\n';
+		std::cout << "VERSION_MINOR: " << VERSION_MINOR << '\n';
+		std::cout << "VERSION_PATCH: " << VERSION_PATCH << '\n';
+		std::cout << "config_file_path(): \"" << config_file_path() << "\"\n";
+	}
 } //unnamed namespace
 
 int main (int parArgc, char* parArgv[], char* parEnvp[]) {
@@ -88,6 +105,11 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	using tawashi::PastieResponse;
 	using tawashi::ErrorResponse;
 	using tawashi::Response;
+
+	if (2 == parArgc and boost::string_ref(parArgv[1]) == "--show-paths") {
+		print_buildtime_info();
+		return 0;
+	}
 
 	//Prepare the logger
 	spdlog::set_pattern("[%Y-%m-%d %T %z] - %v");
