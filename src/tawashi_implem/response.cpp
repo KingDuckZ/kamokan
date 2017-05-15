@@ -82,6 +82,7 @@ namespace tawashi {
 			std::ifstream if_mstch(oss.str(), std::ios::binary | std::ios::in);
 
 			if (not if_mstch) {
+				spdlog::get("statuslog")->warn("Couldn't open file \"{}\"", oss.str());
 				if (parThrow)
 					throw std::runtime_error(std::string("File \"") + oss.str() + "\" not found");
 				else
