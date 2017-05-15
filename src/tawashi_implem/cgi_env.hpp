@@ -21,7 +21,6 @@
 #include "duckhandy/compatibility.h"
 #include "escapist.hpp"
 #include "kakoune/safe_ptr.hh"
-#include "tawashiConfig.h"
 #include <vector>
 #include <string>
 #include <boost/utility/string_ref.hpp>
@@ -43,27 +42,27 @@ namespace tawashi {
 			typedef boost::container::flat_map<std::string, std::string> GetMapType;
 
 			explicit Env (const char* const* parEnvList);
-			virtual_testing ~Env() noexcept;
+			~Env() noexcept;
 
-			virtual_testing const std::string& auth_type() const;
-			virtual_testing std::size_t content_length() const;
-			virtual_testing const std::string& content_type() const;
-			virtual_testing boost::optional<VersionInfo> gateway_interface() const a_pure;
-			virtual_testing const std::string& path_info() const;
-			virtual_testing const std::string& path_translated() const;
-			virtual_testing const std::string& query_string() const;
-			virtual_testing const std::string& remote_addr() const;
-			virtual_testing const std::string& remote_host() const;
-			virtual_testing const std::string& remote_ident() const;
-			virtual_testing const std::string& remote_user() const;
-			virtual_testing const std::string& request_method() const;
-			virtual_testing const std::string& script_name() const;
-			virtual_testing const std::string& server_name() const;
-			virtual_testing uint16_t server_port() const a_pure;
-			virtual_testing boost::optional<VersionInfo> server_protocol() const a_pure;
-			virtual_testing const std::string& server_software() const;
+			const std::string& auth_type() const;
+			std::size_t content_length() const;
+			const std::string& content_type() const;
+			boost::optional<VersionInfo> gateway_interface() const a_pure;
+			const std::string& path_info() const;
+			const std::string& path_translated() const;
+			const std::string& query_string() const;
+			const std::string& remote_addr() const;
+			const std::string& remote_host() const;
+			const std::string& remote_ident() const;
+			const std::string& remote_user() const;
+			const std::string& request_method() const;
+			const std::string& script_name() const;
+			const std::string& server_name() const;
+			uint16_t server_port() const a_pure;
+			boost::optional<VersionInfo> server_protocol() const a_pure;
+			const std::string& server_software() const;
 
-			virtual_testing GetMapType query_string_split() const a_pure;
+			GetMapType query_string_split() const a_pure;
 
 			std::ostream& print_all (std::ostream& parStream, const char* parNewline) const;
 

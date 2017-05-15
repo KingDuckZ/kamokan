@@ -10,7 +10,6 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_DEBUG} -Wall -Wpedantic -Wconversion 
 
 add_executable(${PROJECT_NAME}
 	check.cpp
-	fake_cgi_env.cpp
 	test_ini_file.cpp
 	test_settings_bag.cpp
 	test_index_response.cpp

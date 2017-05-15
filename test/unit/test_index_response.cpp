@@ -16,7 +16,7 @@
  */
 
 #include "catch.hpp"
-#include "fake_cgi_env.hpp"
+#include "cgi_env.hpp"
 #include "index_response.hpp"
 #include "ini_file.hpp"
 #include "settings_bag.hpp"
@@ -74,25 +74,25 @@ namespace tawashi {
 TEST_CASE ("Index response", "[index][response]") {
 	using curry::SafeStackObject;
 
-	std::string env_ini(
-		"[fake_env]\n"
-		"  auth_type = \n"
-		"  content_type = \n"
-		"  path_info = \n"
-		"  path_translated = \n"
-		"  query_string = index.cgi\n"
-		"  remote_addr = \n"
-		"  remote_host = \n"
-		"  remote_ident = \n"
-		"  remote_user = \n"
-		"  request_method = GET\n"
-		"  script_name = \n"
-		"  server_name = test_server\n"
-		"  server_software = \n"
-		"  content_length = 0\n"
-		"  server_port = 80\n"
-	);
-	SafeStackObject<tawashi::cgi::FakeEnv> fake_env(std::move(env_ini));
+	const char* const env_raw[] = {
+		"AUTH_TYPE=",
+		"CONTENT_TYPE=",
+		"PATH_INFO=",
+		"PATH_TRANSLATED=",
+		"QUERY_STRING=index.cgi"
+		"REMOTE_ADDR=",
+		"REMOTE_HOST=",
+		"REMOTE_IDENT=",
+		"REMOTE_USER=",
+		"REQUEST_METHOD=GET"
+		"SCRIPT_NAME=",
+		"SERVER_NAME=test_server"
+		"SERVER_SOFTWARE=",
+		"CONTENT_LENGTH=",
+		"SERVER_PORT=80",
+		nullptr
+	};
+	SafeStackObject<tawashi::cgi::Env> fake_env(env_raw);
 
 	std::string tawashi_settings(
 		"[tawashi]\n"
