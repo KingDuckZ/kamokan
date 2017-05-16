@@ -1,6 +1,6 @@
 {{>head}}
 <body>
-
+{{> topbar}}
 <div id="content" class="error">
 
 	{{error_code}}
