@@ -78,6 +78,7 @@ namespace {
 		parSettings.add_default("truncate_long_pasties", "false");
 		parSettings.add_default("logging_level", "err");
 		parSettings.add_default("resubmit_wait", "10");
+		parSettings.add_default("log_file", "-");
 	}
 
 	void print_buildtime_info() {
@@ -107,9 +108,20 @@ namespace {
 		return SafeStackObject<IniFile>(istream_iterator<char>(conf), istream_iterator<char>());
 	}
 
-	void set_logging_level (const tawashi::SettingsBag& parSettings) {
+	std::shared_ptr<spdlog::logger> setup_logging (const tawashi::SettingsBag& parSettings) {
+		//Prepare the logger
+		spdlog::set_pattern("[%Y-%m-%d %T %z] - %v");
+		spdlog::set_level(spdlog::level::trace); //set to maximum possible here
+		boost::string_ref log_path = parSettings["log_file"];
+		const bool log_to_stderr = (log_path == boost::string_ref("-"));
+		auto statuslog = (log_to_stderr ?
+			spdlog::stderr_logger_st("statuslog") :
+			spdlog::basic_logger_st("statuslog", std::string(log_path.begin(), log_path.end()), false)
+		);
+
 		auto logging_level = tawashi::LoggingLevels::_from_string_nocase(parSettings.as<std::string>("logging_level").c_str());
 		spdlog::set_level(static_cast<decltype(spdlog::level::trace)>(logging_level._to_integral()));
+		return statuslog;
 	}
 } //unnamed namespace
 
@@ -126,18 +138,12 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		return 0;
 	}
 
-	//Prepare the logger
-	spdlog::set_pattern("[%Y-%m-%d %T %z] - %v");
-	spdlog::set_level(spdlog::level::trace); //set to maximum possible here
-	auto statuslog = spdlog::stderr_logger_st("statuslog");
-
-	statuslog->info("Loading config: \"{}\"", config_file_path());
-
 	SafeStackObject<tawashi::IniFile> ini = load_ini();
 	auto settings = SafeStackObject<tawashi::SettingsBag>(ini);
 	fill_defaults(*settings);
 
-	set_logging_level(*settings);
+	auto statuslog = setup_logging(*settings);
+	statuslog->info("Loaded config: \"{}\"", config_file_path());
 
 	auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp);
 	tawashi::ResponseFactory resp_factory(settings, cgi_env);
