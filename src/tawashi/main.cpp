@@ -96,6 +96,21 @@ namespace {
 		std::cout << "VERSION_PATCH: " << VERSION_PATCH << '\n';
 		std::cout << "config_file_path(): \"" << config_file_path() << "\"\n";
 	}
+
+	curry::SafeStackObject<tawashi::IniFile> load_ini() {
+		using curry::SafeStackObject;
+		using tawashi::IniFile;
+		using std::istream_iterator;
+
+		std::ifstream conf(config_file_path());
+		conf >> std::noskipws;
+		return SafeStackObject<IniFile>(istream_iterator<char>(conf), istream_iterator<char>());
+	}
+
+	void set_logging_level (const tawashi::SettingsBag& parSettings) {
+		auto logging_level = tawashi::LoggingLevels::_from_string_nocase(parSettings.as<std::string>("logging_level").c_str());
+		spdlog::set_level(static_cast<decltype(spdlog::level::trace)>(logging_level._to_integral()));
+	}
 } //unnamed namespace
 
 int main (int parArgc, char* parArgv[], char* parEnvp[]) {
@@ -118,18 +133,11 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 
 	statuslog->info("Loading config: \"{}\"", config_file_path());
 
-	std::ifstream conf(config_file_path());
-	conf >> std::noskipws;
-	auto ini = SafeStackObject<tawashi::IniFile>(std::istream_iterator<char>(conf), std::istream_iterator<char>());
-	conf.close();
-
+	SafeStackObject<tawashi::IniFile> ini = load_ini();
 	auto settings = SafeStackObject<tawashi::SettingsBag>(ini);
 	fill_defaults(*settings);
 
-	{
-		auto logging_level = tawashi::LoggingLevels::_from_string_nocase(settings->as<std::string>("logging_level").c_str());
-		spdlog::set_level(static_cast<decltype(spdlog::level::trace)>(logging_level._to_integral()));
-	}
+	set_logging_level(*settings);
 
 	auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp);
 	tawashi::ResponseFactory resp_factory(settings, cgi_env);
