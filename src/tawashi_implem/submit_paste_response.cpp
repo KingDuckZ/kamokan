@@ -24,9 +24,8 @@
 #include "duckhandy/compatibility.h"
 #include "duckhandy/lexical_cast.hpp"
 #include "duckhandy/int_to_string_ary.hpp"
+#include "tawashi_exception.hpp"
 #include <ciso646>
-#include <sstream>
-#include <stdexcept>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include <cstdint>
@@ -40,9 +39,14 @@ namespace tawashi {
 		const char g_language_key[] = "lang";
 		const char g_duration_key[] = "ttl";
 
-		class MissingPostVarError : public std::runtime_error {
+		class MissingPostVarError : public TawashiException {
 		public:
-			MissingPostVarError (const std::string& parMsg) : std::runtime_error(parMsg) {}
+			explicit MissingPostVarError(const boost::string_ref& parKey) :
+				TawashiException(
+					ErrorReasons::MissingPostVariable,
+					"Error retrieving POST variable \"" + std::string(parKey.begin(), parKey.end()) + "\""
+				)
+			{}
 		};
 
 		template <std::size_t N>
@@ -57,11 +61,8 @@ namespace tawashi {
 		boost::string_ref get_value_from_post (const cgi::PostMapType& parPost, boost::string_ref parKey) {
 			std::string key(parKey.data(), parKey.size());
 			auto post_data_it = parPost.find(key);
-			if (parPost.end() == post_data_it) {
-				std::ostringstream oss;
-				oss << "can't find POST data field \"" << parKey << '"';
-				throw MissingPostVarError(oss.str());
-			}
+			if (parPost.end() == post_data_it)
+				throw MissingPostVarError(parKey);
 			return post_data_it->second;
 		}
 
@@ -104,18 +105,24 @@ namespace tawashi {
 		boost::string_ref pastie;
 		boost::string_ref lang;
 		boost::string_ref duration;
+
+		auto statuslog = spdlog::get("statuslog");
+		assert(statuslog);
+
 		try {
 			pastie = get_value_from_post(post, make_string_ref(g_post_key));
 		}
-		catch (const MissingPostVarError& e) {
-			m_error_message = e.what();
+		catch (const TawashiException& e) {
+			statuslog->error(e.what());
+			error_redirect(500, e.reason());
 			return;
 		}
 		try {
 			lang = get_value_from_post(post, make_string_ref(g_language_key));
 			duration = get_value_from_post(post, make_string_ref(g_duration_key));
 		}
-		catch (const MissingPostVarError&) {
+		catch (const MissingPostVarError& e) {
+			statuslog->info(e.what());
 		}
 
 		const SettingsBag& settings = this->settings();
@@ -145,6 +152,7 @@ namespace tawashi {
 			this->change_type(Response::Location, oss.str());
 		}
 		else {
+			error_redirect(500, ErrorReasons::PastieNotSaved);
 			return;
 		}
 	}

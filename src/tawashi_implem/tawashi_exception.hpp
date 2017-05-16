@@ -16,16 +16,20 @@
  */
 
 #pragma once
-
-#include "enum.h"
+#include "error_reasons.hpp"
+#include <stdexcept>
+#include <string>
+#include <boost/utility/string_ref.hpp>
 
 namespace tawashi {
-	BETTER_ENUM(ErrorReasons, int,
-		PostLengthNotInRange,
-		PastieNotSaved,
-		UserFlooding,
-		UnkownReason,
-		RedisDisconnected,
-		MissingPostVariable
-	)
+	class TawashiException : public std::runtime_error {
+	public:
+		TawashiException (ErrorReasons parReason, const boost::string_ref& parMessage);
+		~TawashiException() noexcept;
+
+		ErrorReasons reason() const { return m_reason; }
+
+	private:
+		ErrorReasons m_reason;
+	};
 } //namespace tawashi

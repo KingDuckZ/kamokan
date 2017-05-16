@@ -49,7 +49,8 @@ namespace tawashi {
 			"Submitted pastie couldn't be saved.",
 			"The pastie was not saved because the client is submitting too many pasties too quickly. Please wait a bit longer and try again.",
 			"An unknown error was raised.",
-			"Unable to connect to Redis."
+			"Unable to connect to Redis.",
+			"Request is missing a POST variable."
 		};
 		constexpr const auto lengths = string_lengths(err_descs);
 		static_assert(err_descs.static_size == lengths.static_size, "Mismatching array sizes between strings and their lengths");

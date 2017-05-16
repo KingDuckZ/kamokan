@@ -15,17 +15,23 @@
  * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "enum.h"
+#include "tawashi_exception.hpp"
+#include <sstream>
 
 namespace tawashi {
-	BETTER_ENUM(ErrorReasons, int,
-		PostLengthNotInRange,
-		PastieNotSaved,
-		UserFlooding,
-		UnkownReason,
-		RedisDisconnected,
-		MissingPostVariable
-	)
+	namespace {
+		std::string compose_err_message (ErrorReasons parReason, const boost::string_ref& parMessage) {
+			std::ostringstream oss;
+			oss << "Exception with reason " << parReason << ": " << parMessage;
+			return oss.str();
+		}
+	} //unnamed namespace
+
+	TawashiException::TawashiException (ErrorReasons parReason, const boost::string_ref& parMessage) :
+		std::runtime_error(compose_err_message(parReason, parMessage)),
+		m_reason(parReason)
+	{
+	}
+
+	TawashiException::~TawashiException() noexcept = default;
 } //namespace tawashi

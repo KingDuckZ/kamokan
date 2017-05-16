@@ -39,7 +39,5 @@ namespace tawashi {
 		virtual void on_process() override;
 		boost::optional<std::string> submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
 		void error_redirect (int parCode, ErrorReasons parReason);
-
-		std::string m_error_message;
 	};
 } //namespace tawashi

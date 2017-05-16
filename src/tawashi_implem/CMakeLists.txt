@@ -25,6 +25,7 @@ add_library(${PROJECT_NAME} STATIC
 	sanitized_utf8.cpp
 	tiger.c
 	error_response.cpp
+	tawashi_exception.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
