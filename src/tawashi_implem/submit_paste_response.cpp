@@ -190,6 +190,10 @@ namespace tawashi {
 	}
 
 	void SubmitPasteResponse::error_redirect (int parCode, ErrorReasons parReason) {
+		auto statuslog = spdlog::get("statuslog");
+		assert(statuslog);
+		statuslog->info("Redirecting to error page, code={} reason={}", parCode, parReason);
+
 		std::ostringstream oss;
 		oss << base_uri() << "/error.cgi?code=" << parCode << "&reason=" << parReason._to_integral();
 		this->change_type(Response::Location, oss.str());
