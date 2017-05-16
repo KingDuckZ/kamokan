@@ -152,7 +152,6 @@ namespace tawashi {
 			this->change_type(Response::Location, oss.str());
 		}
 		else {
-			error_redirect(500, ErrorReasons::PastieNotSaved);
 			return;
 		}
 	}
