@@ -143,6 +143,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	fill_defaults(*settings);
 
 	auto statuslog = setup_logging(*settings);
+	SPDLOG_DEBUG(statuslog, "tawashi started");
 	statuslog->info("Loaded config: \"{}\"", config_file_path());
 
 	auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp);
@@ -157,5 +158,6 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	std::unique_ptr<Response> response = resp_factory.make_response(cgi_env->path_info().substr(1));
 	response->send();
 
+	SPDLOG_DEBUG(statuslog, "tawashi done, quitting");
 	return 0;
 }
