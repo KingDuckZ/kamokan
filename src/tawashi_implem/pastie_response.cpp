@@ -27,7 +27,7 @@
 
 namespace tawashi {
 	namespace {
-		const char g_nolang_token[] = "plaintext";
+		const char g_nolang_token[] = "colourless";
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (
