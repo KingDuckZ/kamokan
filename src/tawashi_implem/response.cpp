@@ -185,6 +185,7 @@ namespace tawashi {
 			break;
 		case Location:
 			SPDLOG_TRACE(statuslog, "Response is a Location (redirect)");
+			*m_stream_out << "Status: 303 See Other" << "\n";
 			*m_stream_out << "Location: " << m_resp_value << "\n\n";
 			render_page = false;
 			break;

@@ -127,8 +127,10 @@ namespace tawashi {
 
 		const SettingsBag& settings = this->settings();
 		const auto max_sz = settings.as<uint32_t>("max_pastie_size");
-		if (pastie.size() < settings.as<uint32_t>("min_pastie_size"))
+		if (pastie.size() < settings.as<uint32_t>("min_pastie_size")) {
+			error_redirect(431, ErrorReasons::PostLengthNotInRange);
 			return;
+		}
 		if (max_sz and pastie.size() > max_sz) {
 			if (settings.as<bool>("truncate_long_pasties")) {
 				pastie = pastie.substr(0, max_sz);
@@ -147,11 +149,13 @@ namespace tawashi {
 		if (token) {
 			std::ostringstream oss;
 			oss << base_uri() << '/' << *token;
+			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", *token, oss.str());
 			if (not lang.empty())
 				oss << '?' << lang;
 			this->change_type(Response::Location, oss.str());
 		}
 		else {
+			statuslog->info("Empty pastie token (possibly due to a previous failure)");
 			return;
 		}
 	}
