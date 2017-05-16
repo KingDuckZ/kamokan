@@ -177,6 +177,7 @@ namespace tawashi {
 		this->on_mustache_prepare(mustache_context);
 
 		m_header_sent = true;
+		bool render_page = true;
 		switch (m_resp_type) {
 		case ContentType:
 			SPDLOG_TRACE(statuslog, "Response is a Content-type (data)");
@@ -185,21 +186,25 @@ namespace tawashi {
 		case Location:
 			SPDLOG_TRACE(statuslog, "Response is a Location (redirect)");
 			*m_stream_out << "Location: " << m_resp_value << "\n\n";
+			render_page = false;
 			break;
 		}
 
-		SPDLOG_TRACE(statuslog, "Rendering in mustache");
-		*m_stream_out << mstch::render(
-			on_mustache_retrieve(),
-			mustache_context,
-			std::bind(
-				&load_whole_file,
-				std::cref(m_website_root),
-				".mustache",
-				std::placeholders::_1,
-				false
-			)
-		);
+		if (render_page) {
+			SPDLOG_TRACE(statuslog, "Rendering in mustache");
+			*m_stream_out << mstch::render(
+				on_mustache_retrieve(),
+				mustache_context,
+				std::bind(
+					&load_whole_file,
+					std::cref(m_website_root),
+					".mustache",
+					std::placeholders::_1,
+					false
+				)
+			);
+		}
+
 		SPDLOG_TRACE(statuslog, "Flushing output");
 		m_stream_out->flush();
 	}

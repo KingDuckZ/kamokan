@@ -22,6 +22,7 @@
 #include <string>
 #include <boost/optional.hpp>
 #include <boost/utility/string_ref.hpp>
+#include <cassert>
 
 namespace tawashi {
 	class SubmitPasteResponse : public Response {
@@ -33,7 +34,7 @@ namespace tawashi {
 		);
 
 	protected:
-		virtual boost::string_ref page_basename() const override { return boost::string_ref("paste"); }
+		virtual boost::string_ref page_basename() const override { assert(false); return boost::string_ref(""); }
 
 	private:
 		virtual void on_process() override;
