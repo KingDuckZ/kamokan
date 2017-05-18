@@ -66,6 +66,16 @@ namespace tawashi {
 			return post_data_it->second;
 		}
 
+		boost::string_ref get_value_from_post_log_failure (const cgi::PostMapType& parPost, boost::string_ref parKey) {
+			try {
+				return get_value_from_post(parPost, parKey);
+			}
+			catch (const MissingPostVarError& e) {
+				spdlog::get("statuslog")->info(e.what());
+				return boost::string_ref();
+			}
+		}
+
 		std::string hashed_ip (const std::string& parIP) {
 			using dhandy::tags::hex;
 
@@ -115,13 +125,9 @@ namespace tawashi {
 			statuslog->error(e.what());
 			return make_error_redirect(HttpStatusCodes::Code500_InternalServerError, e.reason());
 		}
-		try {
-			lang = get_value_from_post(post, make_string_ref(g_language_key));
-			duration = get_value_from_post(post, make_string_ref(g_duration_key));
-		}
-		catch (const MissingPostVarError& e) {
-			statuslog->info(e.what());
-		}
+
+		lang = get_value_from_post_log_failure(post, make_string_ref(g_language_key));
+		duration = get_value_from_post_log_failure(post, make_string_ref(g_duration_key));
 
 		const SettingsBag& settings = this->settings();
 		const auto max_sz = settings.as<uint32_t>("max_pastie_size");
