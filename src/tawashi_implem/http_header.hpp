@@ -47,6 +47,8 @@ namespace tawashi {
 		};
 
 		HttpHeader();
+		HttpHeader (const HttpHeader&) = default;
+		HttpHeader (HttpHeader&&) = default;
 		HttpHeader (Types parType, HttpStatusCodes parCode, std::string&& parParam);
 		~HttpHeader() noexcept = default;
 
