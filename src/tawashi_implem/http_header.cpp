@@ -42,36 +42,6 @@ namespace tawashi {
 			return "INVALID STATUS CODE";
 		}
 
-		inline constexpr uint16_t single_status_code_to_code (const char* parCode) {
-			std::size_t idx = 0;
-			uint16_t ret_num = 0;
-			uint16_t digits = 0;
-			char cur_char = 0;
-			while ((cur_char = parCode[idx++]) and digits < 3) {
-				if (cur_char >= '0' and cur_char <= '9') {
-					uint16_t multip = 1;
-					for (uint16_t z = 1; z < (3 - digits); ++z) {
-						multip *= 10;
-					}
-					ret_num += multip * (cur_char - '0');
-					++digits;
-				}
-			}
-			return ret_num;
-		}
-
-		template <int... Values>
-		inline constexpr sprout::array<uint16_t, sizeof...(Values)> make_status_codes_lookup (dhandy::bt::number_seq<int, Values...>) {
-			return sprout::array<uint16_t, sizeof...(Values)> {
-				single_status_code_to_code(HttpStatusCodes::_names()[Values])...
-			};
-		}
-
-		uint16_t status_code_name_to_num (HttpStatusCodes parCode) {
-			constexpr const auto status_codes = make_status_codes_lookup(dhandy::bt::number_range<int, 0, HttpStatusCodes::_size() - 1>());
-			return status_codes[parCode._to_integral()];
-		}
-
 		constexpr auto g_status_code_descriptions = ::better_enums::make_map(get_status_code_desc);
 	} //unnamed namespace
 
@@ -102,12 +72,16 @@ namespace tawashi {
 		m_param = std::move(parParameter);
 	}
 
+	bool HttpHeader::body_required() const {
+		return type() == ContentType;
+	}
+
 	std::ostream& operator<< (std::ostream& parStream, const HttpHeader& parHeader) {
 		const HttpStatusCodes code_none = HttpStatusCodes::CodeNone;
 		if (parHeader.status_code() != code_none) {
 			parStream <<
 				"Status: " <<
-				status_code_name_to_num(parHeader.status_code()) <<
+				parHeader.status_code()._to_integral() <<
 				g_status_code_descriptions[parHeader.status_code()] <<
 				'\n'
 			;
@@ -132,22 +106,5 @@ namespace tawashi {
 
 	HttpHeader make_header_type_text_utf8() {
 		return HttpHeader(HttpHeader::ContentType, HttpStatusCodes::CodeNone, "text/plain; charset=utf-8");
-	}
-
-	HttpStatusCodes int_to_status_code (uint16_t parCode) {
-		constexpr const auto status_codes = make_status_codes_lookup(dhandy::bt::number_range<int, 0, HttpStatusCodes::_size() - 1>());
-		auto it_found_code = std::find(status_codes.begin(), status_codes.end(), parCode);
-		if (it_found_code != status_codes.end()) {
-			const auto index = it_found_code - status_codes.begin();
-			assert(index < HttpStatusCodes::_size() - 1);
-			return HttpStatusCodes::_from_integral(index);
-		}
-		else {
-			return HttpStatusCodes::CodeNone;
-		}
-	}
-
-	bool HttpHeader::body_required() const {
-		return type() == ContentType;
 	}
 } //namespace tawashi

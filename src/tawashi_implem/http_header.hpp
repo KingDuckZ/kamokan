@@ -23,20 +23,20 @@
 #include <ostream>
 
 namespace tawashi {
-	SLOW_ENUM(HttpStatusCodes, uint16_t,
-		Code301_MovedPermanently,
-		Code302_Found,
-		Code303_SeeOther,
-		Code400_BadRequest,
-		Code403_Forbidden,
-		Code404_NotFound,
-		Code413_PayloadTooLarge,
-		Code429_TooManyRequests,
-		Code431_RequestHeaderFieldsTooLarge,
-		Code500_InternalServerError,
-		Code501_NotImplemented,
-		Code503_ServiceUnavailable,
-		CodeNone
+	BETTER_ENUM(HttpStatusCodes, uint16_t,
+		Code301_MovedPermanently = 301,
+		Code302_Found = 302,
+		Code303_SeeOther = 303,
+		Code400_BadRequest = 400,
+		Code403_Forbidden = 403,
+		Code404_NotFound = 404,
+		Code413_PayloadTooLarge = 413,
+		Code429_TooManyRequests = 429,
+		Code431_RequestHeaderFieldsTooLarge = 431,
+		Code500_InternalServerError = 500,
+		Code501_NotImplemented = 501,
+		Code503_ServiceUnavailable = 503,
+		CodeNone = 0
 	)
 	class HttpHeader {
 	public:
@@ -70,5 +70,4 @@ namespace tawashi {
 	std::ostream& operator<< (std::ostream& parStream, const HttpHeader& parHeader);
 	HttpHeader make_header_type_html();
 	HttpHeader make_header_type_text_utf8();
-	HttpStatusCodes int_to_status_code (uint16_t parCode);
 } //namespace tawashi

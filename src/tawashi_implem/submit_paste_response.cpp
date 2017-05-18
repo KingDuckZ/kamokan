@@ -113,7 +113,7 @@ namespace tawashi {
 		}
 		catch (const TawashiException& e) {
 			statuslog->error(e.what());
-			return make_error_redirect(500, e.reason());
+			return make_error_redirect(HttpStatusCodes::Code500_InternalServerError, e.reason());
 		}
 		try {
 			lang = get_value_from_post(post, make_string_ref(g_language_key));
@@ -126,14 +126,14 @@ namespace tawashi {
 		const SettingsBag& settings = this->settings();
 		const auto max_sz = settings.as<uint32_t>("max_pastie_size");
 		if (pastie.size() < settings.as<uint32_t>("min_pastie_size")) {
-			return make_error_redirect(431, ErrorReasons::PostLengthNotInRange);
+			return make_error_redirect(HttpStatusCodes::Code431_RequestHeaderFieldsTooLarge, ErrorReasons::PostLengthNotInRange);
 		}
 		if (max_sz and pastie.size() > max_sz) {
 			if (settings.as<bool>("truncate_long_pasties")) {
 				pastie = pastie.substr(0, max_sz);
 			}
 			else {
-				return make_error_redirect(431, ErrorReasons::PostLengthNotInRange);
+				return make_error_redirect(HttpStatusCodes::Code431_RequestHeaderFieldsTooLarge, ErrorReasons::PostLengthNotInRange);
 			}
 		}
 
@@ -164,13 +164,13 @@ namespace tawashi {
 	) -> StringOrHeader {
 		auto& redis = this->redis();
 		if (not redis.is_connected()) {
-			return std::make_pair(boost::optional<std::string>(), make_error_redirect(503, ErrorReasons::RedisDisconnected));
+			return std::make_pair(boost::optional<std::string>(), make_error_redirect(HttpStatusCodes::Code503_ServiceUnavailable, ErrorReasons::RedisDisconnected));
 		}
 
 		std::string ip_hash = hashed_ip(cgi_env().remote_addr());
 		if (redis.get(ip_hash)) {
 			//please wait and submit again
-			return std::make_pair(boost::optional<std::string>(), make_error_redirect(429, ErrorReasons::UserFlooding));
+			return std::make_pair(boost::optional<std::string>(), make_error_redirect(HttpStatusCodes::Code429_TooManyRequests, ErrorReasons::UserFlooding));
 		}
 
 		const auto next_id = redis.incr("paste_counter");
@@ -187,6 +187,6 @@ namespace tawashi {
 				return std::make_pair(boost::make_optional(token), HttpHeader());
 		}
 
-		return std::make_pair(boost::optional<std::string>(), make_error_redirect(500, ErrorReasons::PastieNotSaved));
+		return std::make_pair(boost::optional<std::string>(), make_error_redirect(HttpStatusCodes::Code500_InternalServerError, ErrorReasons::PastieNotSaved));
 	}
 } //namespace tawashi
