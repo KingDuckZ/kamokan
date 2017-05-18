@@ -82,6 +82,7 @@ namespace tawashi {
 			parStream <<
 				"Status: " <<
 				parHeader.status_code()._to_integral() <<
+				' ' <<
 				g_status_code_descriptions[parHeader.status_code()] <<
 				'\n'
 			;

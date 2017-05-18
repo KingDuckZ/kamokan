@@ -149,7 +149,7 @@ namespace tawashi {
 			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", *token, oss.str());
 			if (not lang.empty())
 				oss << '?' << lang;
-			return this->make_redirect(HttpStatusCodes::CodeNone, oss.str());
+			return this->make_redirect(HttpStatusCodes::Code303_SeeOther, oss.str());
 		}
 		else {
 			statuslog->info("Empty pastie token (possibly due to a previous failure)");
