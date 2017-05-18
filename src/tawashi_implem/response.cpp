@@ -246,7 +246,7 @@ namespace tawashi {
 		statuslog->info("Redirecting to error page, code={} reason={}", parCode, parReason);
 
 		std::ostringstream oss;
-		oss << "error.cgi?code=" << parCode << "&reason=" << parReason._to_integral();
+		oss << "error.cgi?code=" << parCode._to_integral() << "&reason=" << parReason._to_integral();
 		return make_redirect(parCode, oss.str());
 	}
 } //namespace tawashi
