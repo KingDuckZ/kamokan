@@ -58,7 +58,7 @@ namespace tawashi {
 		const SettingsBag& settings() const;
 		virtual std::string load_mustache() const;
 		HttpHeader make_redirect (HttpStatusCodes parCode, const std::string& parLocation);
-		HttpHeader make_error_redirect (HttpStatusCodes parCode, ErrorReasons parReason);
+		HttpHeader make_error_redirect (ErrorReasons parReason);
 
 	private:
 		virtual HttpHeader on_process();

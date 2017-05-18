@@ -38,7 +38,6 @@ namespace tawashi {
 
 	void ErrorResponse::on_mustache_prepare (mstch::map& parContext) {
 		auto get = cgi_env().query_string_split();
-		auto err_code = boost::lexical_cast<int>(get["code"]);
 		const int reason_int = boost::lexical_cast<int>(get["reason"]);
 		ErrorReasons reason_code(ErrorReasons::UnkownReason);
 		if (reason_int >= 0 and reason_int < ErrorReasons::_size())
@@ -62,7 +61,6 @@ namespace tawashi {
 #endif
 
 		parContext["error_message"] = std::string(err_descs[reason_code], lengths[reason_code]);
-		parContext["error_code"] = std::to_string(err_code);
 		parContext["error_id"] = std::to_string(reason_code);
 	}
 } //namespace tawashi

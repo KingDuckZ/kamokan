@@ -240,13 +240,14 @@ namespace tawashi {
 		return HttpHeader(HttpHeader::Location, parCode, oss.str());
 	}
 
-	HttpHeader Response::make_error_redirect (HttpStatusCodes parCode, ErrorReasons parReason) {
+	HttpHeader Response::make_error_redirect (ErrorReasons parReason) {
 		auto statuslog = spdlog::get("statuslog");
 		assert(statuslog);
-		statuslog->info("Redirecting to error page, code={} reason={}", parCode, parReason);
+		const HttpStatusCodes redir_code = HttpStatusCodes::Code302_Found;
+		statuslog->info("Redirecting to error page, code={} reason={}", redir_code, parReason);
 
 		std::ostringstream oss;
-		oss << "error.cgi?code=" << parCode._to_integral() << "&reason=" << parReason._to_integral();
-		return make_redirect(parCode, oss.str());
+		oss << "error.cgi?reason=" << parReason._to_integral();
+		return make_redirect(redir_code, oss.str());
 	}
 } //namespace tawashi
