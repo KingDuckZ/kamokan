@@ -146,6 +146,10 @@ namespace cgi {
 		return m_cgi_env[CGIVars::SERVER_NAME];
 	}
 
+	bool Env::https() const {
+		return m_cgi_env[CGIVars::HTTPS] == "on";
+	}
+
 	uint16_t Env::server_port() const {
 		using dhandy::lexical_cast;
 		const std::string& value = m_cgi_env[CGIVars::SERVER_PORT];

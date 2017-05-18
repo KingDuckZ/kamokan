@@ -57,7 +57,7 @@ namespace tawashi {
 		void change_type (Types parRespType, std::string&& parValue);
 
 		const cgi::Env& cgi_env() const;
-		const boost::string_ref& base_uri() const;
+		const std::string& base_uri() const;
 		virtual boost::string_ref page_basename() const = 0;
 		redis::IncRedis& redis() const;
 		const SettingsBag& settings() const;
@@ -72,6 +72,7 @@ namespace tawashi {
 		Kakoune::SafePtr<cgi::Env> m_cgi_env;
 		Kakoune::SafePtr<SettingsBag> m_settings;
 		std::string m_website_root;
+		std::string m_base_uri;
 		Types m_resp_type;
 		std::unique_ptr<redis::IncRedis> m_redis;
 		std::ostream* m_stream_out;

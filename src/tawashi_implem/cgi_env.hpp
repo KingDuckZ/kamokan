@@ -58,6 +58,7 @@ namespace tawashi {
 			const std::string& request_method() const;
 			const std::string& script_name() const;
 			const std::string& server_name() const;
+			bool https() const;
 			uint16_t server_port() const a_pure;
 			boost::optional<VersionInfo> server_protocol() const a_pure;
 			const std::string& server_software() const;

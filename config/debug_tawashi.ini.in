@@ -2,7 +2,7 @@
 redis_server = 127.0.0.1
 redis_port = 6379
 redis_mode = inet
-base_uri = http://127.0.0.1:8080
+base_uri = 127.0.0.1:8080
 website_root = @CMAKE_CURRENT_BINARY_DIR@/html
 logging_level = trace
 log_file = @CMAKE_CURRENT_BINARY_DIR@/tawashi.log

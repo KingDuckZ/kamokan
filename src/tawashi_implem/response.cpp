@@ -106,6 +106,16 @@ namespace tawashi {
 		std::string disable_mstch_escaping (const std::string& parStr) {
 			return parStr;
 		};
+
+		std::string make_base_uri (const boost::string_ref& parBaseURI, bool parHttps) {
+			std::ostringstream oss;
+			if (parHttps)
+				oss << "https://";
+			else
+				oss << "http://";
+			oss << parBaseURI;
+			return oss.str();
+		}
 	} //unnamed namespace
 
 	Response::Response (
@@ -119,6 +129,7 @@ namespace tawashi {
 		m_cgi_env(parCgiEnv),
 		m_settings(parSettings),
 		m_website_root(make_root_path(*parSettings)),
+		m_base_uri(make_base_uri(m_settings->at("base_uri"), m_cgi_env->https())),
 		m_resp_type(ContentType),
 		m_stream_out(parStreamOut),
 		m_header_sent(false)
@@ -158,7 +169,7 @@ namespace tawashi {
 		SPDLOG_TRACE(statuslog, "Preparing mustache dictionary");
 		mstch::map mustache_context {
 			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
-			{"base_uri", m_settings->as<std::string>("base_uri")},
+			{"base_uri", std::string(base_uri())},
 			{"languages", make_mstch_langmap(*m_settings)}
 		};
 
@@ -225,8 +236,8 @@ namespace tawashi {
 		m_resp_value = std::move(parValue);
 	}
 
-	const boost::string_ref& Response::base_uri() const {
-		return m_settings->at("base_uri");
+	const std::string& Response::base_uri() const {
+		return m_base_uri;
 	}
 
 	std::string Response::load_mustache() const {
