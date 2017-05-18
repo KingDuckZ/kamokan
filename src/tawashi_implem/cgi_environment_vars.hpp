@@ -22,7 +22,7 @@
 #include "enum.h"
 
 namespace tawashi {
-	BETTER_ENUM(CGIVars, std::size_t,
+	SLOW_ENUM(CGIVars, std::size_t,
 		AUTH_TYPE = 0,
 		CONTENT_LENGTH,
 		CONTENT_TYPE,

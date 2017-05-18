@@ -18,11 +18,11 @@
 #pragma once
 
 #include "response.hpp"
-#include "error_reasons.hpp"
 #include <string>
 #include <boost/optional.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <cassert>
+#include <utility>
 
 namespace tawashi {
 	class SubmitPasteResponse : public Response {
@@ -37,8 +37,8 @@ namespace tawashi {
 		virtual boost::string_ref page_basename() const override { assert(false); return boost::string_ref(""); }
 
 	private:
-		virtual void on_process() override;
-		boost::optional<std::string> submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
-		void error_redirect (int parCode, ErrorReasons parReason);
+		typedef std::pair<boost::optional<std::string>, HttpHeader> StringOrHeader;
+		virtual HttpHeader on_process() override;
+		StringOrHeader submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
 	};
 } //namespace tawashi

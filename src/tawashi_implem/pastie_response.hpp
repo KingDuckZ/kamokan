@@ -34,7 +34,7 @@ namespace tawashi {
 		virtual boost::string_ref page_basename() const override { return boost::string_ref("pastie"); }
 
 	private:
-		virtual void on_process() override;
+		virtual HttpHeader on_process() override;
 		virtual void on_mustache_prepare (mstch::map& parContext) override;
 		virtual std::string on_mustache_retrieve() override;
 

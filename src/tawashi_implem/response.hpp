@@ -19,6 +19,8 @@
 
 #include "mstch/mstch.hpp"
 #include "kakoune/safe_ptr.hh"
+#include "http_header.hpp"
+#include "error_reasons.hpp"
 #include <string>
 #include <iostream>
 #include <boost/utility/string_ref.hpp>
@@ -42,11 +44,6 @@ namespace tawashi {
 		void send();
 
 	protected:
-		enum Types {
-			ContentType,
-			Location
-		};
-
 		Response (
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
@@ -54,26 +51,24 @@ namespace tawashi {
 			bool parWantRedis
 		);
 
-		void change_type (Types parRespType, std::string&& parValue);
-
 		const cgi::Env& cgi_env() const;
 		const std::string& base_uri() const;
 		virtual boost::string_ref page_basename() const = 0;
 		redis::IncRedis& redis() const;
 		const SettingsBag& settings() const;
 		virtual std::string load_mustache() const;
+		HttpHeader make_redirect (HttpStatusCodes parCode, const std::string& parLocation);
+		HttpHeader make_error_redirect (uint16_t parCode, ErrorReasons parReason);
 
 	private:
-		virtual void on_process();
+		virtual HttpHeader on_process();
 		virtual void on_mustache_prepare (mstch::map& parContext);
 		virtual std::string on_mustache_retrieve();
 
-		std::string m_resp_value;
 		Kakoune::SafePtr<cgi::Env> m_cgi_env;
 		Kakoune::SafePtr<SettingsBag> m_settings;
 		std::string m_website_root;
 		std::string m_base_uri;
-		Types m_resp_type;
 		std::unique_ptr<redis::IncRedis> m_redis;
 		std::ostream* m_stream_out;
 		bool m_header_sent;

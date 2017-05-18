@@ -97,10 +97,9 @@ namespace tawashi {
 	) :
 		Response(parSettings, parStreamOut, parCgiEnv, true)
 	{
-		this->change_type(Response::ContentType, "text/plain");
 	}
 
-	void SubmitPasteResponse::on_process() {
+	HttpHeader SubmitPasteResponse::on_process() {
 		auto post = cgi::read_post(std::cin, cgi_env());
 		boost::string_ref pastie;
 		boost::string_ref lang;
@@ -114,8 +113,7 @@ namespace tawashi {
 		}
 		catch (const TawashiException& e) {
 			statuslog->error(e.what());
-			error_redirect(500, e.reason());
-			return;
+			return make_error_redirect(500, e.reason());
 		}
 		try {
 			lang = get_value_from_post(post, make_string_ref(g_language_key));
@@ -128,50 +126,51 @@ namespace tawashi {
 		const SettingsBag& settings = this->settings();
 		const auto max_sz = settings.as<uint32_t>("max_pastie_size");
 		if (pastie.size() < settings.as<uint32_t>("min_pastie_size")) {
-			error_redirect(431, ErrorReasons::PostLengthNotInRange);
-			return;
+			return make_error_redirect(431, ErrorReasons::PostLengthNotInRange);
 		}
 		if (max_sz and pastie.size() > max_sz) {
 			if (settings.as<bool>("truncate_long_pasties")) {
 				pastie = pastie.substr(0, max_sz);
 			}
 			else {
-				error_redirect(431, ErrorReasons::PostLengthNotInRange);
-				return;
+				return make_error_redirect(431, ErrorReasons::PostLengthNotInRange);
 			}
 		}
 
 		//TODO: replace boost's lexical_cast with mine when I have some checks
 		//over invalid inputs
 		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
-		boost::optional<std::string> token = submit_to_redis(pastie, duration_int, lang);
+		StringOrHeader submit_result = submit_to_redis(pastie, duration_int, lang);
+		const auto& token = submit_result.first;
 
 		if (token) {
 			std::ostringstream oss;
-			oss << base_uri() << '/' << *token;
+			oss << *token;
 			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", *token, oss.str());
 			if (not lang.empty())
 				oss << '?' << lang;
-			this->change_type(Response::Location, oss.str());
+			return this->make_redirect(HttpStatusCodes::CodeNone, oss.str());
 		}
 		else {
 			statuslog->info("Empty pastie token (possibly due to a previous failure)");
-			return;
+			return submit_result.second;
 		}
 	}
 
-	boost::optional<std::string> SubmitPasteResponse::submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang) {
+	auto SubmitPasteResponse::submit_to_redis (
+		const boost::string_ref& parText,
+		uint32_t parExpiry,
+		const boost::string_ref& parLang
+	) -> StringOrHeader {
 		auto& redis = this->redis();
 		if (not redis.is_connected()) {
-			error_redirect(503, ErrorReasons::RedisDisconnected);
-			return boost::optional<std::string>();
+			return std::make_pair(boost::optional<std::string>(), make_error_redirect(503, ErrorReasons::RedisDisconnected));
 		}
 
 		std::string ip_hash = hashed_ip(cgi_env().remote_addr());
 		if (redis.get(ip_hash)) {
 			//please wait and submit again
-			error_redirect(429, ErrorReasons::UserFlooding);
-			return boost::optional<std::string>();
+			return std::make_pair(boost::optional<std::string>(), make_error_redirect(429, ErrorReasons::UserFlooding));
 		}
 
 		const auto next_id = redis.incr("paste_counter");
@@ -185,20 +184,9 @@ namespace tawashi {
 			redis.set(ip_hash, "");
 			redis.expire(ip_hash, settings().as<uint32_t>("resubmit_wait"));
 			if (redis.expire(token, parExpiry))
-				return boost::make_optional(token);
+				return std::make_pair(boost::make_optional(token), HttpHeader());
 		}
 
-		error_redirect(500, ErrorReasons::PastieNotSaved);
-		return boost::optional<std::string>();
-	}
-
-	void SubmitPasteResponse::error_redirect (int parCode, ErrorReasons parReason) {
-		auto statuslog = spdlog::get("statuslog");
-		assert(statuslog);
-		statuslog->info("Redirecting to error page, code={} reason={}", parCode, parReason);
-
-		std::ostringstream oss;
-		oss << base_uri() << "/error.cgi?code=" << parCode << "&reason=" << parReason._to_integral();
-		this->change_type(Response::Location, oss.str());
+		return std::make_pair(boost::optional<std::string>(), make_error_redirect(500, ErrorReasons::PastieNotSaved));
 	}
 } //namespace tawashi

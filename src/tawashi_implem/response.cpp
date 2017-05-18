@@ -124,13 +124,11 @@ namespace tawashi {
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
 		bool parWantRedis
 	) :
-		m_resp_value(g_def_response_type),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
 		m_cgi_env(parCgiEnv),
 		m_settings(parSettings),
 		m_website_root(make_root_path(*parSettings)),
 		m_base_uri(make_base_uri(m_settings->at("base_uri"), m_cgi_env->https())),
-		m_resp_type(ContentType),
 		m_stream_out(parStreamOut),
 		m_header_sent(false)
 	{
@@ -155,7 +153,8 @@ namespace tawashi {
 
 	Response::~Response() noexcept = default;
 
-	void Response::on_process() {
+	HttpHeader Response::on_process() {
+		return HttpHeader();
 	}
 
 	void Response::on_mustache_prepare (mstch::map&) {
@@ -183,26 +182,13 @@ namespace tawashi {
 		}
 
 		SPDLOG_TRACE(statuslog, "Raising event on_process");
-		this->on_process();
+		HttpHeader http_header = this->on_process();
+		*m_stream_out << http_header;
+
 		SPDLOG_TRACE(statuslog, "Raising event on_mustache_prepare");
 		this->on_mustache_prepare(mustache_context);
 
-		m_header_sent = true;
-		bool render_page = true;
-		switch (m_resp_type) {
-		case ContentType:
-			SPDLOG_TRACE(statuslog, "Response is a Content-type (data)");
-			*m_stream_out << "Content-type: " << m_resp_value << "\n\n";
-			break;
-		case Location:
-			SPDLOG_TRACE(statuslog, "Response is a Location (redirect)");
-			*m_stream_out << "Status: 303 See Other" << "\n";
-			*m_stream_out << "Location: " << m_resp_value << "\n\n";
-			render_page = false;
-			break;
-		}
-
-		if (render_page) {
+		if (http_header.body_required()) {
 			SPDLOG_TRACE(statuslog, "Rendering in mustache");
 			*m_stream_out << mstch::render(
 				on_mustache_retrieve(),
@@ -229,13 +215,6 @@ namespace tawashi {
 		return *m_cgi_env;
 	}
 
-	void Response::change_type (Types parRespType, std::string&& parValue) {
-		assert(not m_header_sent);
-		assert(not parValue.empty());
-		m_resp_type = parRespType;
-		m_resp_value = std::move(parValue);
-	}
-
 	const std::string& Response::base_uri() const {
 		return m_base_uri;
 	}
@@ -253,5 +232,21 @@ namespace tawashi {
 	const SettingsBag& Response::settings() const {
 		assert(m_settings);
 		return *m_settings;
+	}
+
+	HttpHeader Response::make_redirect (HttpStatusCodes parCode, const std::string& parLocation) {
+		std::ostringstream oss;
+		oss << base_uri() << '/' << parLocation;
+		return HttpHeader(HttpHeader::Location, parCode, oss.str());
+	}
+
+	HttpHeader Response::make_error_redirect (uint16_t parCode, ErrorReasons parReason) {
+		auto statuslog = spdlog::get("statuslog");
+		assert(statuslog);
+		statuslog->info("Redirecting to error page, code={} reason={}", parCode, parReason);
+
+		std::ostringstream oss;
+		oss << "error.cgi?code=" << parCode << "&reason=" << parReason._to_integral();
+		return make_redirect(int_to_status_code(parCode), oss.str());
 	}
 } //namespace tawashi

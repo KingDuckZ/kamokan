@@ -42,11 +42,11 @@ namespace tawashi {
 	{
 	}
 
-	void PastieResponse::on_process() {
+	HttpHeader PastieResponse::on_process() {
 		auto get = cgi_env().query_string_split();
 		const std::string& query_str(cgi_env().query_string());
 		if (get["m"] == "plain" or query_str.empty()) {
-			this->change_type(Response::ContentType, "text/plain; charset=utf-8");
+			return make_header_type_text_utf8();
 			m_plain_text = true;
 		}
 		else if (query_str == g_nolang_token) {
@@ -61,6 +61,7 @@ namespace tawashi {
 			if (m_lang_file.empty())
 				m_lang_file = "default.lang";
 		}
+		return make_header_type_html();
 	}
 
 	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {

@@ -26,6 +26,7 @@ add_library(${PROJECT_NAME} STATIC
 	tiger.c
 	error_response.cpp
 	tawashi_exception.cpp
+	http_header.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
