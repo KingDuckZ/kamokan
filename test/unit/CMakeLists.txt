@@ -15,6 +15,7 @@ add_executable(${PROJECT_NAME}
 	test_index_response.cpp
 	test_invalid_utf8_post.cpp
 	../data/UTF-8-test.txt.c
+	test_invalid_utf8_get.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
