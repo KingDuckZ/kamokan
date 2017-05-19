@@ -166,7 +166,10 @@ namespace cgi {
 	}
 
 	bool Env::https() const {
-		return m_cgi_env[CGIVars::HTTPS] == "on";
+		const std::string& val = m_cgi_env[CGIVars::HTTPS];
+		return val.size() == 2 and (
+			val == "on" or val == "ON" or val == "oN" or val == "On"
+		);
 	}
 
 	uint16_t Env::server_port() const {
