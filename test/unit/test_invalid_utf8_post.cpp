@@ -33,15 +33,17 @@ extern "C" {
 	extern const unsigned int UTF_8_test_txt_len;
 } //extern C
 
-TEST_CASE ("Retrieve and sanitize invalid an invalid utf-8 text", "[utf8][security]") {
+TEST_CASE ("Retrieve and sanitize invalid an invalid utf-8 text from POST data", "[utf8][security]") {
 	using tawashi::cgi::PostMapType;
 
-	auto content_length = std::string("CONTENT_LENGTH=") + std::to_string(UTF_8_test_txt_len);
 	const std::string invalid_text_prefix("invalid_text=");
+	const std::size_t content_length_num = invalid_text_prefix.size() + UTF_8_test_txt_len;
+	auto content_length = std::string("CONTENT_LENGTH=") + std::to_string(content_length_num);
 	std::string invalid_text;
 	invalid_text.reserve(invalid_text_prefix.size() + UTF_8_test_txt_len);
 	invalid_text = "invalid_text=";
 	std::copy(reinterpret_cast<const char*>(UTF_8_test_txt), reinterpret_cast<const char*>(UTF_8_test_txt) + UTF_8_test_txt_len, std::back_inserter(invalid_text));
+	REQUIRE(invalid_text.size() == content_length_num);
 
 	std::istringstream iss;
 	iss >> std::noskipws;
