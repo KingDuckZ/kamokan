@@ -31,6 +31,7 @@
 #include <boost/fusion/adapted/struct.hpp>
 #include <boost/phoenix/stl/container.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <spdlog/spdlog.h>
 
 BOOST_FUSION_ADAPT_STRUCT(
 	tawashi::cgi::Env::VersionInfo,
@@ -88,10 +89,18 @@ namespace cgi {
 	{
 		const std::string& path = m_cgi_env[CGIVars::PATH_INFO];
 		assert(parBasePath.size() <= path.size());
-		if (boost::starts_with(path, parBasePath))
+
+		if (boost::starts_with(path, parBasePath)) {
 			m_skip_path_info = parBasePath.size();
-		else
-			m_skip_path_info = 0;
+		}
+		else {
+			auto statuslog = spdlog::get("statuslog");
+			assert(statuslog);
+			std::string str_base_path(parBasePath.begin(), parBasePath.end());
+			std::string str_path(path.begin(), path.end());
+			statuslog->error("base path is not a prefix of PATH_INFO: base path={}, PATH_INFO={}, tawashi will most likely malfunction", str_base_path, str_path);
+			m_skip_path_info = 1; //try with the default, maybe the user is lucky and it will work (ie base path = /)
+		}
 	}
 
 	Env::~Env() noexcept = default;
