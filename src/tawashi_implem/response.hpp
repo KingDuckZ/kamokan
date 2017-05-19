@@ -71,6 +71,5 @@ namespace tawashi {
 		std::string m_base_uri;
 		std::unique_ptr<redis::IncRedis> m_redis;
 		std::ostream* m_stream_out;
-		bool m_header_sent;
 	};
 } //namespace tawashi

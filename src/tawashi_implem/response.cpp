@@ -148,8 +148,7 @@ namespace tawashi {
 		m_settings(parSettings),
 		m_website_root(make_root_path(*parSettings)),
 		m_base_uri(make_base_uri(m_settings, m_cgi_env)),
-		m_stream_out(parStreamOut),
-		m_header_sent(false)
+		m_stream_out(parStreamOut)
 	{
 		assert(m_cgi_env);
 		assert(m_stream_out);
