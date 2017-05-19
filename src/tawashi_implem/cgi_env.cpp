@@ -30,6 +30,7 @@
 #include <boost/phoenix/operator.hpp>
 #include <boost/fusion/adapted/struct.hpp>
 #include <boost/phoenix/stl/container.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 BOOST_FUSION_ADAPT_STRUCT(
 	tawashi::cgi::Env::VersionInfo,
@@ -81,9 +82,16 @@ namespace cgi {
 		}
 	} //unnamed namespace
 
-	Env::Env(const char* const* parEnvList) :
-		m_cgi_env(cgi_environment_vars(parEnvList))
+	Env::Env(const char* const* parEnvList, const boost::string_ref& parBasePath) :
+		m_cgi_env(cgi_environment_vars(parEnvList)),
+		m_skip_path_info(0)
 	{
+		const std::string& path = m_cgi_env[CGIVars::PATH_INFO];
+		assert(parBasePath.size() <= path.size());
+		if (boost::starts_with(path, parBasePath))
+			m_skip_path_info = parBasePath.size();
+		else
+			m_skip_path_info = 0;
 	}
 
 	Env::~Env() noexcept = default;
@@ -106,8 +114,10 @@ namespace cgi {
 		return split_version(m_cgi_env[CGIVars::GATEWAY_INTERFACE]);
 	}
 
-	const std::string& Env::path_info() const {
-		return m_cgi_env[CGIVars::PATH_INFO];
+	boost::string_ref Env::path_info() const {
+		const std::string& path = m_cgi_env[CGIVars::PATH_INFO];
+		assert(m_skip_path_info <= path.size());
+		return boost::string_ref(path).substr(m_skip_path_info);
 	}
 
 	const std::string& Env::path_translated() const {

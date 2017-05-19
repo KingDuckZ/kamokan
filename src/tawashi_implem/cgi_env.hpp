@@ -41,14 +41,14 @@ namespace tawashi {
 
 			typedef boost::container::flat_map<std::string, std::string> GetMapType;
 
-			explicit Env (const char* const* parEnvList);
+			Env (const char* const* parEnvList, const boost::string_ref& parBasePath);
 			~Env() noexcept;
 
 			const std::string& auth_type() const;
 			std::size_t content_length() const;
 			const std::string& content_type() const;
 			boost::optional<VersionInfo> gateway_interface() const a_pure;
-			const std::string& path_info() const;
+			boost::string_ref path_info() const;
 			const std::string& path_translated() const;
 			const std::string& query_string() const;
 			const std::string& remote_addr() const;
@@ -70,6 +70,7 @@ namespace tawashi {
 		private:
 			std::vector<std::string> m_cgi_env;
 			Escapist m_houdini;
+			std::size_t m_skip_path_info;
 		};
 	} //namespace cgi
 } //namespace tawashi

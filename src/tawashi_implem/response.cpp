@@ -20,6 +20,7 @@
 #include "settings_bag.hpp"
 #include "tawashiConfig.h"
 #include "duckhandy/stringize.h"
+#include "duckhandy/lexical_cast.hpp"
 #include "pathname/pathname.hpp"
 #include "list_highlight_langs.hpp"
 #include "cgi_env.hpp"
@@ -107,13 +108,31 @@ namespace tawashi {
 			return parStr;
 		};
 
-		std::string make_base_uri (const boost::string_ref& parBaseURI, bool parHttps) {
+		std::string make_base_uri (const Kakoune::SafePtr<SettingsBag>& parSettings, const Kakoune::SafePtr<cgi::Env>& parCgiEnv) {
+			assert(parSettings);
+			assert(parCgiEnv);
+
 			std::ostringstream oss;
-			if (parHttps)
+			if (parCgiEnv->https())
 				oss << "https://";
 			else
 				oss << "http://";
-			oss << parBaseURI;
+			oss << parSettings->at("host_name");
+			boost::string_ref host_port = parSettings->at("host_port");
+			if (not host_port.empty()) {
+				if (host_port == "from_downstream") {
+					const uint16_t port = parCgiEnv->server_port();
+					if ((80 != port and not parCgiEnv->https()) or 443 != port and parCgiEnv->https()) {
+						oss << ':' << port;
+					}
+				}
+				else if (not host_port.empty()) {
+					oss << ':' << host_port;
+				}
+			}
+			boost::string_ref host_path = parSettings->at("host_path");
+			if (host_path != "/")
+				oss << host_path;
 			return oss.str();
 		}
 	} //unnamed namespace
@@ -128,7 +147,7 @@ namespace tawashi {
 		m_cgi_env(parCgiEnv),
 		m_settings(parSettings),
 		m_website_root(make_root_path(*parSettings)),
-		m_base_uri(make_base_uri(m_settings->at("base_uri"), m_cgi_env->https())),
+		m_base_uri(make_base_uri(m_settings, m_cgi_env)),
 		m_stream_out(parStreamOut),
 		m_header_sent(false)
 	{

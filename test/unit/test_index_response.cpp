@@ -77,7 +77,7 @@ TEST_CASE ("Index response", "[index][response]") {
 	const char* const env_raw[] = {
 		"AUTH_TYPE=",
 		"CONTENT_TYPE=",
-		"PATH_INFO=",
+		"PATH_INFO=/",
 		"PATH_TRANSLATED=",
 		"QUERY_STRING=index.cgi"
 		"REMOTE_ADDR=",
@@ -90,16 +90,19 @@ TEST_CASE ("Index response", "[index][response]") {
 		"SERVER_SOFTWARE=",
 		"CONTENT_LENGTH=",
 		"SERVER_PORT=80",
+		"HTTPS=",
 		nullptr
 	};
-	SafeStackObject<tawashi::cgi::Env> fake_env(env_raw);
+	SafeStackObject<tawashi::cgi::Env> fake_env(env_raw, "/");
 
 	std::string tawashi_settings(
 		"[tawashi]\n"
-		"  base_uri = http://127.0.0.1\n"
+		"  host_name = 127.0.0.1\n"
 		"  website_root = /home/michele/dev/code/cpp/tawashi/html\n"
 		"  logging_level = debug\n"
 		"  langmap_dir = /usr/share/source-highlight\n"
+		"  host_path = /\n"
+		"  host_port =\n"
 	);
 	SafeStackObject<tawashi::IniFile> ini(std::move(tawashi_settings));
 	SafeStackObject<tawashi::SettingsBag> settings(ini);

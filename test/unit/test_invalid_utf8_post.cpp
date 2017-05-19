@@ -49,10 +49,11 @@ TEST_CASE ("Retrieve and sanitize invalid an invalid utf-8 text", "[utf8][securi
 
 	const char* const fake_env[] = {
 		content_length.c_str(),
+		"PATH_INFO=/",
 		nullptr
 	};
 
-	tawashi::cgi::Env env(fake_env);
+	tawashi::cgi::Env env(fake_env, "/");
 	const PostMapType& post_data = read_post(iss, env);
 
 	CHECK(g_utf8_validate(post_data.at("invalid_text").data(), post_data.at("invalid_text").size(), nullptr));

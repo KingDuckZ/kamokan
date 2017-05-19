@@ -70,7 +70,9 @@ namespace {
 		parSettings.add_default("redis_mode", "sock");
 		parSettings.add_default("redis_sock", "/tmp/redis.sock");
 		parSettings.add_default("redis_db", "0");
-		parSettings.add_default("base_uri", "http://127.0.0.1");
+		parSettings.add_default("host_name", "127.0.0.1");
+		parSettings.add_default("host_port", "");
+		parSettings.add_default("host_path", "/");
 		parSettings.add_default("website_root", "");
 		parSettings.add_default("langmap_dir", "/usr/share/source-highlight");
 		parSettings.add_default("min_pastie_size", "10");
@@ -146,7 +148,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	SPDLOG_DEBUG(statuslog, "tawashi started");
 	statuslog->info("Loaded config: \"{}\"", config_file_path());
 
-	auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp);
+	auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp, settings->at("host_path"));
 	tawashi::ResponseFactory resp_factory(settings, cgi_env);
 	SPDLOG_TRACE(statuslog, "Registering makers in the response factory");
 	resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);
@@ -155,7 +157,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	resp_factory.register_maker("error.cgi", &make_response<ErrorResponse>);
 	resp_factory.register_jolly_maker(&make_response<PastieResponse>);
 
-	std::unique_ptr<Response> response = resp_factory.make_response(cgi_env->path_info().substr(1));
+	std::unique_ptr<Response> response = resp_factory.make_response(cgi_env->path_info());
 	response->send();
 
 	SPDLOG_DEBUG(statuslog, "tawashi done, quitting");
