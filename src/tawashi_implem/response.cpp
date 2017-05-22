@@ -24,6 +24,7 @@
 #include "pathname/pathname.hpp"
 #include "list_highlight_langs.hpp"
 #include "cgi_env.hpp"
+#include "num_conv.hpp"
 #include <utility>
 #include <cassert>
 #include <fstream>
@@ -126,7 +127,7 @@ namespace tawashi {
 						oss << ':' << port;
 					}
 				}
-				else if (not host_port.empty()) {
+				else if (not host_port.empty() and seems_valid_number<uint16_t>(host_port)) {
 					oss << ':' << host_port;
 				}
 			}
