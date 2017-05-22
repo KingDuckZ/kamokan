@@ -24,6 +24,7 @@
 #include <sstream>
 #include <utility>
 #include <string>
+#include <spdlog/spdlog.h>
 
 namespace {
 	const char g_mustache_html[] =
@@ -73,6 +74,8 @@ namespace tawashi {
 
 TEST_CASE ("Index response", "[index][response]") {
 	using curry::SafeStackObject;
+
+	auto statuslog = spdlog::stdout_logger_st("statuslog");
 
 	const char* const env_raw[] = {
 		"AUTH_TYPE=",

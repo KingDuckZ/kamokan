@@ -29,4 +29,5 @@ install(DIRECTORY html/website/ DESTINATION html)
 
 if (BUILD_TESTING)
 	add_subdirectory(test/unit)
+	add_subdirectory(test/simulation)
 endif()
