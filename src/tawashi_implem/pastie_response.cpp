@@ -46,8 +46,8 @@ namespace tawashi {
 		auto get = cgi_env().query_string_split();
 		const std::string& query_str(cgi_env().query_string());
 		if (get["m"] == "plain" or query_str.empty()) {
-			return make_header_type_text_utf8();
 			m_plain_text = true;
+			return make_header_type_text_utf8();
 		}
 		else if (query_str == g_nolang_token) {
 			m_syntax_highlight = false;
@@ -68,7 +68,7 @@ namespace tawashi {
 		using opt_string = redis::IncRedis::opt_string;
 		using opt_string_list = redis::IncRedis::opt_string_list;
 
-		auto token = boost::string_ref(cgi_env().path_info());
+		boost::string_ref token = cgi_env().path_info();
 		auto& redis = this->redis();
 		opt_string_list pastie_reply = redis.hmget(token, "pastie");
 		opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
