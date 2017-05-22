@@ -20,6 +20,7 @@
 #include "cgi_env.hpp"
 #include <functional>
 #include <boost/container/flat_map.hpp>
+#include <spdlog/spdlog.h>
 
 namespace tawashi {
 	namespace {
@@ -42,17 +43,20 @@ namespace tawashi {
 	ResponseFactory::~ResponseFactory() noexcept = default;
 
 	std::unique_ptr<Response> ResponseFactory::make_response (const boost::string_ref& parName) {
-		//spdlog::get("statuslog")->info("making response object for \"{}\"", parName);
+		std::string name(parName.data(), parName.size());
+		spdlog::get("statuslog")->info("making response object for \"{}\"", name);
 
-		auto maker_it = m_local_data->makers.find(std::string(parName.data(), parName.size()));
+		auto maker_it = m_local_data->makers.find(name);
 		if (m_local_data->makers.end() != maker_it) {
 			return maker_it->second(m_local_data->settings, m_local_data->cgi_env);
 		}
 		else if (m_local_data->jolly_maker) {
+			spdlog::get("statuslog")->info("no exact match found for \"{}\", assuming it's a pastie's token", name);
 			return m_local_data->jolly_maker(m_local_data->settings, m_local_data->cgi_env);
 		}
 		else {
 			assert(false);
+			spdlog::get("statuslog")->critical("no exact match found for \"{}\" and no jolly maker given, this should not happen", name);
 			return std::unique_ptr<Response>();
 		}
 	}

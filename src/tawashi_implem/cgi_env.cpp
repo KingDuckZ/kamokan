@@ -88,17 +88,36 @@ namespace cgi {
 		m_skip_path_info(0)
 	{
 		const std::string& path = m_cgi_env[CGIVars::PATH_INFO];
-		assert(parBasePath.size() <= path.size());
+		if (parBasePath.empty()) {
+			spdlog::get("statuslog")->error("Received base path is empty - this will likely cause Tawashi to malfunction");
+		}
+		else if (parBasePath.size() > path.size()) {
+			spdlog::get("statuslog")->error(
+				"Received base path \"{}\" has size {}, which is longer than PATH_INFO \"{}\" size {}",
+				std::string(parBasePath.begin(), parBasePath.end()),
+				parBasePath.size(),
+				path,
+				path.size()
+			);
+		}
+		else if (parBasePath[parBasePath.size() - 1] != '/') {
+			spdlog::get("statuslog")->warn(
+				"Received base path \"{}\" doesn't end with a '/' character",
+				std::string(parBasePath.begin(), parBasePath.end())
+			);
+		}
 
 		if (boost::starts_with(path, parBasePath)) {
 			m_skip_path_info = parBasePath.size();
 		}
 		else {
-			auto statuslog = spdlog::get("statuslog");
-			assert(statuslog);
 			std::string str_base_path(parBasePath.begin(), parBasePath.end());
 			std::string str_path(path.begin(), path.end());
-			statuslog->error("base path is not a prefix of PATH_INFO: base path={}, PATH_INFO={}, tawashi will most likely malfunction", str_base_path, str_path);
+			spdlog::get("statuslog")->error(
+				"base path is not a prefix of PATH_INFO: base path={}, PATH_INFO={}, tawashi will most likely malfunction",
+				str_base_path,
+				str_path
+			);
 			m_skip_path_info = 1; //try with the default, maybe the user is lucky and it will work (ie base path = /)
 		}
 	}

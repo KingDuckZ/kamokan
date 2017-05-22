@@ -146,20 +146,27 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 
 	auto statuslog = setup_logging(*settings);
 	SPDLOG_DEBUG(statuslog, "tawashi started");
-	statuslog->info("Loaded config: \"{}\"", config_file_path());
+	int retval = 0;
+	try {
+		statuslog->info("Loaded config: \"{}\"", config_file_path());
 
-	auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp, settings->at("host_path"));
-	tawashi::ResponseFactory resp_factory(settings, cgi_env);
-	SPDLOG_TRACE(statuslog, "Registering makers in the response factory");
-	resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);
-	resp_factory.register_maker("", &make_response<IndexResponse>);
-	resp_factory.register_maker("paste.cgi", &make_response<SubmitPasteResponse>);
-	resp_factory.register_maker("error.cgi", &make_response<ErrorResponse>);
-	resp_factory.register_jolly_maker(&make_response<PastieResponse>);
+		auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp, settings->at("host_path"));
+		tawashi::ResponseFactory resp_factory(settings, cgi_env);
+		SPDLOG_TRACE(statuslog, "Registering makers in the response factory");
+		resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);
+		resp_factory.register_maker("", &make_response<IndexResponse>);
+		resp_factory.register_maker("paste.cgi", &make_response<SubmitPasteResponse>);
+		resp_factory.register_maker("error.cgi", &make_response<ErrorResponse>);
+		resp_factory.register_jolly_maker(&make_response<PastieResponse>);
 
-	std::unique_ptr<Response> response = resp_factory.make_response(cgi_env->path_info());
-	response->send();
+		std::unique_ptr<Response> response = resp_factory.make_response(cgi_env->path_info());
+		response->send();
+	}
+	catch (const std::exception& e) {
+		statuslog->critical("Uncaught exception in main(): \"{}\"", e.what());
+		retval = 1;
+	}
 
-	SPDLOG_DEBUG(statuslog, "tawashi done, quitting");
-	return 0;
+	SPDLOG_DEBUG(statuslog, "tawashi done, quitting with {}", retval);
+	return retval;
 }

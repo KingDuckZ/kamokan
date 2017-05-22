@@ -80,6 +80,7 @@ namespace tawashi {
 
 		std::string processed_pastie;
 		if (m_syntax_highlight) {
+			//TODO: redirect to "pastie not found" if !pastie
 			processed_pastie = std::move(*pastie);
 		}
 		else {
