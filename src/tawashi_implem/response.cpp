@@ -131,8 +131,9 @@ namespace tawashi {
 				}
 			}
 			boost::string_ref host_path = parSettings->at("host_path");
-			if (host_path != "/")
-				oss << host_path;
+			if (not host_path.empty() and host_path[host_path.size() - 1] == '/')
+				host_path = host_path.substr(0, host_path.size() - 1);
+			oss << host_path;
 			return oss.str();
 		}
 	} //unnamed namespace
