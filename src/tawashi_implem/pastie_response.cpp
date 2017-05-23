@@ -43,11 +43,16 @@ namespace tawashi {
 		Response(parSettings, parStreamOut, parCgiEnv, true),
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false),
-		m_syntax_highlight(true)
+		m_syntax_highlight(true),
+		m_pastie_not_found(false)
 	{
 	}
 
 	HttpHeader PastieResponse::on_process() {
+		if (m_pastie_not_found) {
+			return make_error_redirect(ErrorReasons::PastieNotFound);
+		}
+
 		auto get = cgi_env().query_string_split();
 		const std::string& query_str(cgi_env().query_string());
 		if (get["m"] == "plain" or query_str.empty()) {
@@ -77,6 +82,11 @@ namespace tawashi {
 		auto& redis = this->redis();
 		opt_string_list pastie_reply = redis.hmget(token, "pastie");
 		opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
+
+		if (not pastie) {
+			m_pastie_not_found = true;
+			return;
+		}
 
 		srchilite::SourceHighlight highlighter;
 		highlighter.setDataDir(settings().as<std::string>("langmap_dir"));

@@ -26,6 +26,7 @@ namespace tawashi {
 		UserFlooding,
 		UnkownReason,
 		RedisDisconnected,
-		MissingPostVariable
+		MissingPostVariable,
+		PastieNotFound
 	)
 } //namespace tawashi
