@@ -85,6 +85,7 @@ namespace tawashi {
 		highlighter.setCanUseStdOut(false);
 		highlighter.setTabSpaces(4);
 		highlighter.setStyleCssFile("sh_darkness.css");
+		highlighter.setGenerateLineNumbers(false);
 
 		std::string processed_pastie;
 		if (m_syntax_highlight) {
@@ -93,7 +94,10 @@ namespace tawashi {
 		}
 		else {
 			Escapist houdini;
-			processed_pastie = houdini.escape_html(*pastie);
+			std::ostringstream oss;
+			oss << R"(<pre><tt><font color="#EDEDED">)";
+			oss << houdini.escape_html(*pastie) << "</font></tt></pre>\n";
+			processed_pastie = oss.str();
 		}
 
 		if (not m_plain_text and m_syntax_highlight) {
