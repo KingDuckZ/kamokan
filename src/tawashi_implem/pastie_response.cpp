@@ -77,6 +77,14 @@ namespace tawashi {
 		highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
 		highlighter.setGenerateEntireDoc(false);
 		highlighter.setGenerateLineNumbers(true);
+#if defined(NDEBUG)
+		highlighter.setOptimize(true);
+#else
+		highlighter.setOptimize(false);
+#endif
+		highlighter.setCanUseStdOut(false);
+		highlighter.setTabSpaces(4);
+		highlighter.setStyleCssFile("sh_darkness.css");
 
 		std::string processed_pastie;
 		if (m_syntax_highlight) {
