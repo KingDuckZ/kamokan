@@ -205,10 +205,10 @@ namespace tawashi {
 		HttpHeader http_header = this->on_process();
 		*m_stream_out << http_header;
 
-		SPDLOG_TRACE(statuslog, "Raising event on_mustache_prepare");
-		this->on_mustache_prepare(mustache_context);
-
 		if (http_header.body_required()) {
+			SPDLOG_TRACE(statuslog, "Raising event on_mustache_prepare");
+			this->on_mustache_prepare(mustache_context);
+
 			SPDLOG_TRACE(statuslog, "Rendering in mustache");
 			*m_stream_out << mstch::render(
 				on_mustache_retrieve(),
