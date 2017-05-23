@@ -81,6 +81,7 @@ namespace {
 		parSettings.add_default("logging_level", "err");
 		parSettings.add_default("resubmit_wait", "10");
 		parSettings.add_default("log_file", "-");
+		parSettings.add_default("highlight_css", "sh_darkness.css");
 	}
 
 	void print_buildtime_info() {

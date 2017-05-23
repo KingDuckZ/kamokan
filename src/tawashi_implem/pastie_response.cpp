@@ -28,6 +28,11 @@
 namespace tawashi {
 	namespace {
 		const char g_nolang_token[] = "colourless";
+
+		std::string highlight_css_path (const SettingsBag& parSettings) {
+			//TODO: make sure the file exists or throw or do something
+			return parSettings.as<std::string>("highlight_css");
+		}
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (
@@ -84,7 +89,7 @@ namespace tawashi {
 #endif
 		highlighter.setCanUseStdOut(false);
 		highlighter.setTabSpaces(4);
-		highlighter.setStyleCssFile("sh_darkness.css");
+		highlighter.setStyleCssFile(highlight_css_path(settings()));
 		highlighter.setGenerateLineNumbers(false);
 
 		std::string processed_pastie;

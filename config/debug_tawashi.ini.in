@@ -4,6 +4,7 @@ redis_port = 6379
 redis_mode = inet
 host_name = 127.0.0.1
 host_port = from_downstream
+highlight_css = sh_greenlcd.css
 website_root = @CMAKE_CURRENT_BINARY_DIR@/html
 logging_level = trace
 log_file = @CMAKE_CURRENT_BINARY_DIR@/tawashi.log
