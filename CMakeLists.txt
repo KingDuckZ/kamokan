@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 list (APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
-project(tawashi_top VERSION 0.1.10 LANGUAGES NONE)
+project(tawashi_top VERSION 0.1.11 LANGUAGES NONE)
 
 include(CTest)
 
