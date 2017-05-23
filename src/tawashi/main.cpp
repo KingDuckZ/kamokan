@@ -28,6 +28,7 @@
 #include "duckhandy/compatibility.h"
 #include "settings_bag.hpp"
 #include "logging_levels.hpp"
+#include "request_method_type.hpp"
 #include <spdlog/spdlog.h>
 #include <string>
 #include <fstream>
@@ -135,6 +136,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	using tawashi::PastieResponse;
 	using tawashi::ErrorResponse;
 	using tawashi::Response;
+	using tawashi::RequestMethodType;
 
 	if (2 == parArgc and boost::string_ref(parArgv[1]) == "--show-paths") {
 		print_buildtime_info();
@@ -154,10 +156,11 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp, settings->at("host_path"));
 		tawashi::ResponseFactory resp_factory(settings, cgi_env);
 		SPDLOG_TRACE(statuslog, "Registering makers in the response factory");
-		resp_factory.register_maker("index.cgi", &make_response<IndexResponse>);
-		resp_factory.register_maker("", &make_response<IndexResponse>);
-		resp_factory.register_maker("paste.cgi", &make_response<SubmitPasteResponse>);
-		resp_factory.register_maker("error.cgi", &make_response<ErrorResponse>);
+		resp_factory.register_maker("index.cgi", RequestMethodType::GET, &make_response<IndexResponse>);
+		resp_factory.register_maker("", RequestMethodType::GET, &make_response<IndexResponse>);
+		resp_factory.register_maker("", RequestMethodType::POST, &make_response<SubmitPasteResponse>);
+		resp_factory.register_maker("paste.cgi", RequestMethodType::POST, &make_response<SubmitPasteResponse>);
+		resp_factory.register_maker("error.cgi", RequestMethodType::GET, &make_response<ErrorResponse>);
 		resp_factory.register_jolly_maker(&make_response<PastieResponse>);
 
 		std::unique_ptr<Response> response = resp_factory.make_response(
