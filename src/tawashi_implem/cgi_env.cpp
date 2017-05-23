@@ -81,45 +81,38 @@ namespace cgi {
 			else
 				return optional<Env::VersionInfo>();
 		}
+
+		std::size_t calculate_skip_path_length (const boost::string_ref& parPathInfo, const boost::string_ref& parBasePath) {
+			const std::size_t base_path_tr_slash = (not parBasePath.empty() and parBasePath[parBasePath.size() - 1] == '/' ? 1 : 0);
+			boost::string_ref base_path = parBasePath.substr(0, parBasePath.size() - base_path_tr_slash);
+			SPDLOG_TRACE(spdlog::get("statuslog"), "calculating skip prefix for PATH_INFO=\"{}\", base path=\"{}\", parBasePath=\"{}\", base path trailing slash={}",
+				std::string(parPathInfo.begin(), parPathInfo.end()),
+				std::string(base_path.begin(), base_path.end()),
+				std::string(parBasePath.begin(), parBasePath.end()),
+				base_path_tr_slash
+			);
+
+			if (boost::starts_with(parPathInfo, base_path)) {
+				//account for the trailing slash in either base path and path info
+				return std::min(parBasePath.size(), parPathInfo.size());
+			}
+			else {
+				std::string str_base_path(parBasePath.begin(), parBasePath.end());
+				std::string str_path(parPathInfo.begin(), parPathInfo.end());
+				spdlog::get("statuslog")->error(
+					"base path is not a prefix of PATH_INFO: base path={}, PATH_INFO={}, tawashi will most likely malfunction",
+					str_base_path,
+					str_path
+				);
+				return 1; //try with the default, maybe the user is lucky and it will work (ie base path = /)
+			}
+		}
 	} //unnamed namespace
 
 	Env::Env(const char* const* parEnvList, const boost::string_ref& parBasePath) :
 		m_cgi_env(cgi_environment_vars(parEnvList)),
-		m_skip_path_info(0)
+		m_skip_path_info(calculate_skip_path_length(m_cgi_env[CGIVars::PATH_INFO], parBasePath))
 	{
-		const std::string& path = m_cgi_env[CGIVars::PATH_INFO];
-		if (parBasePath.empty()) {
-			spdlog::get("statuslog")->error("Received base path is empty - this will likely cause Tawashi to malfunction");
-		}
-		else if (parBasePath.size() > path.size()) {
-			spdlog::get("statuslog")->error(
-				"Received base path \"{}\" has size {}, which is longer than PATH_INFO \"{}\" size {}",
-				std::string(parBasePath.begin(), parBasePath.end()),
-				parBasePath.size(),
-				path,
-				path.size()
-			);
-		}
-		else if (parBasePath[parBasePath.size() - 1] != '/') {
-			spdlog::get("statuslog")->warn(
-				"Received base path \"{}\" doesn't end with a '/' character",
-				std::string(parBasePath.begin(), parBasePath.end())
-			);
-		}
-
-		if (boost::starts_with(path, parBasePath)) {
-			m_skip_path_info = parBasePath.size();
-		}
-		else {
-			std::string str_base_path(parBasePath.begin(), parBasePath.end());
-			std::string str_path(path.begin(), path.end());
-			spdlog::get("statuslog")->error(
-				"base path is not a prefix of PATH_INFO: base path={}, PATH_INFO={}, tawashi will most likely malfunction",
-				str_base_path,
-				str_path
-			);
-			m_skip_path_info = 1; //try with the default, maybe the user is lucky and it will work (ie base path = /)
-		}
 	}
 
 	Env::~Env() noexcept = default;
