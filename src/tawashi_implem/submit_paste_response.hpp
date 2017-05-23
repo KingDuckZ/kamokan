@@ -39,6 +39,12 @@ namespace tawashi {
 	private:
 		typedef std::pair<boost::optional<std::string>, HttpHeader> StringOrHeader;
 		virtual HttpHeader on_process() override;
+		virtual void on_mustache_prepare (mstch::map& parContext) override;
+		virtual std::string on_mustache_retrieve() override;
 		StringOrHeader submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
+
+		//TODO: remove, this shouldn't be in this class, nor on_mustache_prepare
+		//or on_mustache_retrieve.
+		std::string m_redirect_to;
 	};
 } //namespace tawashi

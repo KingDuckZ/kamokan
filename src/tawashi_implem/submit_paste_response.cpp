@@ -155,7 +155,15 @@ namespace tawashi {
 			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", *token, oss.str());
 			if (not lang.empty())
 				oss << '?' << lang;
-			return this->make_redirect(HttpStatusCodes::Code303_SeeOther, oss.str());
+
+			//TODO: clean up this hack, make a separate class or something
+			if (cgi_env().path_info().empty()) {
+				m_redirect_to = oss.str();
+				return HttpHeader();
+			}
+			else {
+				return this->make_redirect(HttpStatusCodes::Code303_SeeOther, oss.str());
+			}
 		}
 		else {
 			statuslog->info("Empty pastie token (possibly due to a previous failure)");
@@ -194,5 +202,13 @@ namespace tawashi {
 		}
 
 		return std::make_pair(boost::optional<std::string>(), make_error_redirect(ErrorReasons::PastieNotSaved));
+	}
+
+	void SubmitPasteResponse::on_mustache_prepare (mstch::map& parContext) {
+		parContext["redirect_to_address"] = m_redirect_to;
+	}
+
+	std::string SubmitPasteResponse::on_mustache_retrieve() {
+		return "{{base_uri}}/{{redirect_to_address}}\n";
 	}
 } //namespace tawashi
