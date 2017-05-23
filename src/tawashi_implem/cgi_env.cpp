@@ -111,7 +111,8 @@ namespace cgi {
 
 	Env::Env(const char* const* parEnvList, const boost::string_ref& parBasePath) :
 		m_cgi_env(cgi_environment_vars(parEnvList)),
-		m_skip_path_info(calculate_skip_path_length(m_cgi_env[CGIVars::PATH_INFO], parBasePath))
+		m_skip_path_info(calculate_skip_path_length(m_cgi_env[CGIVars::PATH_INFO], parBasePath)),
+		m_request_method_type(RequestMethodType::_from_string(m_cgi_env[CGIVars::REQUEST_METHOD].data()))
 	{
 	}
 
@@ -165,8 +166,8 @@ namespace cgi {
 		return m_cgi_env[CGIVars::REMOTE_USER];
 	}
 
-	const std::string& Env::request_method() const {
-		return m_cgi_env[CGIVars::REQUEST_METHOD];
+	RequestMethodType Env::request_method() const {
+		return m_request_method_type;
 	}
 
 	const std::string& Env::script_name() const {

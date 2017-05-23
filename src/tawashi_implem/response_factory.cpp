@@ -28,7 +28,8 @@ namespace tawashi {
 
 	struct ResponseFactory::LocalData {
 		Kakoune::SafePtr<SettingsBag> settings;
-		boost::container::flat_map<std::string, ResponseMakerFunc> makers;
+		boost::container::flat_map<std::string, ResponseMakerFunc> makers_get;
+		boost::container::flat_map<std::string, ResponseMakerFunc> makers_post;
 		ResponseMakerFunc jolly_maker;
 		Kakoune::SafePtr<cgi::Env> cgi_env;
 	};
@@ -42,12 +43,17 @@ namespace tawashi {
 
 	ResponseFactory::~ResponseFactory() noexcept = default;
 
-	std::unique_ptr<Response> ResponseFactory::make_response (const boost::string_ref& parName) {
+	std::unique_ptr<Response> ResponseFactory::make_response (const boost::string_ref& parName, RequestMethodType parReqType) {
 		std::string name(parName.data(), parName.size());
-		spdlog::get("statuslog")->info("making response object for \"{}\"", name);
+		spdlog::get("statuslog")->info(
+			"making response object for \"{}\" method {}",
+			name,
+			parReqType._to_string()
+		);
 
-		auto maker_it = m_local_data->makers.find(name);
-		if (m_local_data->makers.end() != maker_it) {
+		const auto& makers = (static_cast<RequestMethodType>(RequestMethodType::POST) == parReqType ? m_local_data->makers_post : m_local_data->makers_get);
+		auto maker_it = makers.find(name);
+		if (makers.end() != maker_it) {
 			return maker_it->second(m_local_data->settings, m_local_data->cgi_env);
 		}
 		else if (m_local_data->jolly_maker) {
@@ -62,7 +68,19 @@ namespace tawashi {
 	}
 
 	void ResponseFactory::register_maker (std::string&& parName, ResponseMakerFunc parMaker) {
-		m_local_data->makers[std::move(parName)] = parMaker;
+		m_local_data->makers_get[parName] = parMaker;
+		m_local_data->makers_post[std::move(parName)] = parMaker;
+	}
+
+	void ResponseFactory::register_maker (std::string&& parName, RequestMethodType parReqType, ResponseMakerFunc parMaker) {
+		switch (parReqType) {
+		case RequestMethodType::GET:
+			m_local_data->makers_get[std::move(parName)] = parMaker;
+			break;
+		case RequestMethodType::POST:
+			m_local_data->makers_post[std::move(parName)] = parMaker;
+			break;
+		};
 	}
 
 	void ResponseFactory::register_jolly_maker (ResponseMakerFunc parMaker) {

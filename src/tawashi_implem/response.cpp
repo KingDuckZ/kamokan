@@ -165,7 +165,7 @@ namespace tawashi {
 		auto statuslog = spdlog::get("statuslog");
 		assert(statuslog);
 		statuslog->info("Preparing response for {} request; query_string=\"{}\"; size={}",
-			cgi_env().request_method(),
+			cgi_env().request_method()._to_string(),
 			cgi_env().query_string(),
 			cgi_env().content_length()
 		);

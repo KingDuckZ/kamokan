@@ -160,7 +160,10 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		resp_factory.register_maker("error.cgi", &make_response<ErrorResponse>);
 		resp_factory.register_jolly_maker(&make_response<PastieResponse>);
 
-		std::unique_ptr<Response> response = resp_factory.make_response(cgi_env->path_info());
+		std::unique_ptr<Response> response = resp_factory.make_response(
+			cgi_env->path_info(),
+			cgi_env->request_method()
+		);
 		response->send();
 	}
 	catch (const std::exception& e) {

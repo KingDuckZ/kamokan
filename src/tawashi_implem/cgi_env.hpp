@@ -21,6 +21,7 @@
 #include "duckhandy/compatibility.h"
 #include "escapist.hpp"
 #include "kakoune/safe_ptr.hh"
+#include "request_method_type.hpp"
 #include <vector>
 #include <string>
 #include <boost/utility/string_ref.hpp>
@@ -55,7 +56,7 @@ namespace tawashi {
 			const std::string& remote_host() const;
 			const std::string& remote_ident() const;
 			const std::string& remote_user() const;
-			const std::string& request_method() const;
+			RequestMethodType request_method() const;
 			const std::string& script_name() const;
 			const std::string& server_name() const;
 			bool https() const;
@@ -71,6 +72,7 @@ namespace tawashi {
 			std::vector<std::string> m_cgi_env;
 			Escapist m_houdini;
 			std::size_t m_skip_path_info;
+			RequestMethodType m_request_method_type;
 		};
 	} //namespace cgi
 } //namespace tawashi
