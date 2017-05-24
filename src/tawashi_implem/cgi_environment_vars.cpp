@@ -32,7 +32,7 @@
 namespace std {
 	template<>
 	struct hash<boost::string_ref> {
-		std::size_t operator() (boost::string_ref const& parStr) const {
+		std::size_t operator() (const boost::string_ref& parStr) const {
 			return boost::hash_range(parStr.begin(), parStr.end());
 		}
 	};
