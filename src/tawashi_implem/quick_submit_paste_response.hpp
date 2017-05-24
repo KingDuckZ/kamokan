@@ -17,17 +17,15 @@
 
 #pragma once
 
-#include "response.hpp"
-#include <string>
+#include "submit_paste_response.hpp"
 #include <boost/optional.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <cassert>
-#include <utility>
 
 namespace tawashi {
-	class SubmitPasteResponse : public Response {
+	class QuickSubmitPasteResponse : public SubmitPasteResponse {
 	public:
-		SubmitPasteResponse (
+		QuickSubmitPasteResponse (
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
@@ -35,12 +33,12 @@ namespace tawashi {
 
 	protected:
 		virtual boost::string_ref page_basename() const override { assert(false); return boost::string_ref(""); }
-		virtual HttpHeader make_success_response (std::string&& parPastieParam);
+		virtual HttpHeader make_success_response (std::string&& parPastieParam) override;
 
 	private:
-		typedef std::pair<boost::optional<std::string>, HttpHeader> StringOrHeader;
+		virtual void on_mustache_prepare (mstch::map& parContext) override;
+		virtual std::string on_mustache_retrieve() override;
 
-		virtual HttpHeader on_process() override;
-		StringOrHeader submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
+		std::string m_redirect_to;
 	};
 } //namespace tawashi

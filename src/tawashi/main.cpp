@@ -17,6 +17,7 @@
 
 #include "tawashiConfig.h"
 #include "submit_paste_response.hpp"
+#include "quick_submit_paste_response.hpp"
 #include "pastie_response.hpp"
 #include "index_response.hpp"
 #include "error_response.hpp"
@@ -133,6 +134,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	using curry::SafeStackObject;
 	using tawashi::IndexResponse;
 	using tawashi::SubmitPasteResponse;
+	using tawashi::QuickSubmitPasteResponse;
 	using tawashi::PastieResponse;
 	using tawashi::ErrorResponse;
 	using tawashi::Response;
@@ -158,7 +160,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		SPDLOG_TRACE(statuslog, "Registering makers in the response factory");
 		resp_factory.register_maker("index.cgi", RequestMethodType::GET, &make_response<IndexResponse>);
 		resp_factory.register_maker("", RequestMethodType::GET, &make_response<IndexResponse>);
-		resp_factory.register_maker("", RequestMethodType::POST, &make_response<SubmitPasteResponse>);
+		resp_factory.register_maker("", RequestMethodType::POST, &make_response<QuickSubmitPasteResponse>);
 		resp_factory.register_maker("paste.cgi", RequestMethodType::POST, &make_response<SubmitPasteResponse>);
 		resp_factory.register_maker("error.cgi", RequestMethodType::GET, &make_response<ErrorResponse>);
 		resp_factory.register_jolly_maker(&make_response<PastieResponse>);

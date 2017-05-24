@@ -27,6 +27,7 @@ add_library(${PROJECT_NAME} STATIC
 	error_response.cpp
 	tawashi_exception.cpp
 	http_header.cpp
+	quick_submit_paste_response.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
