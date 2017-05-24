@@ -150,6 +150,14 @@ namespace cgi {
 		return m_cgi_env[CGIVars::QUERY_STRING];
 	}
 
+	const std::string& Env::http_client_ip() const {
+		return m_cgi_env[CGIVars::HTTP_CLIENT_IP];
+	}
+
+	const std::string& Env::http_x_forwarded_for() const {
+		return m_cgi_env[CGIVars::HTTP_X_FORWARDED_FOR];
+	}
+
 	const std::string& Env::remote_addr() const {
 		return m_cgi_env[CGIVars::REMOTE_ADDR];
 	}

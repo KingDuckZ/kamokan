@@ -52,6 +52,8 @@ namespace tawashi {
 			boost::string_ref path_info() const;
 			const std::string& path_translated() const;
 			const std::string& query_string() const;
+			const std::string& http_client_ip() const;
+			const std::string& http_x_forwarded_for() const;
 			const std::string& remote_addr() const;
 			const std::string& remote_host() const;
 			const std::string& remote_ident() const;

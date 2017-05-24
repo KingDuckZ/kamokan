@@ -18,20 +18,17 @@
 #include "submit_paste_response.hpp"
 #include "incredis/incredis.hpp"
 #include "cgi_post.hpp"
-#include "cgi_env.hpp"
 #include "num_to_token.hpp"
 #include "settings_bag.hpp"
 #include "duckhandy/compatibility.h"
 #include "duckhandy/lexical_cast.hpp"
-#include "duckhandy/int_to_string_ary.hpp"
 #include "tawashi_exception.hpp"
+#include "ip_utils.hpp"
 #include <ciso646>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include <cstdint>
 #include <spdlog/spdlog.h>
-
-extern "C" void tiger (const char* parStr, uint64_t parLength, uint64_t parHash[3], char parPadding);
 
 namespace tawashi {
 	namespace {
@@ -74,29 +71,6 @@ namespace tawashi {
 				spdlog::get("statuslog")->info(e.what());
 				return boost::string_ref();
 			}
-		}
-
-		std::string hashed_ip (const std::string& parIP) {
-			using dhandy::tags::hex;
-
-			uint64_t hash[3];
-			tiger(parIP.data(), parIP.size(), hash, 0x80);
-
-			auto h1 = dhandy::int_to_string_ary<char, hex>(hash[0]);
-			auto h2 = dhandy::int_to_string_ary<char, hex>(hash[1]);
-			auto h3 = dhandy::int_to_string_ary<char, hex>(hash[2]);
-
-			std::string retval(2 * sizeof(uint64_t) * 3, '0');
-			assert(h1.size() <= 2 * sizeof(uint64_t));
-			std::copy(h1.begin(), h1.end(), retval.begin() + 2 * sizeof(uint64_t) * 0 + 2 * sizeof(uint64_t) - h1.size());
-			assert(h2.size() <= 2 * sizeof(uint64_t));
-			std::copy(h2.begin(), h2.end(), retval.begin() + 2 * sizeof(uint64_t) * 1 +  2 * sizeof(uint64_t) - h2.size());
-			assert(h3.size() <= 2 * sizeof(uint64_t));
-			std::copy(h3.begin(), h3.end(), retval.begin() + 2 * sizeof(uint64_t) * 2 +  2 * sizeof(uint64_t) - h3.size());
-
-			SPDLOG_DEBUG(spdlog::get("statuslog"), "IP \"{}\" hashed -> \"{}\"", parIP, retval);
-			assert(retval.size() == 16 * 3);
-			return retval;
 		}
 	} //unnamed namespace
 
@@ -174,8 +148,8 @@ namespace tawashi {
 			return std::make_pair(boost::optional<std::string>(), make_error_redirect(ErrorReasons::RedisDisconnected));
 		}
 
-		std::string ip_hash = hashed_ip(cgi_env().remote_addr());
-		if (redis.get(ip_hash)) {
+		std::string remote_ip = guess_real_remote_ip(cgi_env());
+		if (redis.get(remote_ip)) {
 			//please wait and submit again
 			return std::make_pair(boost::optional<std::string>(), make_error_redirect(ErrorReasons::UserFlooding));
 		}
@@ -188,8 +162,8 @@ namespace tawashi {
 			"max_ttl", dhandy::lexical_cast<std::string>(parExpiry),
 			"lang", parLang)
 		) {
-			redis.set(ip_hash, "");
-			redis.expire(ip_hash, settings().as<uint32_t>("resubmit_wait"));
+			redis.set(remote_ip, "");
+			redis.expire(remote_ip, settings().as<uint32_t>("resubmit_wait"));
 			if (redis.expire(token, parExpiry))
 				return std::make_pair(boost::make_optional(token), HttpHeader());
 		}

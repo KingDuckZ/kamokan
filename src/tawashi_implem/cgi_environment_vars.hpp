@@ -28,9 +28,11 @@ namespace tawashi {
 		CONTENT_TYPE,
 		DOCUMENT_ROOT, //The root directory of your server
 		GATEWAY_INTERFACE,
+		HTTP_CLIENT_IP,
 		HTTP_COOKIE, //The visitor's cookie, if one is set
 		HTTP_HOST, //The hostname of your server
 		HTTP_REFERER, //The URL of the page that called your script
+		HTTP_X_FORWARDED_FOR,
 		HTTPS, //"on" if the script is being called through a secure server
 		HTTP_USER_AGENT, //The browser type of your visitor
 		PATH, //The system path your server is running under

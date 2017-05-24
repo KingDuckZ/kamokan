@@ -4,6 +4,8 @@ project(tawashi_top VERSION 0.1.11 LANGUAGES NONE)
 
 include(CTest)
 
+option(TAWASHI_WITH_IP_LOGGING "Enable code in Tawashi that may result in users IPs being stored in the DB or in logs" ON)
+
 set(INCREDIS_FORCE_DISABLE_TESTS ON)
 set(TAWASHI_SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 set(TAWASHI_GEN_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")

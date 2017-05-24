@@ -17,10 +17,13 @@
 
 #pragma once
 
-#define TAWASHI_CONFIG_PATH "@TAWASHI_CONFIG_PATH@"
-#define TAWASHI_CONFIG_FILE "@TAWASHI_CONFIG_FILE@"
-#define TAWASHI_PATH_PREFIX "@CMAKE_INSTALL_PREFIX@"
-#define VERSION_MAJOR @PROJECT_VERSION_MAJOR@
-#define VERSION_MINOR @PROJECT_VERSION_MINOR@
-#define VERSION_PATCH @PROJECT_VERSION_PATCH@
-#cmakedefine TAWASHI_WITH_IP_LOGGING
+#include "duckhandy/compatibility.h"
+#include <string>
+
+namespace tawashi {
+	namespace cgi {
+		class Env;
+	} //namespace cgi
+
+	std::string guess_real_remote_ip (const cgi::Env& parCgiEnv) a_pure;
+} //namespace tawashi
