@@ -163,13 +163,14 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		resp_factory.register_maker("", RequestMethodType::POST, &make_response<QuickSubmitPasteResponse>);
 		resp_factory.register_maker("paste.cgi", RequestMethodType::POST, &make_response<SubmitPasteResponse>);
 		resp_factory.register_maker("error.cgi", RequestMethodType::GET, &make_response<ErrorResponse>);
-		resp_factory.register_jolly_maker(&make_response<PastieResponse>);
+		resp_factory.register_jolly_maker(&make_response<PastieResponse>, RequestMethodType::GET);
 
 		std::unique_ptr<Response> response = resp_factory.make_response(
 			cgi_env->path_info(),
 			cgi_env->request_method()
 		);
-		response->send();
+		if (response)
+			response->send();
 	}
 	catch (const std::exception& e) {
 		statuslog->critical("Uncaught exception in main(): \"{}\"", e.what());

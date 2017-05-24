@@ -21,6 +21,8 @@
 #include <functional>
 #include <boost/container/flat_map.hpp>
 #include <spdlog/spdlog.h>
+#include <algorithm>
+#include <array>
 
 namespace tawashi {
 	namespace {
@@ -30,7 +32,7 @@ namespace tawashi {
 		Kakoune::SafePtr<SettingsBag> settings;
 		boost::container::flat_map<std::string, ResponseMakerFunc> makers_get;
 		boost::container::flat_map<std::string, ResponseMakerFunc> makers_post;
-		ResponseMakerFunc jolly_maker;
+		std::array<ResponseMakerFunc, RequestMethodType::_size()> jolly_makers;
 		Kakoune::SafePtr<cgi::Env> cgi_env;
 	};
 
@@ -39,6 +41,7 @@ namespace tawashi {
 	{
 		m_local_data->settings = parSettings;
 		m_local_data->cgi_env = parCgiEnv;
+		std::fill(m_local_data->jolly_makers.begin(), m_local_data->jolly_makers.end(), nullptr);
 	}
 
 	ResponseFactory::~ResponseFactory() noexcept = default;
@@ -56,13 +59,12 @@ namespace tawashi {
 		if (makers.end() != maker_it) {
 			return maker_it->second(m_local_data->settings, m_local_data->cgi_env);
 		}
-		else if (m_local_data->jolly_maker) {
+		else if (m_local_data->jolly_makers[parReqType]) {
 			spdlog::get("statuslog")->info("no exact match found for \"{}\", assuming it's a pastie's token", name);
-			return m_local_data->jolly_maker(m_local_data->settings, m_local_data->cgi_env);
+			return m_local_data->jolly_makers[parReqType](m_local_data->settings, m_local_data->cgi_env);
 		}
 		else {
-			assert(false);
-			spdlog::get("statuslog")->critical("no exact match found for \"{}\" and no jolly maker given, this should not happen", name);
+			spdlog::get("statuslog")->critical("no exact match found for \"{}\" with method {} and no jolly maker given, this should not happen", name, parReqType._to_string());
 			return std::unique_ptr<Response>();
 		}
 	}
@@ -83,7 +85,7 @@ namespace tawashi {
 		};
 	}
 
-	void ResponseFactory::register_jolly_maker (ResponseMakerFunc parMaker) {
-		m_local_data->jolly_maker = parMaker;
+	void ResponseFactory::register_jolly_maker (ResponseMakerFunc parMaker, RequestMethodType parReqType) {
+		m_local_data->jolly_makers[parReqType] = parMaker;
 	}
 } //namespace tawashi
