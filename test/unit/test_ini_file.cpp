@@ -21,7 +21,7 @@
 #include <utility>
 #include <ciso646>
 
-TEST_CASE ("Test parsing an ini text", "[ini]") {
+TEST_CASE ("Test parsing an ini text", "[ini][parser]") {
 	using tawashi::IniFile;
 
 	//empty data

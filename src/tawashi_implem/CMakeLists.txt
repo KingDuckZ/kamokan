@@ -29,6 +29,7 @@ add_library(${PROJECT_NAME} STATIC
 	http_header.cpp
 	quick_submit_paste_response.cpp
 	ip_utils.cpp
+	mime_split.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
