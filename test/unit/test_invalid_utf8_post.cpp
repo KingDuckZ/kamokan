@@ -52,6 +52,7 @@ TEST_CASE ("Retrieve and sanitize invalid an invalid utf-8 text from POST data",
 	const char* const fake_env[] = {
 		content_length.c_str(),
 		"PATH_INFO=/",
+		"REQUEST_METHOD=GET",
 		nullptr
 	};
 

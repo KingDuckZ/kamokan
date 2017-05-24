@@ -36,6 +36,7 @@ TEST_CASE ("Retrieve and sanitize invalid an invalid utf-8 text from environment
 	const char* const fake_env[] = {
 		reinterpret_cast<const char*>(path_info_valid),
 		reinterpret_cast<const char*>(path_translated_invalid),
+		"REQUEST_METHOD=GET",
 		nullptr
 	};
 

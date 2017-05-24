@@ -94,6 +94,7 @@ TEST_CASE ("Index response", "[index][response]") {
 		"CONTENT_LENGTH=",
 		"SERVER_PORT=80",
 		"HTTPS=",
+		"REQUEST_METHOD=GET",
 		nullptr
 	};
 	SafeStackObject<tawashi::cgi::Env> fake_env(env_raw, "/");
