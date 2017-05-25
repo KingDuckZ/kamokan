@@ -31,11 +31,14 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/include/qi_difference.hpp>
 #include <boost/fusion/include/std_pair.hpp>
+#include <boost/phoenix/function/lazy_prelude.hpp>
+#include <boost/phoenix/core.hpp>
 #include <boost/phoenix/object/construct.hpp>
 #include <boost/phoenix/stl/container.hpp>
 #include <boost/phoenix/bind/bind_member_function.hpp>
-#include <boost/phoenix/operator.hpp>
-#include <boost/functional/hash.hpp>
+#include <boost/phoenix/operator/arithmetic.hpp>
+#include <boost/phoenix/operator/self.hpp>
+#include <boost/phoenix/stl/algorithm/transformation.hpp>
 #include <cassert>
 
 //    The Internet Media Type [9 <#ref-9>] of the attached entity. The syntax is
@@ -96,13 +99,12 @@ namespace tawashi {
 			using boost::spirit::ascii::space;
 			using boost::spirit::qi::char_;
 			using boost::spirit::qi::lit;
+			using boost::spirit::qi::alnum;
 			using boost::spirit::qi::raw;
 			using boost::spirit::qi::_val;
 			using boost::spirit::qi::lexeme;
 			using boost::string_ref;
 			using boost::spirit::_1;
-			using boost::phoenix::begin;
-			using boost::phoenix::size;
 			namespace px = boost::phoenix;
 
 			content_type = -media_type;
@@ -113,8 +115,18 @@ namespace tawashi {
 			attribute = token.alias();
 			value = token | quoted_string;
 
-			token = raw[+(char_ - ';' - '/' - '=')][_val = px::bind(&string_ref::substr, px::construct<string_ref>(px::ref(*m_master_string)), begin(_1) - px::ref(m_begin), size(_1))];
-			quoted_string = raw[lexeme['"' >> +(char_ - '"') >> '"']][_val = px::bind(&string_ref::substr, px::construct<string_ref>(px::ref(*m_master_string)), begin(_1) - px::ref(m_begin), size(_1))];
+			token = raw[+(alnum | char_("-_."))][_val = px::bind(&string_ref::substr, px::construct<string_ref>(px::ref(*m_master_string)), px::begin(_1) - px::ref(m_begin), px::size(_1))];
+			quoted_string = raw[
+				lexeme[
+					lit('"') >>
+					*(char_ - '"') >>
+					'"'
+				]
+			][_val = px::bind(
+				&string_ref::substr, px::construct<string_ref>(px::ref(*m_master_string)),
+				px::begin(_1) + 1 - px::ref(m_begin),
+				px::size(_1) - 2
+			)];
 		}
 	} //unnamed namespace
 
