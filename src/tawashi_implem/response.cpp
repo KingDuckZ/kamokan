@@ -50,6 +50,10 @@ namespace tawashi {
 		//	return path.substr(start_index, substr_len);
 		//}
 
+		std::string to_string (const boost::string_ref& parStr) {
+			return std::string(parStr.data(), parStr.size());
+		}
+
 		std::string make_root_path (const SettingsBag& parSettings) {
 			auto retval = parSettings["website_root"];
 			if (retval.empty()) {
@@ -109,6 +113,13 @@ namespace tawashi {
 			return parStr;
 		};
 
+		boost::string_ref make_host_path (const SettingsBag& parSettings) {
+			boost::string_ref host_path = parSettings.at("host_path");
+			if (not host_path.empty() and host_path[host_path.size() - 1] == '/')
+				host_path = host_path.substr(0, host_path.size() - 1);
+			return host_path;
+		}
+
 		std::string make_base_uri (const Kakoune::SafePtr<SettingsBag>& parSettings, const Kakoune::SafePtr<cgi::Env>& parCgiEnv) {
 			assert(parSettings);
 			assert(parCgiEnv);
@@ -131,10 +142,8 @@ namespace tawashi {
 					oss << ':' << host_port;
 				}
 			}
-			boost::string_ref host_path = parSettings->at("host_path");
-			if (not host_path.empty() and host_path[host_path.size() - 1] == '/')
-				host_path = host_path.substr(0, host_path.size() - 1);
-			oss << host_path;
+
+			oss << make_host_path(*parSettings);
 			return oss.str();
 		}
 	} //unnamed namespace
@@ -189,6 +198,7 @@ namespace tawashi {
 		mstch::map mustache_context {
 			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
 			{"base_uri", std::string(base_uri())},
+			{"host_path", to_string(make_host_path(this->settings()))},
 			{"languages", make_mstch_langmap(*m_settings)}
 		};
 
