@@ -30,5 +30,6 @@ namespace tawashi {
 		MimeParametersMapType parameters;
 	};
 
-	SplitMime split_mime (const std::string* parMime, bool& parParseOk, int& parParsedCharCount);
+	SplitMime string_to_mime (const std::string* parMime, bool& parParseOk, int& parParsedCharCount);
+	std::string mime_to_string (const SplitMime& parMime, bool& parWriteOk);
 } //namespace tawashi

@@ -28,9 +28,21 @@
 #include <boost/spirit/include/qi_char_class.hpp>
 #include <boost/spirit/include/qi_kleene.hpp>
 #include <boost/spirit/include/qi_alternative.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/spirit/include/qi_difference.hpp>
+
+#include <boost/spirit/include/karma_char.hpp>
+#include <boost/spirit/include/karma_generate.hpp>
+#include <boost/spirit/include/karma_operator.hpp>
+#include <boost/spirit/include/karma_kleene.hpp>
+#include <boost/spirit/include/karma_stream.hpp>
+#include <boost/spirit/include/karma_string.hpp>
+#include <boost/spirit/include/karma_alternative.hpp>
+#include <boost/spirit/include/karma_rule.hpp>
+#include <boost/spirit/include/karma_eps.hpp>
+
 #include <boost/fusion/include/std_pair.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+
 #include <boost/phoenix/function/lazy_prelude.hpp>
 #include <boost/phoenix/core.hpp>
 #include <boost/phoenix/object/construct.hpp>
@@ -39,7 +51,10 @@
 #include <boost/phoenix/operator/arithmetic.hpp>
 #include <boost/phoenix/operator/self.hpp>
 #include <boost/phoenix/stl/algorithm/transformation.hpp>
+
 #include <cassert>
+#include <iterator>
+#include <sstream>
 
 //    The Internet Media Type [9 <#ref-9>] of the attached entity. The syntax is
 //    the same as the HTTP Content-Type header.
@@ -96,6 +111,7 @@ namespace tawashi {
 			m_master_string(parString),
 			m_begin(m_master_string->cbegin())
 		{
+			namespace px = boost::phoenix;
 			using boost::spirit::ascii::space;
 			using boost::spirit::qi::char_;
 			using boost::spirit::qi::lit;
@@ -105,7 +121,6 @@ namespace tawashi {
 			using boost::spirit::qi::lexeme;
 			using boost::string_ref;
 			using boost::spirit::_1;
-			namespace px = boost::phoenix;
 
 			content_type = -media_type;
 			media_type = type >> "/" >> subtype >> *(lit(";") >> parameter);
@@ -115,7 +130,13 @@ namespace tawashi {
 			attribute = token.alias();
 			value = token | quoted_string;
 
-			token = raw[+(alnum | char_("-_."))][_val = px::bind(&string_ref::substr, px::construct<string_ref>(px::ref(*m_master_string)), px::begin(_1) - px::ref(m_begin), px::size(_1))];
+			token = raw[+(alnum | char_("_.-"))][
+				_val = px::bind(
+					&string_ref::substr, px::construct<string_ref>(px::ref(*m_master_string)),
+					px::begin(_1) - px::ref(m_begin),
+					px::size(_1)
+				)
+			];
 			quoted_string = raw[
 				lexeme[
 					lit('"') >>
@@ -128,9 +149,26 @@ namespace tawashi {
 				px::size(_1) - 2
 			)];
 		}
+
+		struct simple_token_checker {
+			typedef bool result_type;
+
+			template <typename V>
+			bool operator() (const V& parIn) const {
+				std::cout << "simple_token_checker returning ";
+				if (std::find(std::begin(parIn), std::end(parIn), ' ') == std::end(parIn)) {
+					std::cout << "true\n";
+					return true;
+				}
+				else {
+					std::cout << "false\n";
+					return false;
+				}
+			}
+		};
 	} //unnamed namespace
 
-	SplitMime split_mime (const std::string* parMime, bool& parParseOk, int& parParsedCharCount) {
+	SplitMime string_to_mime (const std::string* parMime, bool& parParseOk, int& parParsedCharCount) {
 		using boost::spirit::qi::blank;
 		using boost::spirit::qi::blank_type;
 
@@ -153,5 +191,42 @@ namespace tawashi {
 		parParsedCharCount = std::distance(parMime->cbegin(), start_it);
 		assert(parParsedCharCount >= 0);
 		return result;
+	}
+
+	std::string mime_to_string (const SplitMime& parMime, bool& parWriteOk) {
+		namespace px = boost::phoenix;
+		using boost::string_ref;
+		using boost::spirit::karma::generate;
+		using boost::spirit::karma::char_;
+		using boost::spirit::karma::string;
+		using boost::spirit::karma::rule;
+		using boost::spirit::karma::alnum;
+		using boost::spirit::karma::eps;
+		using boost::spirit::_val;
+
+		if (parMime.type.empty() or parMime.subtype.empty()) {
+			parWriteOk = false;
+			return std::string();
+		}
+
+		px::function<simple_token_checker> is_simple_token;
+		std::string retval;
+		std::back_insert_iterator<std::string> out_iter(retval);
+		rule<std::back_insert_iterator<std::string>, string_ref()> token;
+		rule<std::back_insert_iterator<std::string>, string_ref()> quoted_string;
+		rule<std::back_insert_iterator<std::string>, string_ref()> param_value;
+
+		token %= eps(is_simple_token(_val)) << *(alnum | char_("._-"));
+		quoted_string %= '"' << string << '"';
+		param_value %= token | quoted_string;
+
+		parWriteOk = generate(
+			out_iter,
+			string << "/" << string << *(
+				"; " << string << "=" << param_value
+			),
+			parMime
+		);
+		return retval;
 	}
 } //namespace tawashi

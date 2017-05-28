@@ -24,16 +24,16 @@ namespace {
 	}
 } //unnamed namespace
 
-TEST_CASE ("Test the Mime-type splitter", "[mime][parser]") {
+TEST_CASE ("Test the string_to_mime parser", "[mime][parser]") {
 	using tawashi::SplitMime;
-	using tawashi::split_mime;
+	using tawashi::string_to_mime;
 
 	bool ok;
 	int parsed_count;
 	{
 		std::string test("application/x-javascript; charset=UTF-8");
 		std::string curr_val;
-		SplitMime split = split_mime(&test, ok, parsed_count);
+		SplitMime split = string_to_mime(&test, ok, parsed_count);
 
 		REQUIRE(ok);
 		CHECK(test.size() == parsed_count);
@@ -49,7 +49,7 @@ TEST_CASE ("Test the Mime-type splitter", "[mime][parser]") {
 	{
 		std::string test("image/jpeg; filename=genome.jpeg; modification-date=\"Wed, 12 Feb 1997 16:29:51 -0500\"");
 		std::string curr_val;
-		SplitMime split = split_mime(&test, ok, parsed_count);
+		SplitMime split = string_to_mime(&test, ok, parsed_count);
 
 		REQUIRE(ok);
 		CHECK(test.size() == parsed_count);
@@ -64,5 +64,42 @@ TEST_CASE ("Test the Mime-type splitter", "[mime][parser]") {
 		CHECK(split.parameters.find("modification-date") != split.parameters.end());
 		curr_val = to_string(split.parameters.at("modification-date"));
 		CHECK(curr_val == "Wed, 12 Feb 1997 16:29:51 -0500");
+	}
+}
+
+TEST_CASE ("Test the mime_to_string parser", "[mime][parser]") {
+	using tawashi::SplitMime;
+	using tawashi::mime_to_string;
+
+	std::string type = "image";
+	std::string subtype = "jpeg";
+	bool ok;
+
+	{
+		SplitMime test;
+		test.type = type;
+		test.subtype = subtype;
+		std::string result = mime_to_string(test, ok);
+		REQUIRE(ok);
+		CHECK(result == "image/jpeg");
+	}
+	{
+		SplitMime test;
+		test.type = type;
+		test.subtype = subtype;
+		test.parameters["filename"] = "genome.jpeg";
+		std::string result = mime_to_string(test, ok);
+		REQUIRE(ok);
+		CHECK(result == "image/jpeg; filename=genome.jpeg");
+	}
+	{
+		SplitMime test;
+		test.type = type;
+		test.subtype = subtype;
+		test.parameters["modification-date"] = "Wed, 12 Feb 1997 16:29:51 -0500";
+		test.parameters["filename"] = "genome.jpeg";
+		std::string result = mime_to_string(test, ok);
+		REQUIRE(ok);
+		CHECK(result == "image/jpeg; filename=genome.jpeg; modification-date=\"Wed, 12 Feb 1997 16:29:51 -0500\"");
 	}
 }
