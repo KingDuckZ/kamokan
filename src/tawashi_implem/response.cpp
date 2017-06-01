@@ -36,8 +36,6 @@
 
 namespace tawashi {
 	namespace {
-		const char g_def_response_type[] = "text/html";
-
 		//boost::string_ref fetch_page_basename (const cgi::Env& parEnv) {
 		//	const boost::string_ref& path = parEnv.path_info();
 
@@ -267,7 +265,7 @@ namespace tawashi {
 	HttpHeader Response::make_redirect (HttpStatusCodes parCode, const std::string& parLocation) {
 		std::ostringstream oss;
 		oss << base_uri() << '/' << parLocation;
-		return HttpHeader(HttpHeader::Location, parCode, oss.str());
+		return HttpHeader(parCode, oss.str());
 	}
 
 	HttpHeader Response::make_error_redirect (ErrorReasons parReason) {

@@ -21,6 +21,7 @@
 #include "sprout/array/array.hpp"
 #include <utility>
 #include <spdlog/spdlog.h>
+#include <ciso646>
 
 namespace tawashi {
 	namespace {
@@ -46,16 +47,23 @@ namespace tawashi {
 	} //unnamed namespace
 
 	HttpHeader::HttpHeader() :
-		m_param("text/html"),
+		m_mime {"text", "html", {}},
 		m_status_code(HttpStatusCodes::CodeNone),
 		m_header_type(ContentType)
 	{
 	}
 
-	HttpHeader::HttpHeader (Types parType, HttpStatusCodes parCode, std::string&& parParam) :
-		m_param(std::move(parParam)),
+	HttpHeader::HttpHeader (Types parType, HttpStatusCodes parCode, SplitMime&& parMime) :
+		m_mime(std::move(parMime)),
 		m_status_code(parCode),
 		m_header_type(parType)
+	{
+	}
+
+	HttpHeader::HttpHeader (HttpStatusCodes parCode, std::string&& parRedirectLocation) :
+		m_redirect_location(std::move(parRedirectLocation)),
+		m_status_code(parCode),
+		m_header_type(Location)
 	{
 	}
 
@@ -67,9 +75,9 @@ namespace tawashi {
 		m_status_code = HttpStatusCodes::CodeNone;
 	}
 
-	void HttpHeader::set_type (Types parType, std::string&& parParameter) {
+	void HttpHeader::set_type (Types parType, SplitMime&& parParameter) {
 		m_header_type = parType;
-		m_param = std::move(parParameter);
+		m_mime = std::move(parParameter);
 	}
 
 	bool HttpHeader::body_required() const {
@@ -90,11 +98,11 @@ namespace tawashi {
 		switch (parHeader.type()) {
 		case HttpHeader::ContentType:
 			SPDLOG_TRACE(spdlog::get("statuslog"), "Response is a Content-type (data)");
-			parStream << "Content-type: " << parHeader.parameter() << '\n';
+			parStream << "Content-type: " << mime_to_string(parHeader) << '\n';
 			break;
 		case HttpHeader::Location:
 			SPDLOG_TRACE(spdlog::get("statuslog"), "Response is a Location (redirect)");
-			parStream << "Location: " << parHeader.parameter() << '\n';
+			parStream << "Location: " << parHeader.redirect_location() << '\n';
 			break;
 		}
 		parStream << '\n';
@@ -102,10 +110,28 @@ namespace tawashi {
 	}
 
 	HttpHeader make_header_type_html() {
-		return HttpHeader(HttpHeader::ContentType, HttpStatusCodes::CodeNone, "text/html");
+		return HttpHeader(
+			HttpHeader::ContentType,
+			HttpStatusCodes::CodeNone,
+			SplitMime { "text", "html", {}}
+		);
 	}
 
 	HttpHeader make_header_type_text_utf8() {
-		return HttpHeader(HttpHeader::ContentType, HttpStatusCodes::CodeNone, "text/plain; charset=utf-8");
+		return HttpHeader(
+			HttpHeader::ContentType,
+			HttpStatusCodes::CodeNone,
+			SplitMime {"text", "plain", MimeParametersMapType {{"charset", "utf-8"}}}
+		);
+	}
+
+	std::string mime_to_string (const HttpHeader& parHeader) {
+		bool write_ok;
+		std::string retval = mime_to_string(parHeader.mime(), write_ok);
+		if (not write_ok) {
+			assert(false);
+			return std::string();
+		}
+		return retval;
 	}
 } //namespace tawashi

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "enum.h"
+#include "mime_split.hpp"
 #include <cstdint>
 #include <string>
 #include <ostream>
@@ -49,20 +50,23 @@ namespace tawashi {
 		HttpHeader();
 		HttpHeader (const HttpHeader&) = default;
 		HttpHeader (HttpHeader&&) = default;
-		HttpHeader (Types parType, HttpStatusCodes parCode, std::string&& parParam);
+		HttpHeader (Types parType, HttpStatusCodes parCode, SplitMime&& parMime);
+		HttpHeader (HttpStatusCodes parCode, std::string&& parRedirectLocation);
 		~HttpHeader() noexcept = default;
 
 		Types type() const { return m_header_type; }
 		HttpStatusCodes status_code() const { return m_status_code; }
-		const std::string& parameter() const { return m_param; }
+		const std::string& redirect_location() const { return m_redirect_location; }
+		const SplitMime& mime() const { return m_mime; }
 		bool body_required() const;
 
 		void set_status (HttpStatusCodes parCode);
 		void unset_status();
-		void set_type (Types parType, std::string&& parParameter);
+		void set_type (Types parType, SplitMime&& parParameter);
 
 	private:
-		std::string m_param;
+		SplitMime m_mime;
+		std::string m_redirect_location;
 		HttpStatusCodes m_status_code;
 		Types m_header_type;
 	};
@@ -70,4 +74,5 @@ namespace tawashi {
 	std::ostream& operator<< (std::ostream& parStream, const HttpHeader& parHeader);
 	HttpHeader make_header_type_html();
 	HttpHeader make_header_type_text_utf8();
+	[[gnu::pure]] std::string mime_to_string (const HttpHeader& parHeader);
 } //namespace tawashi
