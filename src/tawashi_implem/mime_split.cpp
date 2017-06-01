@@ -155,15 +155,8 @@ namespace tawashi {
 
 			template <typename V>
 			bool operator() (const V& parIn) const {
-				std::cout << "simple_token_checker returning ";
-				if (std::find(std::begin(parIn), std::end(parIn), ' ') == std::end(parIn)) {
-					std::cout << "true\n";
-					return true;
-				}
-				else {
-					std::cout << "false\n";
-					return false;
-				}
+				return std::find(std::begin(parIn), std::end(parIn), ' ') == std::end(parIn) and
+					std::find(std::begin(parIn), std::end(parIn), '\t') == std::end(parIn);
 			}
 		};
 	} //unnamed namespace
