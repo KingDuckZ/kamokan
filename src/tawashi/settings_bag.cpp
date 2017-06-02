@@ -21,26 +21,26 @@
 #include <cassert>
 #include <cstdint>
 #include <sstream>
-#include <spdlog/spdlog.h>
+#include <iostream>
 
 namespace tawashi {
 	namespace {
-		const IniFile::KeyValueMapType* get_tawashi_node (const IniFile& parIni) {
-			auto it_found = parIni.parsed().find("tawashi");
+		const IniFile::KeyValueMapType* get_tawashi_node (const IniFile& parIni, boost::string_ref parSectionName) {
+			auto it_found = parIni.parsed().find(parSectionName);
 			if (parIni.parsed().end() != it_found) {
 				return &it_found->second;
 			}
 			else {
-				spdlog::get("statuslog")->warn("Couldn't find section [tawashi] in the settings file");
+				std::cerr << "Couldn't find section [" << parSectionName << "] in the settings file\n";
 				static const IniFile::KeyValueMapType empty_key_values;
 				return &empty_key_values;
 			}
 		}
 	} //unnamed namespace
 
-	SettingsBag::SettingsBag (const Kakoune::SafePtr<IniFile>& parIni) :
+	SettingsBag::SettingsBag (const Kakoune::SafePtr<IniFile>& parIni, boost::string_ref parSectionName) :
 		m_ini(parIni),
-		m_values(get_tawashi_node(*parIni))
+		m_values(get_tawashi_node(*parIni, parSectionName))
 	{
 		assert(m_values);
 	}

@@ -1,21 +1,21 @@
 /* Copyright 2017, Michele Santullo
- * This file is part of "tawashi".
+ * This file is part of "duckbin".
  *
- * "tawashi" is free software: you can redistribute it and/or modify
+ * "duckbin" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * "tawashi" is distributed in the hope that it will be useful,
+ * "duckbin" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
+ * along with "duckbin".  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "tawashiConfig.h"
+#include "duckbin_config.h"
 #include "submit_paste_response.hpp"
 #include "quick_submit_paste_response.hpp"
 #include "pastie_response.hpp"
@@ -43,16 +43,16 @@ namespace {
 	std::string config_file_path() a_pure;
 
 	std::string config_file_path() {
-		mchlib::PathName config_path(TAWASHI_CONFIG_PATH);
+		mchlib::PathName config_path(DUCKBIN_CONFIG_PATH);
 		mchlib::PathName full_path("");
 		if (config_path.is_absolute()) {
 			full_path = std::move(config_path);
 		}
 		else {
-			full_path = mchlib::PathName(TAWASHI_PATH_PREFIX);
+			full_path = mchlib::PathName(DUCKBIN_PATH_PREFIX);
 			full_path.join(config_path);
 		}
-		full_path.join(TAWASHI_CONFIG_FILE);
+		full_path.join(DUCKBIN_CONFIG_FILE);
 		return full_path.path();
 	}
 
@@ -95,9 +95,9 @@ namespace {
 		std::cout << "no (Debug build)";
 #endif
 		std::cout << '\n';
-		std::cout << "TAWASHI_CONFIG_FILE: \"" << TAWASHI_CONFIG_FILE << "\"\n";
-		std::cout << "TAWASHI_CONFIG_PATH: \"" << TAWASHI_CONFIG_PATH << "\"\n";
-		std::cout << "TAWASHI_PATH_PREFIX: \"" << TAWASHI_PATH_PREFIX << "\"\n";
+		std::cout << "DUCKBIN_CONFIG_FILE: \"" << DUCKBIN_CONFIG_FILE << "\"\n";
+		std::cout << "DUCKBIN_CONFIG_PATH: \"" << DUCKBIN_CONFIG_PATH << "\"\n";
+		std::cout << "DUCKBIN_PATH_PREFIX: \"" << DUCKBIN_PATH_PREFIX << "\"\n";
 		std::cout << "VERSION_MAJOR: " << VERSION_MAJOR << '\n';
 		std::cout << "VERSION_MINOR: " << VERSION_MINOR << '\n';
 		std::cout << "VERSION_PATCH: " << VERSION_PATCH << '\n';
@@ -147,11 +147,11 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	}
 
 	SafeStackObject<tawashi::IniFile> ini = load_ini();
-	auto settings = SafeStackObject<tawashi::SettingsBag>(ini);
+	auto settings = SafeStackObject<tawashi::SettingsBag>(ini, "duckbin");
 	fill_defaults(*settings);
 
 	auto statuslog = setup_logging(*settings);
-	SPDLOG_DEBUG(statuslog, "tawashi started");
+	SPDLOG_DEBUG(statuslog, "duckbin started");
 	int retval = 0;
 	try {
 		statuslog->info("Loaded config: \"{}\"", config_file_path());
@@ -178,6 +178,6 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		retval = 1;
 	}
 
-	SPDLOG_DEBUG(statuslog, "tawashi done, quitting with {}", retval);
+	SPDLOG_DEBUG(statuslog, "duckbin done, quitting with {}", retval);
 	return retval;
 }

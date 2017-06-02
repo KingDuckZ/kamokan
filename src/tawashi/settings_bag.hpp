@@ -31,7 +31,7 @@ namespace tawashi {
 	class SettingsBag : public Kakoune::SafeCountable {
 		typedef std::map<boost::string_ref, boost::string_ref> MapType;
 	public:
-		explicit SettingsBag (const Kakoune::SafePtr<IniFile>& parIni);
+		SettingsBag (const Kakoune::SafePtr<IniFile>& parIni, boost::string_ref parSectionName);
 		~SettingsBag() noexcept;
 
 		const boost::string_ref& operator[] (boost::string_ref parIndex) const;
