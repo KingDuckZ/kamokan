@@ -53,6 +53,7 @@ TEST_CASE ("Retrieve and sanitize invalid an invalid utf-8 text from POST data",
 		content_length.c_str(),
 		"PATH_INFO=/",
 		"REQUEST_METHOD=GET",
+		"CONTENT_TYPE=application/x-www-form-urlencoded",
 		nullptr
 	};
 

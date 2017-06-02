@@ -18,6 +18,7 @@
 #include "cgi_env.hpp"
 #include "cgi_environment_vars.hpp"
 #include "duckhandy/lexical_cast.hpp"
+#include "tawashi_exception.hpp"
 #include <cassert>
 #include <ciso646>
 #include <boost/spirit/include/qi_core.hpp>
@@ -114,6 +115,18 @@ namespace cgi {
 		m_skip_path_info(calculate_skip_path_length(m_cgi_env[CGIVars::PATH_INFO], parBasePath)),
 		m_request_method_type(RequestMethodType::_from_string(m_cgi_env[CGIVars::REQUEST_METHOD].data()))
 	{
+		{
+			const std::string& content_type = m_cgi_env.at(CGIVars::CONTENT_TYPE);
+			int parsed_chars;
+			bool parse_ok;
+			m_split_mime = string_to_mime(&content_type, parse_ok, parsed_chars);
+			if (not parse_ok) {
+				std::string err_msg = "Parsing failed at position " +
+					std::to_string(parsed_chars) + " for input \"" +
+					content_type + "\"";
+				throw TawashiException(ErrorReasons::InvalidContentType, boost::string_ref(err_msg));
+			}
+		}
 	}
 
 	Env::~Env() noexcept = default;
@@ -215,6 +228,10 @@ namespace cgi {
 			retval[m_houdini.unescape_url(itm.first)] = m_houdini.unescape_url(itm.second);
 		}
 		return retval;
+	}
+
+	const SplitMime& Env::content_type_split() const {
+		return m_split_mime;
 	}
 
 	std::ostream& Env::print_all (std::ostream& parStream, const char* parNewline) const {

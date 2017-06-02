@@ -22,6 +22,7 @@
 #include "escapist.hpp"
 #include "kakoune/safe_ptr.hh"
 #include "request_method_type.hpp"
+#include "mime_split.hpp"
 #include <vector>
 #include <string>
 #include <boost/utility/string_ref.hpp>
@@ -67,6 +68,7 @@ namespace tawashi {
 			const std::string& server_software() const;
 
 			GetMapType query_string_split() const a_pure;
+			const SplitMime& content_type_split() const a_pure;
 
 			std::ostream& print_all (std::ostream& parStream, const char* parNewline) const;
 
@@ -75,6 +77,7 @@ namespace tawashi {
 			Escapist m_houdini;
 			std::size_t m_skip_path_info;
 			RequestMethodType m_request_method_type;
+			SplitMime m_split_mime;
 		};
 	} //namespace cgi
 } //namespace tawashi

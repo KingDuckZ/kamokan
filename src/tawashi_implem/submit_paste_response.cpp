@@ -84,7 +84,6 @@ namespace tawashi {
 	}
 
 	HttpHeader SubmitPasteResponse::on_process() {
-		auto post = cgi::read_post(std::cin, cgi_env());
 		boost::string_ref pastie;
 		boost::string_ref lang;
 		boost::string_ref duration;
@@ -92,18 +91,25 @@ namespace tawashi {
 		auto statuslog = spdlog::get("statuslog");
 		assert(statuslog);
 
+		const SettingsBag& settings = this->settings();
 		try {
+			auto post = cgi::read_post(std::cin, cgi_env(), settings.as<uint32_t>("max_post_size"));
 			pastie = get_value_from_post(post, make_string_ref(g_post_key));
+			lang = get_value_from_post_log_failure(post, make_string_ref(g_language_key));
+			duration = get_value_from_post_log_failure(post, make_string_ref(g_duration_key));
+		}
+		catch (const UnsupportedContentTypeException& err) {
+			statuslog->info(
+				"Unsupported content type exception: \"{}\"",
+				err.what()
+			);
+			return make_error_redirect(ErrorReasons::UnsupportedContentType);
 		}
 		catch (const TawashiException& e) {
 			statuslog->error(e.what());
 			return make_error_redirect(e.reason());
 		}
 
-		lang = get_value_from_post_log_failure(post, make_string_ref(g_language_key));
-		duration = get_value_from_post_log_failure(post, make_string_ref(g_duration_key));
-
-		const SettingsBag& settings = this->settings();
 		const auto max_sz = settings.as<uint32_t>("max_pastie_size");
 		if (pastie.size() < settings.as<uint32_t>("min_pastie_size")) {
 			return make_error_redirect(ErrorReasons::PostLengthNotInRange);

@@ -50,7 +50,9 @@ namespace tawashi {
 			"An unknown error was raised.",
 			"Unable to connect to Redis.",
 			"Request is missing a POST variable.",
-			"Pastie not found."
+			"Pastie not found.",
+			"Invalid CONTENT_TYPE.",
+			"Unsupported CONTENT_TYPE."
 		};
 		constexpr const auto lengths = string_lengths(err_descs);
 		static_assert(err_descs.static_size == lengths.static_size, "Mismatching array sizes between strings and their lengths");

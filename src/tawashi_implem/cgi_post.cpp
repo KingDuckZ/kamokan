@@ -28,11 +28,42 @@
 #include <ciso646>
 
 namespace tawashi {
+	UnsupportedContentTypeException::UnsupportedContentTypeException (const boost::string_ref& parMessage) :
+		TawashiException(ErrorReasons::UnsupportedContentType, parMessage)
+	{
+	}
+
 	namespace cgi {
 		namespace {
+			bool valid_content_type (const Env& parEnv) {
+				if (parEnv.content_type_split().type != "application" or
+					parEnv.content_type_split().subtype !=
+						"x-www-form-urlencoded") {
+					return false;
+				}
+				return true;
+			}
+
+			std::string read_n (std::istream& parSrc, std::size_t parSize) {
+				if (0 == parSize)
+					return std::string();
+
+				std::string original_data;
+				original_data.reserve(parSize);
+				std::copy_n(
+					std::istream_iterator<char>(parSrc),
+					parSize,
+					std::back_inserter(original_data)
+				);
+				return sanitized_utf8(original_data);
+			}
 		} //unnamed namespace
 
 		const PostMapType& read_post (std::istream& parSrc, const Env& parEnv) {
+			return read_post(parSrc, parEnv, parEnv.content_length());
+		}
+
+		const PostMapType& read_post (std::istream& parSrc, const Env& parEnv, std::size_t parMaxLen) {
 			static bool already_read = false;
 			static PostMapType map;
 			static std::string original_data;
@@ -41,22 +72,17 @@ namespace tawashi {
 				assert(original_data.empty());
 				assert(map.empty());
 
-				const auto input_len = parEnv.content_length();
-				if (input_len > 0) {
-					original_data.reserve(input_len);
-					std::copy_n(
-						std::istream_iterator<char>(parSrc),
-						input_len,
-						std::back_inserter(original_data)
-					);
-					original_data = sanitized_utf8(original_data);
+				if (not valid_content_type(parEnv)) {
+					throw UnsupportedContentTypeException(parEnv.content_type());
+				}
 
-					Escapist houdini;
-					for (auto& itm : split_env_vars(original_data)) {
-						std::string key(houdini.unescape_url(itm.first));
-						std::string val(houdini.unescape_url(itm.second));
-						map[std::move(key)] = std::move(val);
-					}
+				const auto input_len = std::min(parMaxLen, parEnv.content_length());
+				original_data = read_n(parSrc, input_len);
+				Escapist houdini;
+				for (auto& itm : split_env_vars(original_data)) {
+					std::string key(houdini.unescape_url(itm.first));
+					std::string val(houdini.unescape_url(itm.second));
+					map[std::move(key)] = std::move(val);
 				}
 
 				already_read = true;

@@ -84,6 +84,7 @@ namespace {
 		parSettings.add_default("resubmit_wait", "10");
 		parSettings.add_default("log_file", "-");
 		parSettings.add_default("highlight_css", "sh_darkness.css");
+		parSettings.add_default("max_post_size", "1048576");
 	}
 
 	void print_buildtime_info() {

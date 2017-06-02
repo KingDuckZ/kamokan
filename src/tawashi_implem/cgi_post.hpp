@@ -17,11 +17,17 @@
 
 #pragma once
 
+#include "tawashi_exception.hpp"
 #include <boost/container/flat_map.hpp>
 #include <string>
 #include <istream>
+#include <cstddef>
 
 namespace tawashi {
+	class UnsupportedContentTypeException : public TawashiException {
+	public:
+		explicit UnsupportedContentTypeException (const boost::string_ref& parMessage);
+	};
 
 	namespace cgi {
 		class Env;
@@ -29,5 +35,6 @@ namespace tawashi {
 		typedef boost::container::flat_map<std::string, std::string> PostMapType;
 
 		const PostMapType& read_post (std::istream& parSrc, const Env& parEnv);
+		const PostMapType& read_post (std::istream& parSrc, const Env& parEnv, std::size_t parMaxLen);
 	} //namespace cgi
 } //namespace tawashi

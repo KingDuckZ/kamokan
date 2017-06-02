@@ -27,6 +27,8 @@ namespace tawashi {
 		UnkownReason,
 		RedisDisconnected,
 		MissingPostVariable,
-		PastieNotFound
+		PastieNotFound,
+		InvalidContentType,
+		UnsupportedContentType
 	)
 } //namespace tawashi
