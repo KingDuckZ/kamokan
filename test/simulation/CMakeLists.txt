@@ -1,4 +1,4 @@
-project(tawashi_simulation CXX)
+project(kamokan_simulation CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,7 +16,7 @@ target_include_directories(${PROJECT_NAME}
 	PRIVATE ${TAWASHI_GEN_INCLUDE_DIR}
 )
 target_link_libraries(${PROJECT_NAME}
-	PRIVATE tawashi_implem
+	PRIVATE tawashi
 	PRIVATE duckhandy
 )
 

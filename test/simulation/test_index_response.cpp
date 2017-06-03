@@ -1,18 +1,18 @@
 /* Copyright 2017, Michele Santullo
- * This file is part of "tawashi".
+ * This file is part of "kamokan".
  *
- * "tawashi" is free software: you can redistribute it and/or modify
+ * "kamokan" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * "tawashi" is distributed in the hope that it will be useful,
+ * "kamokan" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
+ * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "catch.hpp"
@@ -99,17 +99,17 @@ TEST_CASE ("Index response", "[index][response]") {
 	};
 	SafeStackObject<tawashi::cgi::Env> fake_env(env_raw, "/");
 
-	std::string tawashi_settings(
-		"[tawashi]\n"
+	std::string kamokan_settings(
+		"[kamokan]\n"
 		"  host_name = 127.0.0.1\n"
-		"  website_root = /home/michele/dev/code/cpp/tawashi/html\n"
+		"  website_root = /home/michele/dev/code/cpp/kamokan/html\n"
 		"  logging_level = debug\n"
 		"  langmap_dir = /usr/share/source-highlight\n"
 		"  host_path = /\n"
 		"  host_port =\n"
 	);
-	SafeStackObject<tawashi::IniFile> ini(std::move(tawashi_settings));
-	SafeStackObject<tawashi::SettingsBag> settings(ini);
+	SafeStackObject<tawashi::IniFile> ini(std::move(kamokan_settings));
+	SafeStackObject<tawashi::SettingsBag> settings(ini, "kamokan");
 
 	std::stringstream response_stream;
 

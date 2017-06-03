@@ -24,7 +24,7 @@ target_include_directories(${PROJECT_NAME}
 	PRIVATE ${GLIB_INCLUDE_DIRS}
 )
 target_link_libraries(${PROJECT_NAME}
-	PRIVATE tawashi_implem
+	PRIVATE tawashi
 	PRIVATE duckhandy
 	PRIVATE ${GLIB_LIBRARIES}
 )

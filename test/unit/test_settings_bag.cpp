@@ -50,7 +50,7 @@ TEST_CASE ("Add and retrieve values from SettingsBag", "[settings][ini]") {
 	auto ini = SafeStackObject<IniFile>(std::istream_iterator<char>(ss), std::istream_iterator<char>());
 	CHECK(ini->parse_success());
 	REQUIRE(ini->parsed_characters() == raw_ini_char_count);
-	SettingsBag settings(ini);
+	SettingsBag settings(ini, "tawashi");
 
 	CHECK(settings["redis_server"] == "127.0.0.1");
 	CHECK(settings["empty"].empty());
