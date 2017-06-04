@@ -83,23 +83,23 @@ namespace cgi {
 				return optional<Env::VersionInfo>();
 		}
 
-		std::size_t calculate_skip_path_length (const boost::string_ref& paPath, const boost::string_ref& parBasePath) {
+		std::size_t calculate_skip_path_length (const boost::string_ref& parPath, const boost::string_ref& parBasePath) {
 			const std::size_t base_path_tr_slash = (not parBasePath.empty() and parBasePath[parBasePath.size() - 1] == '/' ? 1 : 0);
 			boost::string_ref base_path = parBasePath.substr(0, parBasePath.size() - base_path_tr_slash);
 			SPDLOG_TRACE(spdlog::get("statuslog"), "calculating skip prefix for REQUEST_URI=\"{}\", base path=\"{}\", parBasePath=\"{}\", base path trailing slash={}",
-				std::string(paPath.begin(), paPath.end()),
+				std::string(parPath.begin(), parPath.end()),
 				std::string(base_path.begin(), base_path.end()),
 				std::string(parBasePath.begin(), parBasePath.end()),
 				base_path_tr_slash
 			);
 
-			if (boost::starts_with(paPath, base_path)) {
+			if (boost::starts_with(parPath, base_path)) {
 				//account for the trailing slash in either base path and path info
-				return std::min(parBasePath.size(), paPath.size());
+				return std::min(parBasePath.size(), parPath.size()) + (1 - base_path_tr_slash);
 			}
 			else {
 				std::string str_base_path(parBasePath.begin(), parBasePath.end());
-				std::string str_path(paPath.begin(), paPath.end());
+				std::string str_path(parPath.begin(), parPath.end());
 				spdlog::get("statuslog")->error(
 					"base path is not a prefix of REQUEST_URI: base path={}, REQUEST_URI={}, tawashi will most likely malfunction",
 					str_base_path,
