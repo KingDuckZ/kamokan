@@ -50,7 +50,7 @@ namespace tawashi {
 			std::size_t content_length() const;
 			const std::string& content_type() const;
 			boost::optional<VersionInfo> gateway_interface() const a_pure;
-			boost::string_ref path_info() const;
+			const std::string& path_info() const;
 			const std::string& path_translated() const;
 			const std::string& query_string() const;
 			const std::string& http_client_ip() const;
@@ -60,6 +60,7 @@ namespace tawashi {
 			const std::string& remote_ident() const;
 			const std::string& remote_user() const;
 			RequestMethodType request_method() const;
+			const std::string& request_uri() const;
 			const std::string& script_name() const;
 			const std::string& server_name() const;
 			bool https() const;
@@ -69,6 +70,7 @@ namespace tawashi {
 
 			GetMapType query_string_split() const a_pure;
 			const SplitMime& content_type_split() const a_pure;
+			boost::string_ref request_uri_relative() const;
 
 			std::ostream& print_all (std::ostream& parStream, const char* parNewline) const;
 

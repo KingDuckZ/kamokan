@@ -83,25 +83,25 @@ namespace cgi {
 				return optional<Env::VersionInfo>();
 		}
 
-		std::size_t calculate_skip_path_length (const boost::string_ref& parPathInfo, const boost::string_ref& parBasePath) {
+		std::size_t calculate_skip_path_length (const boost::string_ref& paPath, const boost::string_ref& parBasePath) {
 			const std::size_t base_path_tr_slash = (not parBasePath.empty() and parBasePath[parBasePath.size() - 1] == '/' ? 1 : 0);
 			boost::string_ref base_path = parBasePath.substr(0, parBasePath.size() - base_path_tr_slash);
-			SPDLOG_TRACE(spdlog::get("statuslog"), "calculating skip prefix for PATH_INFO=\"{}\", base path=\"{}\", parBasePath=\"{}\", base path trailing slash={}",
-				std::string(parPathInfo.begin(), parPathInfo.end()),
+			SPDLOG_TRACE(spdlog::get("statuslog"), "calculating skip prefix for REQUEST_URI=\"{}\", base path=\"{}\", parBasePath=\"{}\", base path trailing slash={}",
+				std::string(paPath.begin(), paPath.end()),
 				std::string(base_path.begin(), base_path.end()),
 				std::string(parBasePath.begin(), parBasePath.end()),
 				base_path_tr_slash
 			);
 
-			if (boost::starts_with(parPathInfo, base_path)) {
+			if (boost::starts_with(paPath, base_path)) {
 				//account for the trailing slash in either base path and path info
-				return std::min(parBasePath.size(), parPathInfo.size());
+				return std::min(parBasePath.size(), paPath.size());
 			}
 			else {
 				std::string str_base_path(parBasePath.begin(), parBasePath.end());
-				std::string str_path(parPathInfo.begin(), parPathInfo.end());
+				std::string str_path(paPath.begin(), paPath.end());
 				spdlog::get("statuslog")->error(
-					"base path is not a prefix of PATH_INFO: base path={}, PATH_INFO={}, tawashi will most likely malfunction",
+					"base path is not a prefix of REQUEST_URI: base path={}, REQUEST_URI={}, tawashi will most likely malfunction",
 					str_base_path,
 					str_path
 				);
@@ -112,7 +112,7 @@ namespace cgi {
 
 	Env::Env(const char* const* parEnvList, const boost::string_ref& parBasePath) :
 		m_cgi_env(cgi_environment_vars(parEnvList)),
-		m_skip_path_info(calculate_skip_path_length(m_cgi_env[CGIVars::PATH_INFO], parBasePath)),
+		m_skip_path_info(calculate_skip_path_length(m_cgi_env[CGIVars::REQUEST_URI], parBasePath)),
 		m_request_method_type(RequestMethodType::_from_string(m_cgi_env[CGIVars::REQUEST_METHOD].data()))
 	{
 		{
@@ -149,10 +149,8 @@ namespace cgi {
 		return split_version(m_cgi_env[CGIVars::GATEWAY_INTERFACE]);
 	}
 
-	boost::string_ref Env::path_info() const {
-		const std::string& path = m_cgi_env[CGIVars::PATH_INFO];
-		assert(m_skip_path_info <= path.size());
-		return boost::string_ref(path).substr(m_skip_path_info);
+	const std::string& Env::path_info() const {
+		return m_cgi_env[CGIVars::PATH_INFO];
 	}
 
 	const std::string& Env::path_translated() const {
@@ -189,6 +187,10 @@ namespace cgi {
 
 	RequestMethodType Env::request_method() const {
 		return m_request_method_type;
+	}
+
+	const std::string& Env::request_uri() const {
+		return m_cgi_env[CGIVars::REQUEST_URI];
 	}
 
 	const std::string& Env::script_name() const {
@@ -242,5 +244,10 @@ namespace cgi {
 		return parStream;
 	}
 
+	boost::string_ref Env::request_uri_relative() const {
+		const std::string& path = m_cgi_env[CGIVars::REQUEST_URI];
+		assert(m_skip_path_info <= path.size());
+		return boost::string_ref(path).substr(m_skip_path_info);
+	}
 } //namespace cgi
 } //namespace tawashi

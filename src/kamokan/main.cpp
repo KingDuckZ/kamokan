@@ -167,7 +167,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		resp_factory.register_jolly_maker(&make_response<PastieResponse>, RequestMethodType::GET);
 
 		std::unique_ptr<Response> response = resp_factory.make_response(
-			cgi_env->path_info(),
+			cgi_env->request_uri_relative(),
 			cgi_env->request_method()
 		);
 		if (response)
