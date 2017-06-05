@@ -21,14 +21,11 @@
 #include "kakoune/safe_ptr.hh"
 #include "http_header.hpp"
 #include "error_reasons.hpp"
+#include "storage.hpp"
 #include <string>
 #include <iostream>
 #include <boost/utility/string_ref.hpp>
 #include <memory>
-
-namespace redis {
-	class IncRedis;
-} //namespace redis
 
 namespace tawashi {
 	class SettingsBag;
@@ -54,7 +51,7 @@ namespace tawashi {
 		const cgi::Env& cgi_env() const;
 		const std::string& base_uri() const;
 		virtual boost::string_ref page_basename() const = 0;
-		redis::IncRedis& redis() const;
+		const Storage& storage() const;
 		const SettingsBag& settings() const;
 		virtual std::string load_mustache() const;
 		HttpHeader make_redirect (HttpStatusCodes parCode, const std::string& parLocation);
@@ -65,11 +62,11 @@ namespace tawashi {
 		virtual void on_mustache_prepare (mstch::map& parContext);
 		virtual std::string on_mustache_retrieve();
 
+		Storage m_storage;
 		Kakoune::SafePtr<cgi::Env> m_cgi_env;
 		Kakoune::SafePtr<SettingsBag> m_settings;
 		std::string m_website_root;
 		std::string m_base_uri;
-		std::unique_ptr<redis::IncRedis> m_redis;
 		std::ostream* m_stream_out;
 	};
 } //namespace tawashi

@@ -41,6 +41,6 @@ namespace tawashi {
 		typedef std::pair<boost::optional<std::string>, HttpHeader> StringOrHeader;
 
 		virtual HttpHeader on_process() override;
-		StringOrHeader submit_to_redis (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
+		StringOrHeader submit_to_storage (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
 	};
 } //namespace tawashi

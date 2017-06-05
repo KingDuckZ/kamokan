@@ -16,7 +16,7 @@
  */
 
 #include "pastie_response.hpp"
-#include "incredis/incredis.hpp"
+#include "storage.hpp"
 #include "settings_bag.hpp"
 #include "escapist.hpp"
 #include "cgi_env.hpp"
@@ -75,13 +75,8 @@ namespace tawashi {
 	}
 
 	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
-		using opt_string = redis::IncRedis::opt_string;
-		using opt_string_list = redis::IncRedis::opt_string_list;
-
 		boost::string_ref token = cgi_env().request_uri_relative();
-		auto& redis = this->redis();
-		opt_string_list pastie_reply = redis.hmget(token, "pastie");
-		opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
+		boost::optional<std::string> pastie = this->storage().retrieve_pastie(token);
 
 		if (not pastie) {
 			m_pastie_not_found = true;

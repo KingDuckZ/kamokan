@@ -16,9 +16,8 @@
  */
 
 #include "submit_paste_response.hpp"
-#include "incredis/incredis.hpp"
+#include "storage.hpp"
 #include "cgi_post.hpp"
-#include "num_to_token.hpp"
 #include "settings_bag.hpp"
 #include "duckhandy/compatibility.h"
 #include "duckhandy/lexical_cast.hpp"
@@ -126,7 +125,7 @@ namespace tawashi {
 		//TODO: replace boost's lexical_cast with mine when I have some checks
 		//over invalid inputs
 		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
-		StringOrHeader submit_result = submit_to_redis(pastie, duration_int, lang);
+		StringOrHeader submit_result = submit_to_storage(pastie, duration_int, lang);
 		const auto& token = submit_result.first;
 
 		if (token) {
@@ -144,37 +143,18 @@ namespace tawashi {
 		}
 	}
 
-	auto SubmitPasteResponse::submit_to_redis (
+	auto SubmitPasteResponse::submit_to_storage (
 		const boost::string_ref& parText,
 		uint32_t parExpiry,
 		const boost::string_ref& parLang
 	) -> StringOrHeader {
-		auto& redis = this->redis();
-		if (not redis.is_connected()) {
-			return std::make_pair(boost::optional<std::string>(), make_error_redirect(ErrorReasons::RedisDisconnected));
-		}
-
+		auto& storage = this->storage();
 		std::string remote_ip = guess_real_remote_ip(cgi_env());
-		if (redis.get(remote_ip)) {
-			//please wait and submit again
-			return std::make_pair(boost::optional<std::string>(), make_error_redirect(ErrorReasons::UserFlooding));
-		}
-
-		const auto next_id = redis.incr("paste_counter");
-		const std::string token = num_to_token(next_id);
-		assert(not token.empty());
-		if (redis.hmset(token,
-			"pastie", parText,
-			"max_ttl", dhandy::lexical_cast<std::string>(parExpiry),
-			"lang", parLang)
-		) {
-			redis.set(remote_ip, "");
-			redis.expire(remote_ip, settings().as<uint32_t>("resubmit_wait"));
-			if (redis.expire(token, parExpiry))
-				return std::make_pair(boost::make_optional(token), HttpHeader());
-		}
-
-		return std::make_pair(boost::optional<std::string>(), make_error_redirect(ErrorReasons::PastieNotSaved));
+		Storage::SubmissionResult submission_res = storage.submit_pastie(parText, parExpiry, parLang, remote_ip);
+		if (not submission_res.error)
+			return std::make_pair(boost::make_optional(std::move(submission_res.token)), HttpHeader());
+		else
+			return std::make_pair(boost::optional<std::string>(), make_error_redirect(*submission_res.error));
 	}
 
 	HttpHeader SubmitPasteResponse::make_success_response (std::string&& parPastieParam) {

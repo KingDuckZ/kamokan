@@ -16,7 +16,6 @@
  */
 
 #include "response.hpp"
-#include "incredis/incredis.hpp"
 #include "settings_bag.hpp"
 #include "tawashi_config.h"
 #include "duckhandy/stringize.h"
@@ -59,23 +58,6 @@ namespace tawashi {
 			}
 			else {
 				return mchlib::PathName(retval).path() + '/';
-			}
-		}
-
-		redis::IncRedis make_incredis (const tawashi::SettingsBag& parSettings) {
-			using redis::IncRedis;
-
-			if (parSettings["redis_mode"] == "inet") {
-				return IncRedis(
-					parSettings.as<std::string>("redis_server"),
-					parSettings.as<uint16_t>("redis_port")
-				);
-			}
-			else if (parSettings["redis_mode"] == "sock") {
-				return IncRedis(parSettings.as<std::string>("redis_sock"));
-			}
-			else {
-				throw std::runtime_error("Unknown setting for \"redis_mode\", valid settings are \"inet\" or \"sock\"");
 			}
 		}
 
@@ -152,6 +134,7 @@ namespace tawashi {
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
 		bool parWantRedis
 	) :
+		m_storage(parSettings),
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
 		m_cgi_env(parCgiEnv),
 		m_settings(parSettings),
@@ -163,8 +146,7 @@ namespace tawashi {
 		assert(m_stream_out);
 
 		if (parWantRedis) {
-			m_redis = std::make_unique<redis::IncRedis>(make_incredis(*parSettings));
-			m_redis->connect();
+			m_storage.connect_async();
 		}
 
 		mstch::config::escape = &disable_mstch_escaping;
@@ -200,14 +182,7 @@ namespace tawashi {
 			{"languages", make_mstch_langmap(*m_settings)}
 		};
 
-		if (m_redis) {
-			SPDLOG_TRACE(statuslog, "Finalizing redis connection");
-			m_redis->wait_for_connect();
-			auto batch = m_redis->make_batch();
-			batch.select(m_settings->as<uint32_t>("redis_db"));
-			batch.client_setname("tawashi_v" STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH));
-			batch.throw_if_failed();
-		}
+		m_storage.finalize_connection();
 
 		SPDLOG_TRACE(statuslog, "Raising event on_process");
 		HttpHeader http_header = this->on_process();
@@ -252,9 +227,9 @@ namespace tawashi {
 		return *content;
 	}
 
-	redis::IncRedis& Response::redis() const {
-		assert(m_redis);
-		return *m_redis;
+	const Storage& Response::storage() const {
+		assert(m_storage.is_connected());
+		return m_storage;
 	}
 
 	const SettingsBag& Response::settings() const {
