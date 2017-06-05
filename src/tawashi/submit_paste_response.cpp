@@ -132,9 +132,9 @@ namespace tawashi {
 		if (token) {
 			std::ostringstream oss;
 			oss << *token;
-			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", *token, oss.str());
 			if (not lang.empty())
 				oss << '?' << lang;
+			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", *token, oss.str());
 
 			return this->make_success_response(oss.str());
 		}

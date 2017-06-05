@@ -265,6 +265,10 @@ namespace tawashi {
 	HttpHeader Response::make_redirect (HttpStatusCodes parCode, const std::string& parLocation) {
 		std::ostringstream oss;
 		oss << base_uri() << '/' << parLocation;
+
+		auto statuslog = spdlog::get("statuslog");
+		assert(statuslog);
+		statuslog->info("Redirecting to page \"{}\"", oss.str());
 		return HttpHeader(parCode, oss.str());
 	}
 
