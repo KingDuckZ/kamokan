@@ -146,7 +146,7 @@ TEST_CASE ("Submit paste response", "[submitpaste][response]") {
 
 	{
 		std::string output = oss.str();
-		const char expected[] = "Status: 303 See Other\n"
+		const char expected[] = "Status: HTTP/1.1 303 See Other\n"
 			"Location: http://192.168.0.10/kamokan/b?colourless\n\n"
 		;
 		CHECK(output == expected);

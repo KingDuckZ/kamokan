@@ -88,7 +88,7 @@ namespace tawashi {
 		const HttpStatusCodes code_none = HttpStatusCodes::CodeNone;
 		if (parHeader.status_code() != code_none) {
 			parStream <<
-				"Status: " <<
+				"Status: HTTP/1.1 " <<
 				parHeader.status_code()._to_integral() <<
 				' ' <<
 				g_status_code_descriptions[parHeader.status_code()] <<
