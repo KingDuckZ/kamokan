@@ -18,3 +18,4 @@
 #pragma once
 
 #define KAMOKAN_HTML_PATH "@CMAKE_CURRENT_SOURCE_DIR@/html/website"
+#cmakedefine TAWASHI_WITH_IP_LOGGING

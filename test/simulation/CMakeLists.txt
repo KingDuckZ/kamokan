@@ -9,6 +9,8 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_DEBUG} -Wall -Wpedantic -Wconversion 
 add_executable(${PROJECT_NAME}
 	check.cpp
 	test_index_response.cpp
+	test_submit_pastie.cpp
+	fake_storage.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

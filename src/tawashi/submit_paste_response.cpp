@@ -34,6 +34,11 @@ namespace tawashi {
 		const char g_post_key[] = "pastie";
 		const char g_language_key[] = "lang";
 		const char g_duration_key[] = "ttl";
+#if defined(TAWASHI_WITH_TESTING)
+		const bool g_connect_to_redis = false;
+#else
+		const bool g_connect_to_redis = true;
+#endif
 
 		class MissingPostVarError : public TawashiException {
 		public:
@@ -78,7 +83,7 @@ namespace tawashi {
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		Response(parSettings, parStreamOut, parCgiEnv, true)
+		Response(parSettings, parStreamOut, parCgiEnv, g_connect_to_redis)
 	{
 	}
 
