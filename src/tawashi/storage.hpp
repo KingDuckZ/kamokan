@@ -40,19 +40,23 @@ namespace tawashi {
 		};
 
 		explicit Storage (const Kakoune::SafePtr<SettingsBag>& parSettings);
-		~Storage();
+		tawashi_virtual_testing ~Storage();
 
-		void connect_async();
-		bool is_connected() const;
-		void finalize_connection();
-		SubmissionResult submit_pastie (
+		tawashi_virtual_testing void connect_async();
+		tawashi_virtual_testing bool is_connected() const;
+		tawashi_virtual_testing void finalize_connection();
+		tawashi_virtual_testing SubmissionResult submit_pastie (
 			const boost::string_ref& parText,
 			uint32_t parExpiry,
 			const boost::string_ref& parLang,
 			const std::string& parRemoteIP
 		) const;
 
-		boost::optional<std::string> retrieve_pastie (const boost::string_ref& parToken) const;
+		tawashi_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_ref& parToken) const;
+
+#if defined(TAWASHI_WITH_TESTING)
+		const SettingsBag& settings() const;
+#endif
 
 	private:
 		std::unique_ptr<redis::IncRedis> m_redis;

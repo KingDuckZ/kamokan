@@ -133,9 +133,11 @@ namespace tawashi {
 			oss << *token;
 			if (not lang.empty())
 				oss << '?' << lang;
-			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", *token, oss.str());
 
-			return this->make_success_response(oss.str());
+			std::string redirect = oss.str();
+			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", *token, redirect);
+
+			return this->make_success_response(std::move(redirect));
 		}
 		else {
 			statuslog->info("Empty pastie token (possibly due to a previous failure)");

@@ -51,7 +51,7 @@ namespace tawashi {
 		const cgi::Env& cgi_env() const;
 		const std::string& base_uri() const;
 		virtual boost::string_ref page_basename() const = 0;
-		const Storage& storage() const;
+		tawashi_virtual_testing const Storage& storage() const;
 		const SettingsBag& settings() const;
 		virtual std::string load_mustache() const;
 		HttpHeader make_redirect (HttpStatusCodes parCode, const std::string& parLocation);

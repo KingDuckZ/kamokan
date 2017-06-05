@@ -17,7 +17,6 @@
 
 #include "response.hpp"
 #include "settings_bag.hpp"
-#include "tawashi_config.h"
 #include "duckhandy/stringize.h"
 #include "duckhandy/lexical_cast.hpp"
 #include "pathname/pathname.hpp"

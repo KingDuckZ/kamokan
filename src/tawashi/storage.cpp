@@ -128,4 +128,10 @@ namespace tawashi {
 
 		return pastie;
 	}
+
+#if defined(TAWASHI_WITH_TESTING)
+	const SettingsBag& Storage::settings() const {
+		return *m_settings;
+	}
+#endif
 } //namespace tawashi
