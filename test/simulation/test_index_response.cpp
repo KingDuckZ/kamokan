@@ -21,6 +21,7 @@
 #include "ini_file.hpp"
 #include "settings_bag.hpp"
 #include "safe_stack_object.hpp"
+#include "simulation_config.h"
 #include <sstream>
 #include <utility>
 #include <string>
@@ -102,7 +103,7 @@ TEST_CASE ("Index response", "[index][response]") {
 	std::string kamokan_settings(
 		"[kamokan]\n"
 		"  host_name = 127.0.0.1\n"
-		"  website_root = /home/michele/dev/code/cpp/kamokan/html\n"
+		"  website_root = " KAMOKAN_HTML_PATH "\n"
 		"  logging_level = debug\n"
 		"  langmap_dir = /usr/share/source-highlight\n"
 		"  host_path = /\n"

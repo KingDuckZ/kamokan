@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
 	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/Catch/single_include
 	PRIVATE ${TAWASHI_GEN_INCLUDE_DIR}
+	PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
 )
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE tawashi
@@ -24,4 +25,9 @@ add_test(
 	NAME TawashiSimulationTest
 	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 	COMMAND ${PROJECT_NAME}
+)
+
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/simulation_config.h.in
+	${CMAKE_CURRENT_BINARY_DIR}/include/simulation_config.h
 )
