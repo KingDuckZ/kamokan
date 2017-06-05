@@ -95,7 +95,7 @@ namespace cgi {
 
 			if (boost::starts_with(parPath, base_path)) {
 				//account for the trailing slash in either base path and path info
-				return std::min(parBasePath.size(), parPath.size()) + (1 - base_path_tr_slash);
+				return std::min(parBasePath.size() + (1 - base_path_tr_slash), parPath.size());
 			}
 			else {
 				std::string str_base_path(parBasePath.begin(), parBasePath.end());
