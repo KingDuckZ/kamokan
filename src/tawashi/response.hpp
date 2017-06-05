@@ -22,6 +22,7 @@
 #include "http_header.hpp"
 #include "error_reasons.hpp"
 #include "storage.hpp"
+#include "cgi_post.hpp"
 #include <string>
 #include <iostream>
 #include <boost/utility/string_ref.hpp>
@@ -49,6 +50,8 @@ namespace tawashi {
 		);
 
 		const cgi::Env& cgi_env() const;
+		tawashi_virtual_testing cgi::PostMapType cgi_post() const;
+
 		const std::string& base_uri() const;
 		virtual boost::string_ref page_basename() const = 0;
 		tawashi_virtual_testing const Storage& storage() const;

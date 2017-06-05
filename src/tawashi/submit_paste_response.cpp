@@ -92,7 +92,7 @@ namespace tawashi {
 
 		const SettingsBag& settings = this->settings();
 		try {
-			auto post = cgi::read_post(std::cin, cgi_env(), settings.as<uint32_t>("max_post_size"));
+			auto post = this->cgi_post();
 			pastie = get_value_from_post(post, make_string_ref(g_post_key));
 			lang = get_value_from_post_log_failure(post, make_string_ref(g_language_key));
 			duration = get_value_from_post_log_failure(post, make_string_ref(g_duration_key));
