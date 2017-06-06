@@ -24,6 +24,7 @@
 #include <srchilite/sourcehighlight.h>
 #include <srchilite/langmap.h>
 #include <sstream>
+#include <algorithm>
 
 namespace tawashi {
 	namespace {
@@ -34,6 +35,15 @@ namespace tawashi {
 			return parSettings.as<std::string>("highlight_css");
 		}
 
+		boost::string_view get_pastie_name (boost::string_view parRequest) {
+			using boost::string_view;
+
+			auto it_found = std::find(parRequest.begin(), parRequest.end(), '?');
+			if (parRequest.end() == it_found)
+				return parRequest.substr(0, it_found - parRequest.begin());
+			else
+				return parRequest;
+		}
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (
@@ -76,7 +86,7 @@ namespace tawashi {
 	}
 
 	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
-		boost::string_view token = cgi_env().path_info_relative();
+		boost::string_view token = get_pastie_name(cgi_env().request_uri_relative());
 		boost::optional<std::string> pastie = this->storage().retrieve_pastie(token);
 
 		if (not pastie) {
