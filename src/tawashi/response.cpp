@@ -47,7 +47,7 @@ namespace tawashi {
 		//	return path.substr(start_index, substr_len);
 		//}
 
-		std::string to_string (const boost::string_ref& parStr) {
+		std::string to_string (const boost::string_view& parStr) {
 			return std::string(parStr.data(), parStr.size());
 		}
 
@@ -61,7 +61,7 @@ namespace tawashi {
 			}
 		}
 
-		boost::optional<std::string> load_whole_file (const std::string& parWebsiteRoot, const char* parSuffix, const boost::string_ref& parName, bool parThrow) {
+		boost::optional<std::string> load_whole_file (const std::string& parWebsiteRoot, const char* parSuffix, const boost::string_view& parName, bool parThrow) {
 			std::ostringstream oss;
 			oss << parWebsiteRoot << parName << parSuffix;
 			spdlog::get("statuslog")->info("Trying to load \"{}\"", oss.str());
@@ -93,8 +93,8 @@ namespace tawashi {
 			return parStr;
 		};
 
-		boost::string_ref make_host_path (const SettingsBag& parSettings) {
-			boost::string_ref host_path = parSettings.at("host_path");
+		boost::string_view make_host_path (const SettingsBag& parSettings) {
+			boost::string_view host_path = parSettings.at("host_path");
 			if (not host_path.empty() and host_path[host_path.size() - 1] == '/')
 				host_path = host_path.substr(0, host_path.size() - 1);
 			return host_path;
@@ -110,7 +110,7 @@ namespace tawashi {
 			else
 				oss << "http://";
 			oss << parSettings->at("host_name");
-			boost::string_ref host_port = parSettings->at("host_port");
+			boost::string_view host_port = parSettings->at("host_port");
 			if (not host_port.empty()) {
 				if (host_port == "from_downstream") {
 					const uint16_t port = parCgiEnv->server_port();

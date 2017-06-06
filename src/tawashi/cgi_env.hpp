@@ -25,7 +25,7 @@
 #include "mime_split.hpp"
 #include <vector>
 #include <string>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <cstdint>
 #include <iostream>
 #include <boost/optional.hpp>
@@ -36,14 +36,14 @@ namespace tawashi {
 		class Env : public Kakoune::SafeCountable {
 		public:
 			struct VersionInfo {
-				boost::string_ref name;
+				boost::string_view name;
 				uint16_t major;
 				uint16_t minor;
 			};
 
 			typedef boost::container::flat_map<std::string, std::string> GetMapType;
 
-			Env (const char* const* parEnvList, const boost::string_ref& parBasePath);
+			Env (const char* const* parEnvList, const boost::string_view& parBasePath);
 			~Env() noexcept;
 
 			const std::string& auth_type() const;
@@ -70,8 +70,8 @@ namespace tawashi {
 
 			GetMapType query_string_split() const a_pure;
 			const SplitMime& content_type_split() const a_pure;
-			boost::string_ref request_uri_relative() const;
-			boost::string_ref path_info_relative() const;
+			boost::string_view request_uri_relative() const;
+			boost::string_view path_info_relative() const;
 
 			std::ostream& print_all (std::ostream& parStream, const char* parNewline) const;
 

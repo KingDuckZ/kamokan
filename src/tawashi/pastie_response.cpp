@@ -33,6 +33,7 @@ namespace tawashi {
 			//TODO: make sure the file exists or throw or do something
 			return parSettings.as<std::string>("highlight_css");
 		}
+
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (
@@ -75,7 +76,7 @@ namespace tawashi {
 	}
 
 	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
-		boost::string_ref token = cgi_env().path_info_relative();
+		boost::string_view token = cgi_env().path_info_relative();
 		boost::optional<std::string> pastie = this->storage().retrieve_pastie(token);
 
 		if (not pastie) {

@@ -18,11 +18,11 @@
 #pragma once
 
 #include <spdlog/spdlog.h>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 
 namespace spdlog {
 	template <typename OStream>
-	inline OStream& operator<< (OStream& parOS, const boost::string_ref& parStr) {
+	inline OStream& operator<< (OStream& parOS, const boost::string_view& parStr) {
 		return parOS << parStr;
 	}
 } //namespace spdlog

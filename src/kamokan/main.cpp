@@ -118,8 +118,8 @@ namespace {
 		//Prepare the logger
 		spdlog::set_pattern("[%Y-%m-%d %T %z] - %v");
 		spdlog::set_level(spdlog::level::trace); //set to maximum possible here
-		boost::string_ref log_path = parSettings["log_file"];
-		const bool log_to_stderr = (log_path == boost::string_ref("-"));
+		boost::string_view log_path = parSettings["log_file"];
+		const bool log_to_stderr = (log_path == "-");
 		auto statuslog = (log_to_stderr ?
 			spdlog::stderr_logger_st("statuslog") :
 			spdlog::basic_logger_st("statuslog", std::string(log_path.begin(), log_path.end()), false)
@@ -141,7 +141,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	using tawashi::Response;
 	using tawashi::RequestMethodType;
 
-	if (2 == parArgc and boost::string_ref(parArgv[1]) == "--show-paths") {
+	if (2 == parArgc and boost::string_view(parArgv[1]) == "--show-paths") {
 		print_buildtime_info();
 		return 0;
 	}

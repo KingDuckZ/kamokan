@@ -20,14 +20,14 @@
 
 namespace tawashi {
 	namespace {
-		std::string compose_err_message (ErrorReasons parReason, const boost::string_ref& parMessage) {
+		std::string compose_err_message (ErrorReasons parReason, const boost::string_view& parMessage) {
 			std::ostringstream oss;
 			oss << "Exception with reason " << parReason << ": " << parMessage;
 			return oss.str();
 		}
 	} //unnamed namespace
 
-	TawashiException::TawashiException (ErrorReasons parReason, const boost::string_ref& parMessage) :
+	TawashiException::TawashiException (ErrorReasons parReason, const boost::string_view& parMessage) :
 		std::runtime_error(compose_err_message(parReason, parMessage)),
 		m_reason(parReason)
 	{

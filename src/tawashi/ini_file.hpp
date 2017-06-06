@@ -20,15 +20,15 @@
 #include "kakoune/safe_ptr.hh"
 #include <boost/container/flat_map.hpp>
 #include <iterator>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <string>
 #include <cassert>
 
 namespace tawashi {
 	class IniFile : public Kakoune::SafeCountable {
 	public:
-		typedef boost::container::flat_map<boost::string_ref, boost::string_ref> KeyValueMapType;
-		typedef boost::container::flat_map<boost::string_ref, KeyValueMapType> IniMapType;
+		typedef boost::container::flat_map<boost::string_view, boost::string_view> KeyValueMapType;
+		typedef boost::container::flat_map<boost::string_view, KeyValueMapType> IniMapType;
 
 		IniFile (std::istream_iterator<char> parInputFrom, std::istream_iterator<char> parInputEnd);
 		explicit IniFile (std::string&& parIniData);

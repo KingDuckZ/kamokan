@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <string>
 
 namespace tawashi {
-	std::string sanitized_utf8 (const boost::string_ref& parStr);
+	std::string sanitized_utf8 (const boost::string_view& parStr);
 } //namespace tawashi

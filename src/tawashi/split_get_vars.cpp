@@ -17,7 +17,7 @@
 
 #include "split_get_vars.hpp"
 #include <boost/algorithm/string/finder.hpp>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <ciso646>
@@ -31,7 +31,7 @@ namespace tawashi {
 		using boost::token_finder;
 		using boost::adaptors::transformed;
 		using boost::adaptors::filtered;
-		using boost::string_ref;
+		using boost::string_view;
 		using boost::split_iterator;
 		using boost::make_iterator_range;
 		using boost::range::find;
@@ -49,11 +49,11 @@ namespace tawashi {
 			transformed([](const MatchRange& r){
 				auto eq = find(r, '=');
 				if (r.empty())
-					return std::pair<string_ref, string_ref>();
+					return std::pair<string_view, string_view>();
 				if (r.end() == eq)
-					return std::make_pair(string_ref(&*r.begin(), r.size()), string_ref());
+					return std::make_pair(string_view(&*r.begin(), r.size()), string_view());
 				else
-					return std::make_pair(string_ref(&*r.begin(), eq - r.begin()), string_ref(&*(eq + 1), r.size() - (eq - r.begin() + 1)));
+					return std::make_pair(string_view(&*r.begin(), eq - r.begin()), string_view(&*(eq + 1), r.size() - (eq - r.begin() + 1)));
 			})
 		);
 	}

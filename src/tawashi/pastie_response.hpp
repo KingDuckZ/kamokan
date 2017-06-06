@@ -19,7 +19,7 @@
 
 #include "response.hpp"
 #include <string>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 
 namespace tawashi {
 	class PastieResponse : public Response {
@@ -31,7 +31,7 @@ namespace tawashi {
 		);
 
 	protected:
-		virtual boost::string_ref page_basename() const override { return boost::string_ref("pastie"); }
+		virtual boost::string_view page_basename() const override { return boost::string_view("pastie"); }
 
 	private:
 		virtual HttpHeader on_process() override;

@@ -81,8 +81,8 @@
 
 BOOST_FUSION_ADAPT_STRUCT(
 	tawashi::SplitMime,
-	(boost::string_ref, type)
-	(boost::string_ref, subtype)
+	(boost::string_view, type)
+	(boost::string_view, subtype)
 	(tawashi::MimeParametersMapType, parameters)
 );
 
@@ -94,13 +94,13 @@ namespace tawashi {
 
 			boost::spirit::qi::rule<Iterator, SplitMime(), Skipper> content_type;
 			boost::spirit::qi::rule<Iterator, SplitMime(), Skipper> media_type;
-			boost::spirit::qi::rule<Iterator, boost::string_ref(), Skipper> type;
-			boost::spirit::qi::rule<Iterator, boost::string_ref(), Skipper> subtype;
+			boost::spirit::qi::rule<Iterator, boost::string_view(), Skipper> type;
+			boost::spirit::qi::rule<Iterator, boost::string_view(), Skipper> subtype;
 			boost::spirit::qi::rule<Iterator, MimeParametersMapType::value_type(), Skipper> parameter;
-			boost::spirit::qi::rule<Iterator, boost::string_ref(), Skipper> attribute;
-			boost::spirit::qi::rule<Iterator, boost::string_ref(), Skipper> value;
-			boost::spirit::qi::rule<Iterator, boost::string_ref(), Skipper> quoted_string;
-			boost::spirit::qi::rule<Iterator, boost::string_ref(), Skipper> token;
+			boost::spirit::qi::rule<Iterator, boost::string_view(), Skipper> attribute;
+			boost::spirit::qi::rule<Iterator, boost::string_view(), Skipper> value;
+			boost::spirit::qi::rule<Iterator, boost::string_view(), Skipper> quoted_string;
+			boost::spirit::qi::rule<Iterator, boost::string_view(), Skipper> token;
 			const std::string* m_master_string;
 			Iterator m_begin;
 		};
@@ -119,7 +119,7 @@ namespace tawashi {
 			using boost::spirit::qi::raw;
 			using boost::spirit::qi::_val;
 			using boost::spirit::qi::lexeme;
-			using boost::string_ref;
+			using boost::string_view;
 			using boost::spirit::_1;
 
 			content_type = -media_type;
@@ -132,7 +132,7 @@ namespace tawashi {
 
 			token = raw[+(alnum | char_("_.-"))][
 				_val = px::bind(
-					&string_ref::substr, px::construct<string_ref>(px::ref(*m_master_string)),
+					&string_view::substr, px::construct<string_view>(px::ref(*m_master_string)),
 					px::begin(_1) - px::ref(m_begin),
 					px::size(_1)
 				)
@@ -144,7 +144,7 @@ namespace tawashi {
 					'"'
 				]
 			][_val = px::bind(
-				&string_ref::substr, px::construct<string_ref>(px::ref(*m_master_string)),
+				&string_view::substr, px::construct<string_view>(px::ref(*m_master_string)),
 				px::begin(_1) + 1 - px::ref(m_begin),
 				px::size(_1) - 2
 			)];
@@ -188,7 +188,7 @@ namespace tawashi {
 
 	std::string mime_to_string (const SplitMime& parMime, bool& parWriteOk) {
 		namespace px = boost::phoenix;
-		using boost::string_ref;
+		using boost::string_view;
 		using boost::spirit::karma::generate;
 		using boost::spirit::karma::char_;
 		using boost::spirit::karma::string;
@@ -205,9 +205,9 @@ namespace tawashi {
 		px::function<simple_token_checker> is_simple_token;
 		std::string retval;
 		std::back_insert_iterator<std::string> out_iter(retval);
-		rule<std::back_insert_iterator<std::string>, string_ref()> token;
-		rule<std::back_insert_iterator<std::string>, string_ref()> quoted_string;
-		rule<std::back_insert_iterator<std::string>, string_ref()> param_value;
+		rule<std::back_insert_iterator<std::string>, string_view()> token;
+		rule<std::back_insert_iterator<std::string>, string_view()> quoted_string;
+		rule<std::back_insert_iterator<std::string>, string_view()> param_value;
 
 		token %= eps(is_simple_token(_val)) << *(alnum | char_("._-"));
 		quoted_string %= '"' << string << '"';

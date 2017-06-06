@@ -30,7 +30,7 @@
 #endif
 
 namespace tawashi {
-	std::string sanitized_utf8 (const boost::string_ref& parStr) {
+	std::string sanitized_utf8 (const boost::string_view& parStr) {
 		std::string sanitized;
 		sanitized.reserve(parStr.size());
 #if defined(SANITIZE_WITH_UTFCPP)

@@ -55,7 +55,7 @@ namespace mchlib {
 			return reserve;
 		}
 
-		std::size_t count_grouped (boost::string_ref parIn, char parDelim) {
+		std::size_t count_grouped (boost::string_view parIn, char parDelim) {
 			std::size_t retval = 0;
 			char prev = '\0';
 			for (auto c : parIn) {
@@ -65,9 +65,9 @@ namespace mchlib {
 			return retval;
 		}
 
-		void split_path (std::vector<boost::string_ref>* parOut, boost::string_ref parPath) {
+		void split_path (std::vector<boost::string_view>* parOut, boost::string_view parPath) {
 			auto from = parPath.begin();
-			boost::string_ref::const_iterator next;
+			boost::string_view::const_iterator next;
 			const auto end = parPath.end();
 			const auto beg = parPath.begin();
 			while (end != (next = std::find(from, end, '/'))) {
@@ -111,7 +111,7 @@ namespace mchlib {
 		}
 	} //unnamed namespace
 
-	PathName::PathName (boost::string_ref parPath) {
+	PathName::PathName (boost::string_view parPath) {
 		if (not parPath.empty()) {
 			m_absolute = ('/' == parPath.front());
 			std::string path(parPath.begin(), parPath.end());
@@ -120,7 +120,7 @@ namespace mchlib {
 			const std::size_t trailing = (path.back() == '/' ? 1 : 0);
 			const std::size_t absolute = (m_absolute ? 1 : 0);
 			const auto res = count + 1 - trailing - absolute;
-			std::vector<boost::string_ref> atoms;
+			std::vector<boost::string_view> atoms;
 			atoms.reserve(res);
 			split_path(&atoms, path);
 			m_pool.insert(atoms, &path);
@@ -139,7 +139,7 @@ namespace mchlib {
 		m_pool.update(parOther.m_pool);
 	}
 
-	const boost::string_ref PathName::operator[] (std::size_t parIndex) const {
+	const boost::string_view PathName::operator[] (std::size_t parIndex) const {
 		return *(m_pool.begin() + parIndex);
 	}
 
@@ -149,11 +149,11 @@ namespace mchlib {
 
 	void PathName::join (const char* parOther) {
 		const std::string src(parOther);
-		const boost::string_ref ref(src);
+		const boost::string_view ref(src);
 		m_pool.insert(ref, &src);
 	}
 
-	void PathName::join (boost::string_ref parOther, const std::string* parSource) {
+	void PathName::join (boost::string_view parOther, const std::string* parSource) {
 		m_pool.insert(parOther, parSource);
 	}
 
@@ -204,11 +204,11 @@ namespace mchlib {
 		return parStream;
 	}
 
-	const boost::string_ref basename (const PathName& parPath) {
+	const boost::string_view basename (const PathName& parPath) {
 		static const char* const empty = "";
 		const auto sz = parPath.atom_count();
 		if (not sz) {
-			return boost::string_ref(empty);
+			return boost::string_view(empty);
 		}
 
 		assert(sz > 0);

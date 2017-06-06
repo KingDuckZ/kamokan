@@ -37,7 +37,7 @@ namespace tawashi {
 
 		class MissingPostVarError : public TawashiException {
 		public:
-			explicit MissingPostVarError(const boost::string_ref& parKey) :
+			explicit MissingPostVarError(const boost::string_view& parKey) :
 				TawashiException(
 					ErrorReasons::MissingPostVariable,
 					"Error retrieving POST variable \"" + std::string(parKey.begin(), parKey.end()) + "\""
@@ -46,15 +46,15 @@ namespace tawashi {
 		};
 
 		template <std::size_t N>
-		inline boost::string_ref make_string_ref (const char (&parStr)[N]) a_always_inline;
+		inline boost::string_view make_string_view (const char (&parStr)[N]) a_always_inline;
 
 		template <std::size_t N>
-		boost::string_ref make_string_ref (const char (&parStr)[N]) {
+		boost::string_view make_string_view (const char (&parStr)[N]) {
 			static_assert(N > 0, "wat?");
-			return boost::string_ref(parStr, N - 1);
+			return boost::string_view(parStr, N - 1);
 		}
 
-		boost::string_ref get_value_from_post (const cgi::PostMapType& parPost, boost::string_ref parKey) {
+		boost::string_view get_value_from_post (const cgi::PostMapType& parPost, boost::string_view parKey) {
 			std::string key(parKey.data(), parKey.size());
 			auto post_data_it = parPost.find(key);
 			if (parPost.end() == post_data_it)
@@ -62,13 +62,13 @@ namespace tawashi {
 			return post_data_it->second;
 		}
 
-		boost::string_ref get_value_from_post_log_failure (const cgi::PostMapType& parPost, boost::string_ref parKey) {
+		boost::string_view get_value_from_post_log_failure (const cgi::PostMapType& parPost, boost::string_view parKey) {
 			try {
 				return get_value_from_post(parPost, parKey);
 			}
 			catch (const MissingPostVarError& e) {
 				spdlog::get("statuslog")->info(e.what());
-				return boost::string_ref();
+				return boost::string_view();
 			}
 		}
 	} //unnamed namespace
@@ -95,9 +95,9 @@ namespace tawashi {
 	}
 
 	HttpHeader SubmitPasteResponse::on_process() {
-		boost::string_ref pastie;
-		boost::string_ref lang;
-		boost::string_ref duration;
+		boost::string_view pastie;
+		boost::string_view lang;
+		boost::string_view duration;
 
 		auto statuslog = spdlog::get("statuslog");
 		assert(statuslog);
@@ -105,9 +105,9 @@ namespace tawashi {
 		const SettingsBag& settings = this->settings();
 		try {
 			auto post = this->cgi_post();
-			pastie = get_value_from_post(post, make_string_ref(g_post_key));
-			lang = get_value_from_post_log_failure(post, make_string_ref(g_language_key));
-			duration = get_value_from_post_log_failure(post, make_string_ref(g_duration_key));
+			pastie = get_value_from_post(post, make_string_view(g_post_key));
+			lang = get_value_from_post_log_failure(post, make_string_view(g_language_key));
+			duration = get_value_from_post_log_failure(post, make_string_view(g_duration_key));
 		}
 		catch (const UnsupportedContentTypeException& err) {
 			statuslog->info(
@@ -158,9 +158,9 @@ namespace tawashi {
 	}
 
 	auto SubmitPasteResponse::submit_to_storage (
-		const boost::string_ref& parText,
+		const boost::string_view& parText,
 		uint32_t parExpiry,
-		const boost::string_ref& parLang
+		const boost::string_view& parLang
 	) -> StringOrHeader {
 		auto& storage = this->storage();
 		std::string remote_ip = guess_real_remote_ip(cgi_env());

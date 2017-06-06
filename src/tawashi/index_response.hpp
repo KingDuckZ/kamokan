@@ -18,7 +18,7 @@
 #pragma once
 
 #include "response.hpp"
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 
 namespace tawashi {
 	class IndexResponse : public Response {
@@ -30,7 +30,7 @@ namespace tawashi {
 		);
 
 	protected:
-		virtual boost::string_ref page_basename() const override { return boost::string_ref("index"); }
+		virtual boost::string_view page_basename() const override { return boost::string_view("index"); }
 
 	private:
 	};

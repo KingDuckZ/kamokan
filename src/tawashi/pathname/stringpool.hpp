@@ -19,7 +19,7 @@
 #define id9CF5E6FA7E334DF09559C2968C494CB9
 
 #include <string>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <vector>
 #include <utility>
 #include <ciso646>
@@ -29,7 +29,7 @@
 #include <boost/iterator/transform_iterator.hpp>
 
 namespace mchlib {
-	template <typename C, typename Str=std::basic_string<C>, typename StrRef=boost::basic_string_ref<C>>
+	template <typename C, typename Str=std::basic_string<C>, typename StrRef=boost::basic_string_view<C>>
 	class StringPool {
 		typedef std::pair<StrRef, const Str*> StringListPair;
 		typedef std::vector<std::pair<Str, std::size_t>> PoolType;

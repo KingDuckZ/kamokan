@@ -46,7 +46,7 @@ namespace tawashi {
 
 	ResponseFactory::~ResponseFactory() noexcept = default;
 
-	std::unique_ptr<Response> ResponseFactory::make_response (const boost::string_ref& parName, RequestMethodType parReqType) {
+	std::unique_ptr<Response> ResponseFactory::make_response (const boost::string_view& parName, RequestMethodType parReqType) {
 		std::string name(parName.data(), parName.size());
 		spdlog::get("statuslog")->info(
 			"making response object for \"{}\" method {}",

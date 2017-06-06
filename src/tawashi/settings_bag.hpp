@@ -20,7 +20,7 @@
 #include "ini_file.hpp"
 #include "kakoune/safe_ptr.hh"
 #include <map>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <functional>
 #include <string>
 #if defined(SPDLOG_DEBUG_ON)
@@ -29,15 +29,15 @@
 
 namespace tawashi {
 	class SettingsBag : public Kakoune::SafeCountable {
-		typedef std::map<boost::string_ref, boost::string_ref> MapType;
+		typedef std::map<boost::string_view, boost::string_view> MapType;
 	public:
-		SettingsBag (const Kakoune::SafePtr<IniFile>& parIni, boost::string_ref parSectionName);
+		SettingsBag (const Kakoune::SafePtr<IniFile>& parIni, boost::string_view parSectionName);
 		~SettingsBag() noexcept;
 
-		const boost::string_ref& operator[] (boost::string_ref parIndex) const;
-		const boost::string_ref& at (boost::string_ref parIndex) const;
-		template <typename T> T as (boost::string_ref parIndex) const;
-		void add_default (boost::string_ref parKey, boost::string_ref parValue);
+		const boost::string_view& operator[] (boost::string_view parIndex) const;
+		const boost::string_view& at (boost::string_view parIndex) const;
+		template <typename T> T as (boost::string_view parIndex) const;
+		void add_default (boost::string_view parKey, boost::string_view parValue);
 
 	private:
 		MapType m_defaults;
@@ -46,11 +46,11 @@ namespace tawashi {
 	};
 
 	template <>
-	inline boost::string_ref SettingsBag::as (boost::string_ref parIndex) const {
+	inline boost::string_view SettingsBag::as (boost::string_view parIndex) const {
 		return (*this)[parIndex];
 	}
 
-	inline const boost::string_ref& SettingsBag::at (boost::string_ref parIndex) const {
+	inline const boost::string_view& SettingsBag::at (boost::string_view parIndex) const {
 #if defined(SPDLOG_DEBUG_ON)
 		SPDLOG_DEBUG(spdlog::get("statuslog"), "Retrieving setting \"{}\"", std::string(parIndex.data(), parIndex.size()));
 #endif

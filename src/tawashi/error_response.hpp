@@ -18,7 +18,7 @@
 #pragma once
 
 #include "response.hpp"
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 
 namespace tawashi {
 	class ErrorResponse : public Response {
@@ -30,7 +30,7 @@ namespace tawashi {
 		);
 
 	protected:
-		virtual boost::string_ref page_basename() const override { return boost::string_ref("error"); }
+		virtual boost::string_view page_basename() const override { return boost::string_view("error"); }
 
 	private:
 		virtual void on_mustache_prepare (mstch::map& parContext) override;

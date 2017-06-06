@@ -19,12 +19,12 @@
 #include "error_reasons.hpp"
 #include <stdexcept>
 #include <string>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 
 namespace tawashi {
 	class TawashiException : public std::runtime_error {
 	public:
-		TawashiException (ErrorReasons parReason, const boost::string_ref& parMessage);
+		TawashiException (ErrorReasons parReason, const boost::string_view& parMessage);
 		~TawashiException() noexcept;
 
 		ErrorReasons reason() const { return m_reason; }

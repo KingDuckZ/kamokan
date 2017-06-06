@@ -20,7 +20,7 @@
 #include "string_lengths.hpp"
 #include <utility>
 #include <unordered_map>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <cassert>
 #include <cstring>
 #include <boost/functional/hash.hpp>
@@ -31,8 +31,8 @@
 
 namespace std {
 	template<>
-	struct hash<boost::string_ref> {
-		std::size_t operator() (const boost::string_ref& parStr) const {
+	struct hash<boost::string_view> {
+		std::size_t operator() (const boost::string_view& parStr) const {
 			return boost::hash_range(parStr.begin(), parStr.end());
 		}
 	};
@@ -40,8 +40,8 @@ namespace std {
 
 namespace tawashi {
 	namespace {
-		std::unordered_map<boost::string_ref, boost::string_ref> get_unrefined_env_vars (const char* const* parEnvList) {
-			using boost::string_ref;
+		std::unordered_map<boost::string_view, boost::string_view> get_unrefined_env_vars (const char* const* parEnvList) {
+			using boost::string_view;
 
 			assert(parEnvList);
 			std::size_t count = 0;
@@ -49,7 +49,7 @@ namespace tawashi {
 				++count;
 			}
 
-			std::unordered_map<string_ref, string_ref> retval;
+			std::unordered_map<string_view, string_view> retval;
 			retval.reserve(count);
 			for (std::size_t z = 0; z < count; ++z) {
 				const char* const equal_sign = std::strchr(parEnvList[z], '=');
@@ -59,14 +59,14 @@ namespace tawashi {
 				const std::size_t whole_length = std::strlen(parEnvList[z] + key_length) + key_length;
 				assert(std::strlen(parEnvList[z]) == whole_length);
 				assert(whole_length >= key_length + 1);
-				retval[string_ref(parEnvList[z], key_length)] = string_ref(parEnvList[z] + key_length + 1, whole_length - key_length - 1);
+				retval[string_view(parEnvList[z], key_length)] = string_view(parEnvList[z] + key_length + 1, whole_length - key_length - 1);
 			}
 			return retval;
 		}
 	} //unnamed namespace
 
 	std::vector<std::string> cgi_environment_vars (const char* const* parEnvList) {
-		using boost::string_ref;
+		using boost::string_view;
 
 		std::vector<std::string> retlist;
 		retlist.reserve(CGIVars::_size());
@@ -79,7 +79,7 @@ namespace tawashi {
 #if !defined(NDEBUG)
 			assert(std::strlen(var._to_string()) == enum_str_lengths[z]);
 #endif
-			auto it_found = unrefined_env_vars.find(boost::string_ref(var._to_string(), enum_str_lengths[z]));
+			auto it_found = unrefined_env_vars.find(string_view(var._to_string(), enum_str_lengths[z]));
 			if (unrefined_env_vars.cend() != it_found)
 				retlist.push_back(sanitized_utf8(it_found->second));
 			else

@@ -25,7 +25,7 @@
 
 namespace tawashi {
 	namespace {
-		const IniFile::KeyValueMapType* get_tawashi_node (const IniFile& parIni, boost::string_ref parSectionName) {
+		const IniFile::KeyValueMapType* get_tawashi_node (const IniFile& parIni, boost::string_view parSectionName) {
 			auto it_found = parIni.parsed().find(parSectionName);
 			if (parIni.parsed().end() != it_found) {
 				return &it_found->second;
@@ -38,7 +38,7 @@ namespace tawashi {
 		}
 	} //unnamed namespace
 
-	SettingsBag::SettingsBag (const Kakoune::SafePtr<IniFile>& parIni, boost::string_ref parSectionName) :
+	SettingsBag::SettingsBag (const Kakoune::SafePtr<IniFile>& parIni, boost::string_view parSectionName) :
 		m_ini(parIni),
 		m_values(get_tawashi_node(*parIni, parSectionName))
 	{
@@ -47,7 +47,7 @@ namespace tawashi {
 
 	SettingsBag::~SettingsBag() noexcept = default;
 
-	const boost::string_ref& SettingsBag::operator[] (boost::string_ref parIndex) const {
+	const boost::string_view& SettingsBag::operator[] (boost::string_view parIndex) const {
 		auto it_found = m_values->find(parIndex);
 		if (m_values->end() != it_found)
 			return it_found->second;
@@ -55,19 +55,19 @@ namespace tawashi {
 			return m_defaults.at(parIndex);
 	}
 
-	void SettingsBag::add_default (boost::string_ref parKey, boost::string_ref parValue) {
+	void SettingsBag::add_default (boost::string_view parKey, boost::string_view parValue) {
 		assert(m_defaults.find(parKey) == m_defaults.end());
 		m_defaults[parKey] = parValue;
 	}
 
 	template <>
-	std::string SettingsBag::as (boost::string_ref parIndex) const {
+	std::string SettingsBag::as (boost::string_view parIndex) const {
 		auto& setting = this->at(parIndex);
 		return std::string(setting.data(), setting.size());
 	}
 
 	template <>
-	bool SettingsBag::as (boost::string_ref parIndex) const {
+	bool SettingsBag::as (boost::string_view parIndex) const {
 		auto& setting = this->at(parIndex);
 		if (setting == "true" or setting == "yes" or setting == "1" or setting == "on") {
 			return true;
@@ -83,17 +83,17 @@ namespace tawashi {
 	}
 
 	template <>
-	uint16_t SettingsBag::as (boost::string_ref parIndex) const {
+	uint16_t SettingsBag::as (boost::string_view parIndex) const {
 		return dhandy::lexical_cast<uint16_t>(this->at(parIndex));
 	}
 
 	template <>
-	uint32_t SettingsBag::as (boost::string_ref parIndex) const {
+	uint32_t SettingsBag::as (boost::string_view parIndex) const {
 		return dhandy::lexical_cast<uint32_t>(this->at(parIndex));
 	}
 
-	template std::string SettingsBag::as<std::string> (boost::string_ref parIndex) const;
-	template bool SettingsBag::as<bool> (boost::string_ref parIndex) const;
-	template uint16_t SettingsBag::as<uint16_t> (boost::string_ref parIndex) const;
-	template uint32_t SettingsBag::as<uint32_t> (boost::string_ref parIndex) const;
+	template std::string SettingsBag::as<std::string> (boost::string_view parIndex) const;
+	template bool SettingsBag::as<bool> (boost::string_view parIndex) const;
+	template uint16_t SettingsBag::as<uint16_t> (boost::string_view parIndex) const;
+	template uint32_t SettingsBag::as<uint32_t> (boost::string_view parIndex) const;
 } //namespace tawashi

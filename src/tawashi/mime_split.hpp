@@ -17,16 +17,16 @@
 
 #pragma once
 
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <boost/container/flat_map.hpp>
 #include <string>
 
 namespace tawashi {
-	typedef boost::container::flat_map<boost::string_ref, boost::string_ref> MimeParametersMapType;
+	typedef boost::container::flat_map<boost::string_view, boost::string_view> MimeParametersMapType;
 
 	struct SplitMime {
-		boost::string_ref type;
-		boost::string_ref subtype;
+		boost::string_view type;
+		boost::string_view subtype;
 		MimeParametersMapType parameters;
 	};
 

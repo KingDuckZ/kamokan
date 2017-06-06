@@ -28,7 +28,7 @@
 #include <ciso646>
 
 namespace tawashi {
-	UnsupportedContentTypeException::UnsupportedContentTypeException (const boost::string_ref& parMessage) :
+	UnsupportedContentTypeException::UnsupportedContentTypeException (const boost::string_view& parMessage) :
 		TawashiException(ErrorReasons::UnsupportedContentType, parMessage)
 	{
 	}

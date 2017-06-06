@@ -36,7 +36,7 @@
 
 BOOST_FUSION_ADAPT_STRUCT(
 	tawashi::cgi::Env::VersionInfo,
-	(boost::string_ref, name)
+	(boost::string_view, name)
 	(uint16_t, major)
 	(uint16_t, minor)
 );
@@ -50,9 +50,9 @@ namespace cgi {
 			using boost::spirit::ascii::space;
 			using boost::spirit::qi::raw;
 			using boost::spirit::qi::char_;
-			using boost::string_ref;
+			using boost::string_view;
 			using VerNum = boost::spirit::qi::uint_parser<uint16_t, 10, 1, 1>;
-			using RuleType = boost::spirit::qi::rule<std::string::const_iterator, string_ref(), boost::spirit::ascii::space_type>;
+			using RuleType = boost::spirit::qi::rule<std::string::const_iterator, string_view(), boost::spirit::ascii::space_type>;
 			using boost::spirit::_1;
 			using boost::spirit::qi::_val;
 			using boost::phoenix::begin;
@@ -64,7 +64,7 @@ namespace cgi {
 			assert(not parString.empty());
 
 			auto beg = parString.cbegin();
-			RuleType protocol = raw[+(char_ - '/')][_val = px::bind(&string_ref::substr, construct<string_ref>(px::ref(parString)), begin(_1) - px::ref(beg), size(_1))];
+			RuleType protocol = raw[+(char_ - '/')][_val = px::bind(&string_view::substr, construct<string_view>(px::ref(parString)), begin(_1) - px::ref(beg), size(_1))];
 			VerNum ver_num;
 
 			auto it_curr = parString.cbegin();
@@ -83,9 +83,9 @@ namespace cgi {
 				return optional<Env::VersionInfo>();
 		}
 
-		std::size_t calculate_skip_path_length (const boost::string_ref& parPath, const boost::string_ref& parBasePath) {
+		std::size_t calculate_skip_path_length (const boost::string_view& parPath, const boost::string_view& parBasePath) {
 			const std::size_t base_path_tr_slash = (not parBasePath.empty() and parBasePath[parBasePath.size() - 1] == '/' ? 1 : 0);
-			boost::string_ref base_path = parBasePath.substr(0, parBasePath.size() - base_path_tr_slash);
+			boost::string_view base_path = parBasePath.substr(0, parBasePath.size() - base_path_tr_slash);
 			SPDLOG_TRACE(spdlog::get("statuslog"), "calculating skip prefix for REQUEST_URI=\"{}\", base path=\"{}\", parBasePath=\"{}\", base path trailing slash={}",
 				std::string(parPath.begin(), parPath.end()),
 				std::string(base_path.begin(), base_path.end()),
@@ -110,7 +110,7 @@ namespace cgi {
 		}
 	} //unnamed namespace
 
-	Env::Env(const char* const* parEnvList, const boost::string_ref& parBasePath) :
+	Env::Env(const char* const* parEnvList, const boost::string_view& parBasePath) :
 		m_cgi_env(cgi_environment_vars(parEnvList)),
 		m_skip_path_info(calculate_skip_path_length(m_cgi_env[CGIVars::REQUEST_URI], parBasePath)),
 		m_request_method_type(RequestMethodType::_from_string(m_cgi_env[CGIVars::REQUEST_METHOD].data()))
@@ -124,7 +124,7 @@ namespace cgi {
 				std::string err_msg = "Parsing failed at position " +
 					std::to_string(parsed_chars) + " for input \"" +
 					content_type + "\"";
-				throw TawashiException(ErrorReasons::InvalidContentType, boost::string_ref(err_msg));
+				throw TawashiException(ErrorReasons::InvalidContentType, boost::string_view(err_msg));
 			}
 		}
 	}
@@ -244,16 +244,16 @@ namespace cgi {
 		return parStream;
 	}
 
-	boost::string_ref Env::request_uri_relative() const {
+	boost::string_view Env::request_uri_relative() const {
 		const std::string& path = m_cgi_env[CGIVars::REQUEST_URI];
 		assert(m_skip_path_info <= path.size());
-		return boost::string_ref(path).substr(m_skip_path_info);
+		return boost::string_view(path).substr(m_skip_path_info);
 	}
 
-	boost::string_ref Env::path_info_relative() const {
+	boost::string_view Env::path_info_relative() const {
 		const std::string& path = m_cgi_env[CGIVars::PATH_INFO];
 		assert(m_skip_path_info <= path.size());
-		return boost::string_ref(path).substr(m_skip_path_info);
+		return boost::string_view(path).substr(m_skip_path_info);
 	}
 } //namespace cgi
 } //namespace tawashi

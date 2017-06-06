@@ -89,9 +89,9 @@ namespace tawashi {
 	}
 
 	Storage::SubmissionResult Storage::submit_pastie (
-		const boost::string_ref& parText,
+		const boost::string_view& parText,
 		uint32_t parExpiry,
-		const boost::string_ref& parLang,
+		const boost::string_view& parLang,
 		const std::string& parRemoteIP
 	) const {
 		if (not is_connected())
@@ -121,7 +121,7 @@ namespace tawashi {
 		return make_submission_result(ErrorReasons::PastieNotSaved);
 	}
 
-	boost::optional<std::string> Storage::retrieve_pastie (const boost::string_ref& parToken) const {
+	boost::optional<std::string> Storage::retrieve_pastie (const boost::string_view& parToken) const {
 		using opt_string = redis::IncRedis::opt_string;
 		using opt_string_list = redis::IncRedis::opt_string_list;
 

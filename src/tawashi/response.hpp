@@ -25,7 +25,7 @@
 #include "cgi_post.hpp"
 #include <string>
 #include <iostream>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <memory>
 
 namespace tawashi {
@@ -53,7 +53,7 @@ namespace tawashi {
 		tawashi_virtual_testing cgi::PostMapType cgi_post() const;
 
 		const std::string& base_uri() const;
-		virtual boost::string_ref page_basename() const = 0;
+		virtual boost::string_view page_basename() const = 0;
 		tawashi_virtual_testing const Storage& storage() const;
 		const SettingsBag& settings() const;
 		virtual std::string load_mustache() const;

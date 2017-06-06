@@ -43,7 +43,7 @@
 
 namespace tawashi {
 	namespace {
-		typedef boost::string_ref string_type;
+		typedef boost::string_view string_type;
 
 		template <typename Iterator, typename Skipper>
 		struct IniGrammar : boost::spirit::qi::grammar<Iterator, IniFile::IniMapType(), Skipper> {
@@ -69,7 +69,7 @@ namespace tawashi {
 			using boost::spirit::_1;
 			using boost::spirit::qi::eol;
 			using boost::spirit::qi::raw;
-			using boost::string_ref;
+			using boost::string_view;
 			using boost::spirit::qi::hold;
 			using boost::spirit::qi::graph;
 			using boost::spirit::qi::blank;
@@ -77,19 +77,19 @@ namespace tawashi {
 
 			section = '[' >> raw[+(graph - ']') >> *(hold[+blank >> +(graph - ']')])]
 				[_val = px::bind(
-					&string_ref::substr,
-					px::construct<string_ref>(px::ref(*m_master_string)),
+					&string_view::substr,
+					px::construct<string_view>(px::ref(*m_master_string)),
 					px::begin(_1) - px::ref(m_begin), px::size(_1)
 				)] >> ']';
 			key = raw[(graph - '[' - '=') >> *(graph - '=') >> *(hold[+blank >> +(graph - '=')])][_val = px::bind(
-				&string_ref::substr,
-				px::construct<string_ref>(px::ref(*m_master_string)),
+				&string_view::substr,
+				px::construct<string_view>(px::ref(*m_master_string)),
 				px::begin(_1) - px::ref(m_begin), px::size(_1)
 			)];
 			key_value = key[px::bind(&refpair::first, _val) = _1] >> '=' >>
 				raw[*(graph - eol) >> *(hold[+blank >> +(graph - eol)])][px::bind(&refpair::second, _val) = px::bind(
-					&string_ref::substr,
-					px::construct<string_ref>(px::ref(*m_master_string)),
+					&string_view::substr,
+					px::construct<string_view>(px::ref(*m_master_string)),
 					px::begin(_1) - px::ref(m_begin), px::size(_1)
 			)];
 			key_values = -(key_value % (+eol));

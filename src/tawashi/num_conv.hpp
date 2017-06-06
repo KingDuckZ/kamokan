@@ -22,7 +22,7 @@
 
 namespace tawashi {
 	template <typename T>
-	inline bool seems_valid_number (const boost::string_ref& parValue) {
+	inline bool seems_valid_number (const boost::string_view& parValue) {
 		const std::size_t skip_sign = (sprout::is_signed<T>::value and not parValue.empty() and parValue[0] == '-' ? 1 : 0);
 		for (std::size_t z = skip_sign; z < parValue.size(); ++z) {
 			const char c = parValue[z];

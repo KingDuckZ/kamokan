@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <string>
 #include <memory>
 
@@ -36,9 +36,9 @@ namespace tawashi {
 		Escapist();
 		~Escapist() noexcept;
 
-		std::string unescape_url (const boost::string_ref& parURL) const;
-		std::string escape_url (const boost::string_ref& parURL) const;
-		std::string escape_html (const boost::string_ref& parHtml) const;
+		std::string unescape_url (const boost::string_view& parURL) const;
+		std::string escape_url (const boost::string_view& parURL) const;
+		std::string escape_html (const boost::string_view& parHtml) const;
 
 	private:
 		std::aligned_storage<sizeof(implem::DummyGHBuf), alignof(implem::DummyGHBuf)>::type m_gh_buf_mem;

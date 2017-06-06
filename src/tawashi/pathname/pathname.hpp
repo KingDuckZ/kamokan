@@ -22,7 +22,7 @@
 #include "kakoune/safe_ptr.hh"
 #include <vector>
 #include <string>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <map>
 #include <iostream>
 
@@ -31,7 +31,7 @@ namespace mchlib {
 	public:
 		PathName ( PathName&& ) = default;
 		PathName ( const PathName& ) = default;
-		explicit PathName ( boost::string_ref parPath );
+		explicit PathName ( boost::string_view parPath );
 		~PathName ( void ) noexcept = default;
 
 		PathName& operator= ( PathName&& ) = default;
@@ -41,10 +41,10 @@ namespace mchlib {
 		std::size_t str_path_size ( void ) const;
 		const std::string& original_path ( void ) const { return (m_original_path ? *m_original_path : m_empty_str); }
 		std::size_t atom_count ( void ) const;
-		const boost::string_ref operator[] ( std::size_t parIndex ) const;
+		const boost::string_view operator[] ( std::size_t parIndex ) const;
 		void join ( const PathName& parOther );
 		void join ( const char* parOther );
-		void join ( boost::string_ref parOther, const std::string* parSource );
+		void join ( boost::string_view parOther, const std::string* parSource );
 		const std::string* get_stringref_source ( std::size_t parIndex ) const;
 		std::string dirname ( void ) const;
 		PathName& pop_right ( void );
@@ -61,7 +61,7 @@ namespace mchlib {
 
 	PathName make_relative_path ( const PathName& parBasePath, const PathName& parOtherPath );
 	std::ostream& operator<< ( std::ostream& parStream, const PathName& parPath );
-	const boost::string_ref basename ( const PathName& parPath );
+	const boost::string_view basename ( const PathName& parPath );
 } //namespace mchlib
 
 #endif

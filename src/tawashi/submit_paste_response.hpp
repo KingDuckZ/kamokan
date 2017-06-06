@@ -20,7 +20,7 @@
 #include "response.hpp"
 #include <string>
 #include <boost/optional.hpp>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <cassert>
 #include <utility>
 
@@ -43,13 +43,13 @@ namespace tawashi {
 		);
 
 	protected:
-		virtual boost::string_ref page_basename() const override { assert(false); return boost::string_ref(""); }
+		virtual boost::string_view page_basename() const override { assert(false); return boost::string_view(""); }
 		virtual HttpHeader make_success_response (std::string&& parPastieParam);
 
 	private:
 		typedef std::pair<boost::optional<std::string>, HttpHeader> StringOrHeader;
 
 		virtual HttpHeader on_process() override;
-		StringOrHeader submit_to_storage (const boost::string_ref& parText, uint32_t parExpiry, const boost::string_ref& parLang);
+		StringOrHeader submit_to_storage (const boost::string_view& parText, uint32_t parExpiry, const boost::string_view& parLang);
 	};
 } //namespace tawashi

@@ -36,7 +36,7 @@ namespace tawashi {
 		explicit ResponseFactory (const Kakoune::SafePtr<SettingsBag>& parSettings, const Kakoune::SafePtr<cgi::Env>& parCgiEnv);
 		~ResponseFactory() noexcept;
 
-		std::unique_ptr<Response> make_response(const boost::string_ref& parName, RequestMethodType parReqType);
+		std::unique_ptr<Response> make_response(const boost::string_view& parName, RequestMethodType parReqType);
 		void register_maker (std::string&& parName, ResponseMakerFunc parMaker);
 		void register_maker (std::string&& parName, RequestMethodType parReqType, ResponseMakerFunc parMaker);
 		void register_jolly_maker (ResponseMakerFunc parMaker, RequestMethodType parReqType);

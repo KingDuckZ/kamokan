@@ -35,7 +35,7 @@ namespace tawashi {
 		static_cast<gh_buf*>(m_gh_buf)->~gh_buf();
 	}
 
-	std::string Escapist::unescape_url (const boost::string_ref& parURL) const {
+	std::string Escapist::unescape_url (const boost::string_view& parURL) const {
 		if (parURL.empty())
 			return std::string();
 
@@ -53,7 +53,7 @@ namespace tawashi {
 			return std::string(buf->ptr, buf->size);
 	}
 
-	std::string Escapist::escape_url (const boost::string_ref& parURL) const {
+	std::string Escapist::escape_url (const boost::string_view& parURL) const {
 		if (parURL.empty())
 			return std::string();
 
@@ -71,7 +71,7 @@ namespace tawashi {
 			return std::string(buf->ptr, buf->size);
 	}
 
-	std::string Escapist::escape_html (const boost::string_ref& parHtml) const {
+	std::string Escapist::escape_html (const boost::string_view& parHtml) const {
 		if (parHtml.empty())
 			return std::string();
 

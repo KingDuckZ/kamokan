@@ -26,7 +26,7 @@
 namespace tawashi {
 	class UnsupportedContentTypeException : public TawashiException {
 	public:
-		explicit UnsupportedContentTypeException (const boost::string_ref& parMessage);
+		explicit UnsupportedContentTypeException (const boost::string_view& parMessage);
 	};
 
 	namespace cgi {

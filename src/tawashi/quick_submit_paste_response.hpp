@@ -19,7 +19,7 @@
 
 #include "submit_paste_response.hpp"
 #include <boost/optional.hpp>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <cassert>
 
 namespace tawashi {
@@ -32,7 +32,7 @@ namespace tawashi {
 		);
 
 	protected:
-		virtual boost::string_ref page_basename() const override { assert(false); return boost::string_ref(""); }
+		virtual boost::string_view page_basename() const override { assert(false); return boost::string_view(""); }
 		virtual HttpHeader make_success_response (std::string&& parPastieParam) override;
 
 	private:

@@ -21,7 +21,7 @@
 #include "error_reasons.hpp"
 #include <memory>
 #include <cstdint>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 #include <boost/optional.hpp>
 #include <string>
 
@@ -46,13 +46,13 @@ namespace tawashi {
 		tawashi_virtual_testing bool is_connected() const;
 		tawashi_virtual_testing void finalize_connection();
 		tawashi_virtual_testing SubmissionResult submit_pastie (
-			const boost::string_ref& parText,
+			const boost::string_view& parText,
 			uint32_t parExpiry,
-			const boost::string_ref& parLang,
+			const boost::string_view& parLang,
 			const std::string& parRemoteIP
 		) const;
 
-		tawashi_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_ref& parToken) const;
+		tawashi_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_view& parToken) const;
 
 #if defined(TAWASHI_WITH_TESTING)
 		const SettingsBag& settings() const;
