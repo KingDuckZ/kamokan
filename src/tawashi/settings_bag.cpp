@@ -17,6 +17,7 @@
 
 #include "settings_bag.hpp"
 #include "duckhandy/lexical_cast.hpp"
+#include "spdlog.hpp"
 #include <ciso646>
 #include <cassert>
 #include <cstdint>
@@ -63,7 +64,7 @@ namespace tawashi {
 	template <>
 	std::string SettingsBag::as (boost::string_view parIndex) const {
 		auto& setting = this->at(parIndex);
-		return std::string(setting.data(), setting.size());
+		return std::string(setting);
 	}
 
 	template <>

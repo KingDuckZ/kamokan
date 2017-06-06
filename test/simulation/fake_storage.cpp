@@ -48,9 +48,9 @@ namespace tawashi {
 	) const {
 		SubmittedPastie pastie;
 		std::string token = num_to_token(m_submission_num++);
-		pastie.text = std::string(parText.data(), parText.size());
+		pastie.text = std::string(parText);
 		pastie.expiry = parExpiry;
-		pastie.lang = std::string(parLang.data(), parLang.size());
+		pastie.lang = std::string(parLang);
 		pastie.remote_ip = parRemoteIP;
 		pastie.token = token;
 		m_submitted_pasties.push_back(std::move(pastie));

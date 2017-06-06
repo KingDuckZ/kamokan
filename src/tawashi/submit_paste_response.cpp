@@ -55,7 +55,7 @@ namespace tawashi {
 		}
 
 		boost::string_view get_value_from_post (const cgi::PostMapType& parPost, boost::string_view parKey) {
-			std::string key(parKey.data(), parKey.size());
+			std::string key(parKey);
 			auto post_data_it = parPost.find(key);
 			if (parPost.end() == post_data_it)
 				throw MissingPostVarError(parKey);

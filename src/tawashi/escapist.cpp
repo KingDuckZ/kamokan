@@ -48,7 +48,7 @@ namespace tawashi {
 			parURL.size()
 		);
 		if (0 == escaped)
-			return std::string(parURL.data(), parURL.size());
+			return std::string(parURL);
 		else
 			return std::string(buf->ptr, buf->size);
 	}
@@ -66,7 +66,7 @@ namespace tawashi {
 			parURL.size()
 		);
 		if (0 == escaped)
-			return std::string(parURL.data(), parURL.size());
+			return std::string(parURL);
 		else
 			return std::string(buf->ptr, buf->size);
 	}
@@ -85,7 +85,7 @@ namespace tawashi {
 			1
 		);
 		if (0 == escaped)
-			return std::string(parHtml.data(), parHtml.size());
+			return std::string(parHtml);
 		else
 			return std::string(buf->ptr, buf->size);
 	}

@@ -19,13 +19,13 @@
 
 #include "ini_file.hpp"
 #include "kakoune/safe_ptr.hh"
+#if defined(SPDLOG_DEBUG_ON)
+#	include "spdlog.hpp"
+#endif
 #include <map>
 #include <boost/utility/string_view.hpp>
 #include <functional>
 #include <string>
-#if defined(SPDLOG_DEBUG_ON)
-#	include <spdlog/spdlog.h>
-#endif
 
 namespace tawashi {
 	class SettingsBag : public Kakoune::SafeCountable {
@@ -52,7 +52,7 @@ namespace tawashi {
 
 	inline const boost::string_view& SettingsBag::at (boost::string_view parIndex) const {
 #if defined(SPDLOG_DEBUG_ON)
-		SPDLOG_DEBUG(spdlog::get("statuslog"), "Retrieving setting \"{}\"", std::string(parIndex.data(), parIndex.size()));
+		SPDLOG_DEBUG(spdlog::get("statuslog"), "Retrieving setting \"{}\"", parIndex);
 #endif
 		return (*this)[parIndex];
 	}

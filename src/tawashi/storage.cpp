@@ -21,10 +21,10 @@
 #include "num_to_token.hpp"
 #include "tawashi_config.h"
 #include "duckhandy/stringize.h"
+#include "spdlog.hpp"
 #include <cassert>
 #include <ciso646>
 #include <string>
-#include <spdlog/spdlog.h>
 #include <utility>
 
 namespace tawashi {
@@ -131,17 +131,10 @@ namespace tawashi {
 #if defined(SPDLOG_DEBUG_ON)
 		{
 			auto statuslog = spdlog::get("statuslog");
-			if (pastie) {
-				statuslog->debug("Retrieving pastie with token \"{}\" gave a result of size {}",
-					std::string(parToken.data(), parToken.size()),
-					pastie->size()
-				);
-			}
-			else {
-				statuslog->debug("Retrieving pastie with token \"{}\" gave no results",
-					std::string(parToken.data(), parToken.size())
-				);
-			}
+			if (pastie)
+				statuslog->debug("Retrieving pastie with token \"{}\" gave a result of size {}", parToken, pastie->size());
+			else
+				statuslog->debug("Retrieving pastie with token \"{}\" gave no results", parToken);
 		}
 #endif
 		return pastie;
