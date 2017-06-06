@@ -60,8 +60,9 @@ target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1
 	PUBLIC $<$<CONFIG:Debug>:SPDLOG_DEBUG_ON>
 	PUBLIC $<$<CONFIG:Debug>:SPDLOG_TRACE_ON>
-	PUBLIC tawashi_virtual_testing$<$<BOOL:BUILD_TESTING>:=virtual>
-	PUBLIC $<$<BOOL:BUILD_TESTING>:TAWASHI_WITH_TESTING>
+	PUBLIC $<$<BOOL:${BUILD_TESTING}>:tawashi_virtual_testing=virtual>
+	PUBLIC $<$<NOT:$<BOOL:${BUILD_TESTING}>>:tawashi_virtual_testing=>
+	PUBLIC $<$<BOOL:${BUILD_TESTING}>:TAWASHI_WITH_TESTING>
 )
 target_compile_options(${PROJECT_NAME}
 	PRIVATE -fdiagnostics-color=always

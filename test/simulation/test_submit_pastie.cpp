@@ -38,7 +38,7 @@ namespace tawashi {
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
 			std::string&& parPostData
 		) :
-			SubmitPasteResponse(parSettings, parStreamOut, parCgiEnv),
+			SubmitPasteResponse(parSettings, parStreamOut, parCgiEnv, false),
 			m_fake_storage(parSettings, true),
 			m_post_data(std::move(parPostData))
 		{

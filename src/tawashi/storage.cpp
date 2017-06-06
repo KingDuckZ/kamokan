@@ -69,6 +69,7 @@ namespace tawashi {
 		assert(not m_redis);
 		m_redis = std::make_unique<redis::IncRedis>(make_incredis(*m_settings));
 		m_redis->connect();
+		SPDLOG_TRACE(spdlog::get("statuslog"), "Trying to connect to Redis asynchronously");
 	}
 
 	bool Storage::is_connected() const {
@@ -76,8 +77,9 @@ namespace tawashi {
 	}
 
 	void Storage::finalize_connection() {
+		SPDLOG_TRACE(spdlog::get("statuslog"), "Asked Storage to finalize the Redis connection");
 		if (m_redis) {
-			SPDLOG_TRACE(spdlog::get("statuslog"), "Finalizing redis connection");
+			SPDLOG_TRACE(spdlog::get("statuslog"), "Finalizing Redis connection");
 			m_redis->wait_for_connect();
 			auto batch = m_redis->make_batch();
 			batch.select(m_settings->as<uint32_t>("redis_db"));

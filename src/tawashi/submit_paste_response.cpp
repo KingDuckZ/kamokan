@@ -34,11 +34,6 @@ namespace tawashi {
 		const char g_post_key[] = "pastie";
 		const char g_language_key[] = "lang";
 		const char g_duration_key[] = "ttl";
-#if defined(TAWASHI_WITH_TESTING)
-		const bool g_connect_to_redis = false;
-#else
-		const bool g_connect_to_redis = true;
-#endif
 
 		class MissingPostVarError : public TawashiException {
 		public:
@@ -78,12 +73,24 @@ namespace tawashi {
 		}
 	} //unnamed namespace
 
+#if defined(TAWASHI_WITH_TESTING)
+	SubmitPasteResponse::SubmitPasteResponse (
+		const Kakoune::SafePtr<SettingsBag>& parSettings,
+		std::ostream* parStreamOut,
+		const Kakoune::SafePtr<cgi::Env>& parCgiEnv,
+		bool parInitStorage
+	) :
+		Response(parSettings, parStreamOut, parCgiEnv, parInitStorage)
+	{
+	}
+#endif
+
 	SubmitPasteResponse::SubmitPasteResponse (
 		const Kakoune::SafePtr<SettingsBag>& parSettings,
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		Response(parSettings, parStreamOut, parCgiEnv, g_connect_to_redis)
+		Response(parSettings, parStreamOut, parCgiEnv, true)
 	{
 	}
 
