@@ -128,6 +128,22 @@ namespace tawashi {
 		opt_string_list pastie_reply = m_redis->hmget(parToken, "pastie");
 		opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
 
+#if defined(SPDLOG_DEBUG_ON)
+		{
+			auto statuslog = spdlog::get("statuslog");
+			if (pastie) {
+				statuslog->debug("Retrieving pastie with token \"{}\" gave a result of size {}",
+					std::string(parToken.data(), parToken.size()),
+					pastie->size()
+				);
+			}
+			else {
+				statuslog->debug("Retrieving pastie with token \"{}\" gave no results",
+					std::string(parToken.data(), parToken.size())
+				);
+			}
+		}
+#endif
 		return pastie;
 	}
 

@@ -71,6 +71,7 @@ namespace tawashi {
 			GetMapType query_string_split() const a_pure;
 			const SplitMime& content_type_split() const a_pure;
 			boost::string_ref request_uri_relative() const;
+			boost::string_ref path_info_relative() const;
 
 			std::ostream& print_all (std::ostream& parStream, const char* parNewline) const;
 

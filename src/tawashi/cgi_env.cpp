@@ -249,5 +249,11 @@ namespace cgi {
 		assert(m_skip_path_info <= path.size());
 		return boost::string_ref(path).substr(m_skip_path_info);
 	}
+
+	boost::string_ref Env::path_info_relative() const {
+		const std::string& path = m_cgi_env[CGIVars::PATH_INFO];
+		assert(m_skip_path_info <= path.size());
+		return boost::string_ref(path).substr(m_skip_path_info);
+	}
 } //namespace cgi
 } //namespace tawashi

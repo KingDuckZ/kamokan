@@ -75,7 +75,7 @@ namespace tawashi {
 	}
 
 	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
-		boost::string_ref token = cgi_env().request_uri_relative();
+		boost::string_ref token = cgi_env().path_info_relative();
 		boost::optional<std::string> pastie = this->storage().retrieve_pastie(token);
 
 		if (not pastie) {
