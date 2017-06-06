@@ -41,9 +41,9 @@ namespace tawashi {
 	}
 
 	Storage::SubmissionResult FakeStorage::submit_pastie (
-		const boost::string_ref& parText,
+		const boost::string_view& parText,
 		uint32_t parExpiry,
-		const boost::string_ref& parLang,
+		const boost::string_view& parLang,
 		const std::string& parRemoteIP
 	) const {
 		SubmittedPastie pastie;
@@ -60,7 +60,7 @@ namespace tawashi {
 		return submission_res;
 	}
 
-	boost::optional<std::string> FakeStorage::retrieve_pastie (const boost::string_ref& parToken) const {
+	boost::optional<std::string> FakeStorage::retrieve_pastie (const boost::string_view& parToken) const {
 		auto it_found = std::find_if(
 			m_submitted_pasties.begin(),
 			m_submitted_pasties.end(),
