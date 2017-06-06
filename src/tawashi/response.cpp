@@ -47,10 +47,6 @@ namespace tawashi {
 		//	return path.substr(start_index, substr_len);
 		//}
 
-		std::string to_string (const boost::string_view& parStr) {
-			return std::string(parStr.data(), parStr.size());
-		}
-
 		std::string make_root_path (const SettingsBag& parSettings) {
 			auto retval = parSettings["website_root"];
 			if (retval.empty()) {
@@ -177,8 +173,8 @@ namespace tawashi {
 		SPDLOG_TRACE(statuslog, "Preparing mustache dictionary");
 		mstch::map mustache_context {
 			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
-			{"base_uri", std::string(base_uri())},
-			{"host_path", to_string(make_host_path(this->settings()))},
+			{"base_uri", base_uri()},
+			{"host_path", make_host_path(this->settings())},
 			{"languages", make_mstch_langmap(*m_settings)}
 		};
 
