@@ -25,6 +25,7 @@
 #include <srchilite/langmap.h>
 #include <sstream>
 #include <algorithm>
+#include <cassert>
 
 namespace tawashi {
 	namespace {
@@ -36,13 +37,9 @@ namespace tawashi {
 		}
 
 		boost::string_view get_pastie_name (boost::string_view parRequest) {
-			using boost::string_view;
-
 			auto it_found = std::find(parRequest.begin(), parRequest.end(), '?');
-			if (parRequest.end() == it_found)
-				return parRequest.substr(0, it_found - parRequest.begin());
-			else
-				return parRequest;
+			assert(it_found - parRequest.begin() <= parRequest.size());
+			return parRequest.substr(0, it_found - parRequest.begin());
 		}
 	} //unnamed namespace
 
