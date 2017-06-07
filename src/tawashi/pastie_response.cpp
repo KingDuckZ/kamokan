@@ -26,6 +26,10 @@
 #include <sstream>
 #include <algorithm>
 #include <cassert>
+#include <boost/algorithm/string/find_iterator.hpp>
+#include <boost/range/iterator_range_core.hpp>
+#include <boost/algorithm/string/finder.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 
 namespace tawashi {
 	namespace {
@@ -40,6 +44,29 @@ namespace tawashi {
 			auto it_found = std::find(parRequest.begin(), parRequest.end(), '?');
 			assert(it_found - parRequest.begin() <= parRequest.size());
 			return parRequest.substr(0, it_found - parRequest.begin());
+		}
+
+		mstch::array pastie_to_numbered_lines (boost::string_view parPastie) {
+			using boost::string_view;
+			using string_view_iterator = string_view::const_iterator;
+			using boost::split_iterator;
+			using boost::token_finder;
+			using boost::adaptors::transformed;
+			using MatchRange = boost::iterator_range<string_view_iterator>;
+
+			int line_num = 1;
+			return boost::copy_range<mstch::array>(
+				boost::make_iterator_range(
+					split_iterator<string_view_iterator>(parPastie, token_finder([](char c){return '\n'==c;})),
+					split_iterator<string_view_iterator>()
+				) |
+				transformed([&line_num,parPastie](const MatchRange& r) {
+					return mstch::map {
+						{"number", line_num++},
+						{"line", parPastie.substr(r.begin() - parPastie.begin(), r.size())}
+					};
+				})
+			);
 		}
 	} //unnamed namespace
 
@@ -126,6 +153,9 @@ namespace tawashi {
 		}
 
 		parContext["pastie"] = std::move(processed_pastie);
+		parContext["pastie_lines"] = pastie_to_numbered_lines(
+			boost::get<std::string>(parContext["pastie"])
+		);
 	}
 
 	std::string PastieResponse::on_mustache_retrieve() {
