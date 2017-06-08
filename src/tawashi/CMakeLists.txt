@@ -1,4 +1,4 @@
-project(tawashi VERSION 0.2.2 LANGUAGES CXX C)
+project(tawashi VERSION 0.2.3 LANGUAGES CXX C)
 
 option(TAWASHI_WITH_IP_LOGGING "Enable code in Tawashi that may result in users IPs being stored in the DB or in logs" ON)
 
