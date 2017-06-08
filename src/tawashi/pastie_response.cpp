@@ -41,12 +41,6 @@ namespace tawashi {
 			return parSettings.as<std::string>("highlight_css");
 		}
 
-		boost::string_view get_pastie_name (boost::string_view parRequest) {
-			auto it_found = std::find(parRequest.begin(), parRequest.end(), '?');
-			assert(it_found - parRequest.begin() <= parRequest.size());
-			return parRequest.substr(0, it_found - parRequest.begin());
-		}
-
 		mstch::array pastie_to_numbered_lines (boost::string_view parPastie) {
 			using boost::string_view;
 			using string_view_iterator = string_view::const_iterator;
@@ -132,7 +126,7 @@ namespace tawashi {
 	}
 
 	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
-		boost::string_view token = get_pastie_name(cgi_env().request_uri_relative());
+		boost::string_view token = cgi::drop_arguments(cgi_env().request_uri_relative());
 		boost::optional<std::string> pastie = this->storage().retrieve_pastie(token);
 
 		if (not is_valid_token(token)) {

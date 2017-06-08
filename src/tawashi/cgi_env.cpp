@@ -110,6 +110,12 @@ namespace cgi {
 		}
 	} //unnamed namespace
 
+	boost::string_view drop_arguments (boost::string_view parURI) {
+		auto it_found = std::find(parURI.begin(), parURI.end(), '?');
+		assert(it_found - parURI.begin() <= parURI.size());
+		return parURI.substr(0, it_found - parURI.begin());
+	}
+
 	Env::Env(const char* const* parEnvList, const boost::string_view& parBasePath) :
 		m_cgi_env(cgi_environment_vars(parEnvList)),
 		m_skip_path_info(calculate_skip_path_length(m_cgi_env[CGIVars::REQUEST_URI], parBasePath)),

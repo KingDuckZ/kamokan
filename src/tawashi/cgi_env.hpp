@@ -82,5 +82,7 @@ namespace tawashi {
 			RequestMethodType m_request_method_type;
 			SplitMime m_split_mime;
 		};
+
+		boost::string_view drop_arguments (boost::string_view parURI);
 	} //namespace cgi
 } //namespace tawashi
