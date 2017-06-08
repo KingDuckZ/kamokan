@@ -44,7 +44,7 @@ namespace tawashi {
 		{
 		}
 
-		virtual cgi::PostMapType cgi_post() const override {
+		virtual const cgi::PostMapType& cgi_post() const override {
 			CHECK(not m_post_data.empty());
 			std::istringstream iss(m_post_data);
 			return cgi::read_post(iss, this->cgi_env(), this->settings().as<uint32_t>("max_post_size"));

@@ -214,7 +214,7 @@ namespace tawashi {
 		return *m_cgi_env;
 	}
 
-	cgi::PostMapType Response::cgi_post() const {
+	const cgi::PostMapType& Response::cgi_post() const {
 		return cgi::read_post(std::cin, cgi_env(), settings().as<uint32_t>("max_post_size"));
 	}
 

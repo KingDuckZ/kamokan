@@ -104,7 +104,7 @@ namespace tawashi {
 
 		const SettingsBag& settings = this->settings();
 		try {
-			auto post = this->cgi_post();
+			auto& post = this->cgi_post();
 			pastie = get_value_from_post(post, make_string_view(g_post_key));
 			lang = get_value_from_post_log_failure(post, make_string_view(g_language_key));
 			duration = get_value_from_post_log_failure(post, make_string_view(g_duration_key));

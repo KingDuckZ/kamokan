@@ -50,7 +50,7 @@ namespace tawashi {
 		);
 
 		const cgi::Env& cgi_env() const;
-		tawashi_virtual_testing cgi::PostMapType cgi_post() const;
+		tawashi_virtual_testing const cgi::PostMapType& cgi_post() const;
 
 		const std::string& base_uri() const;
 		virtual boost::string_view page_basename() const = 0;
