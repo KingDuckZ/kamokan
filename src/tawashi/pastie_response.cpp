@@ -64,9 +64,12 @@ namespace tawashi {
 			);
 		}
 
-		bool is_valid_token (const boost::string_view& parToken) {
+		bool is_valid_token (const boost::string_view& parToken, uint32_t parMaxLen) {
 			if (parToken.empty())
 				return false;
+			if (parMaxLen > 0 and parToken.size() > parMaxLen)
+				return false;
+
 			auto it_mark = std::find(parToken.begin(), parToken.end(), '?');
 			if (parToken.begin() == it_mark)
 				return false;
@@ -129,7 +132,7 @@ namespace tawashi {
 		boost::string_view token = cgi::drop_arguments(cgi_env().request_uri_relative());
 		boost::optional<std::string> pastie = this->storage().retrieve_pastie(token);
 
-		if (not is_valid_token(token)) {
+		if (not is_valid_token(token, settings().as<uint32_t>("max_token_length"))) {
 			m_token_invalid = true;
 			return;
 		}
