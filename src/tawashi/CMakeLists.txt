@@ -33,6 +33,7 @@ add_library(${PROJECT_NAME} STATIC
 	ip_utils.cpp
 	mime_split.cpp
 	storage.cpp
+	truncated_string.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
