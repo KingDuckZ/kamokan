@@ -43,5 +43,6 @@ namespace tawashi {
 		bool m_plain_text;
 		bool m_syntax_highlight;
 		bool m_pastie_not_found;
+		bool m_token_invalid;
 	};
 } //namespace tawashi

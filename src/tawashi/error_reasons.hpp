@@ -29,6 +29,7 @@ namespace tawashi {
 		MissingPostVariable,
 		PastieNotFound,
 		InvalidContentType,
-		UnsupportedContentType
+		UnsupportedContentType,
+		InvalidToken
 	)
 } //namespace tawashi

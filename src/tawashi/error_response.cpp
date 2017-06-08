@@ -52,7 +52,8 @@ namespace tawashi {
 			"Request is missing a POST variable.",
 			"Pastie not found.",
 			"Invalid CONTENT_TYPE.",
-			"Unsupported CONTENT_TYPE."
+			"Unsupported CONTENT_TYPE.",
+			"Invalid pastie token."
 		};
 		constexpr const auto lengths = string_lengths(err_descs);
 		static_assert(err_descs.static_size == lengths.static_size, "Mismatching array sizes between strings and their lengths");

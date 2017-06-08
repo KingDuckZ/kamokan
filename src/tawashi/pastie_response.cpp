@@ -20,6 +20,7 @@
 #include "settings_bag.hpp"
 #include "escapist.hpp"
 #include "cgi_env.hpp"
+#include "spdlog.hpp"
 #include <ciso646>
 #include <srchilite/sourcehighlight.h>
 #include <srchilite/langmap.h>
@@ -68,6 +69,25 @@ namespace tawashi {
 				})
 			);
 		}
+
+		bool is_valid_token (const boost::string_view& parToken) {
+			if (parToken.empty())
+				return false;
+			auto it_mark = std::find(parToken.begin(), parToken.end(), '?');
+			if (parToken.begin() == it_mark)
+				return false;
+			for (auto it_ch = parToken.begin(); it_ch != it_mark; ++it_ch) {
+				if (*it_ch < 'a' or *it_ch > 'z') {
+					spdlog::get("statuslog")->info(
+						"Token's byte {} is invalid; value={}",
+						it_ch - parToken.begin(),
+						static_cast<int>(*it_ch)
+					);
+					return false;
+				}
+			}
+			return true;
+		}
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (
@@ -79,14 +99,16 @@ namespace tawashi {
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false),
 		m_syntax_highlight(true),
-		m_pastie_not_found(false)
+		m_pastie_not_found(false),
+		m_token_invalid(false)
 	{
 	}
 
 	HttpHeader PastieResponse::on_process() {
-		if (m_pastie_not_found) {
+		if (m_pastie_not_found)
 			return make_error_redirect(ErrorReasons::PastieNotFound);
-		}
+		if (m_token_invalid)
+			return make_error_redirect(ErrorReasons::InvalidToken);
 
 		auto get = cgi_env().query_string_split();
 		const std::string& query_str(cgi_env().query_string());
@@ -113,6 +135,10 @@ namespace tawashi {
 		boost::string_view token = get_pastie_name(cgi_env().request_uri_relative());
 		boost::optional<std::string> pastie = this->storage().retrieve_pastie(token);
 
+		if (not is_valid_token(token)) {
+			m_token_invalid = true;
+			return;
+		}
 		if (not pastie) {
 			m_pastie_not_found = true;
 			return;
