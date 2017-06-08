@@ -20,6 +20,10 @@
 #include "split_get_vars.hpp"
 #include "escapist.hpp"
 #include "sanitized_utf8.hpp"
+#include "spdlog.hpp"
+#if defined(SPDLOG_DEBUG_ON)
+#	include "truncated_string.hpp"
+#endif
 #include <iostream>
 #include <iterator>
 #include <algorithm>
@@ -80,6 +84,11 @@ namespace tawashi {
 				original_data = read_n(parSrc, input_len);
 				Escapist houdini;
 				for (auto& itm : split_env_vars(original_data)) {
+#if defined(SPDLOG_DEBUG_ON)
+					if (itm.first == "pastie") {
+						spdlog::get("statuslog")->debug("Raw pastie from POST, size={}: \"{}\"", itm.second.size(), truncated_string(itm.second, 30));
+					}
+#endif
 					std::string key(houdini.unescape_url(itm.first));
 					std::string val(houdini.unescape_url(itm.second));
 					map[std::move(key)] = std::move(val);

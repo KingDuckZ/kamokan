@@ -22,10 +22,12 @@
 #include "tawashi_config.h"
 #include "duckhandy/stringize.h"
 #include "spdlog.hpp"
+#include "truncated_string.hpp"
 #include <cassert>
 #include <ciso646>
 #include <string>
 #include <utility>
+#include <algorithm>
 
 namespace tawashi {
 	namespace {
@@ -102,6 +104,15 @@ namespace tawashi {
 		if (redis.get(parRemoteIP)) {
 			//please wait and submit again
 			return make_submission_result(ErrorReasons::UserFlooding);
+		}
+
+		auto statuslog = spdlog::get("statuslog");
+		if (statuslog->should_log(spdlog::level::info)) {
+			statuslog->info(
+				"Submitting pastie of size {} to redis -> \"{}\"",
+				parText.size(),
+				truncated_string(parText, 30)
+			);
 		}
 
 		const auto next_id = redis.incr("paste_counter");
