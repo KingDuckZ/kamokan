@@ -4,7 +4,7 @@ project(kamokan_top LANGUAGES NONE)
 
 include(CTest)
 
-set(INCREDIS_FORCE_DISABLE_TESTS ON)
+set(INCREDIS_FORCE_DISABLE_TESTS ON CACHE BOOL "Disable destructive and slow incredis tests" FORCE)
 set(TAWASHI_SOURCE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 
 configure_file(
