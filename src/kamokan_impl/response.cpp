@@ -24,6 +24,7 @@
 #include "cgi_env.hpp"
 #include "num_conv.hpp"
 #include "kamokan_config.h"
+#include "version.hpp"
 #include <utility>
 #include <cassert>
 #include <fstream>
@@ -172,7 +173,8 @@ namespace tawashi {
 		statuslog->info("Sending response");
 		SPDLOG_TRACE(statuslog, "Preparing mustache dictionary");
 		mstch::map mustache_context {
-			{"version", std::string{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
+			{"version", boost::string_view{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
+			{"tawashi_version", tawashi::version()},
 			{"base_uri", base_uri()},
 			{"host_path", make_host_path(this->settings())},
 			{"languages", make_mstch_langmap(*m_settings)}

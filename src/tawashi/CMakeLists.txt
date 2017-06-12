@@ -20,6 +20,7 @@ add_library(${PROJECT_NAME}
 	ip_utils.cpp
 	mime_split.cpp
 	truncated_string.cpp
+	version.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
