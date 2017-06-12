@@ -19,7 +19,6 @@
 #include "settings_bag.hpp"
 #include "incredis/incredis.hpp"
 #include "num_to_token.hpp"
-#include "tawashi_config.h"
 #include "duckhandy/stringize.h"
 #include "spdlog.hpp"
 #include "truncated_string.hpp"
@@ -151,7 +150,7 @@ namespace tawashi {
 		return pastie;
 	}
 
-#if defined(TAWASHI_WITH_TESTING)
+#if defined(KAMOKAN_WITH_TESTING)
 	const SettingsBag& Storage::settings() const {
 		return *m_settings;
 	}

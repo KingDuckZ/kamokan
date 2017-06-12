@@ -16,6 +16,7 @@ add_subdirectory(lib/incredis)
 add_subdirectory(lib/mstch)
 add_subdirectory(lib/houdini)
 add_subdirectory(src/tawashi)
+add_subdirectory(src/kamokan_impl)
 add_subdirectory(src/kamokan)
 
 install(DIRECTORY html/website/ DESTINATION html)

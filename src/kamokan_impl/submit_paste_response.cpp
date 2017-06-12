@@ -73,7 +73,7 @@ namespace tawashi {
 		}
 	} //unnamed namespace
 
-#if defined(TAWASHI_WITH_TESTING)
+#if defined(KAMOKAN_WITH_TESTING)
 	SubmitPasteResponse::SubmitPasteResponse (
 		const Kakoune::SafePtr<SettingsBag>& parSettings,
 		std::ostream* parStreamOut,

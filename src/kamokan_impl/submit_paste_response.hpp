@@ -27,7 +27,7 @@
 namespace tawashi {
 	class SubmitPasteResponse : public Response {
 	public:
-#if defined(TAWASHI_WITH_TESTING)
+#if defined(KAMOKAN_WITH_TESTING)
 		SubmitPasteResponse (
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,

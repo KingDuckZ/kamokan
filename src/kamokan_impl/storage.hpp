@@ -54,7 +54,7 @@ namespace tawashi {
 
 		tawashi_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_view& parToken) const;
 
-#if defined(TAWASHI_WITH_TESTING)
+#if defined(KAMOKAN_WITH_TESTING)
 		const SettingsBag& settings() const;
 #endif
 

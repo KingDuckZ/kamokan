@@ -23,7 +23,7 @@
 #include "list_highlight_langs.hpp"
 #include "cgi_env.hpp"
 #include "num_conv.hpp"
-#include "tawashi_config.h"
+#include "kamokan_config.h"
 #include <utility>
 #include <cassert>
 #include <fstream>
