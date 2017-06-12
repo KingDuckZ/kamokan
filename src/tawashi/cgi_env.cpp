@@ -130,7 +130,7 @@ namespace cgi {
 				std::string err_msg = "Parsing failed at position " +
 					std::to_string(parsed_chars) + " for input \"" +
 					content_type + "\"";
-				throw TawashiException(ErrorReasons::InvalidContentType, boost::string_view(err_msg));
+				throw Exception(ErrorReasons::InvalidContentType, boost::string_view(err_msg));
 			}
 		}
 	}

@@ -22,10 +22,10 @@
 #include <boost/utility/string_view.hpp>
 
 namespace tawashi {
-	class TawashiException : public std::runtime_error {
+	class Exception : public std::runtime_error {
 	public:
-		TawashiException (ErrorReasons parReason, const boost::string_view& parMessage);
-		~TawashiException() noexcept;
+		Exception (ErrorReasons parReason, const boost::string_view& parMessage);
+		~Exception() noexcept;
 
 		ErrorReasons reason() const { return m_reason; }
 

@@ -35,10 +35,10 @@ namespace kamokan {
 		const char g_language_key[] = "lang";
 		const char g_duration_key[] = "ttl";
 
-		class MissingPostVarError : public tawashi::TawashiException {
+		class MissingPostVarError : public tawashi::Exception {
 		public:
 			explicit MissingPostVarError(const boost::string_view& parKey) :
-				TawashiException(
+				tawashi::Exception(
 					tawashi::ErrorReasons::MissingPostVariable,
 					"Error retrieving POST variable \"" + std::string(parKey.begin(), parKey.end()) + "\""
 				)
@@ -118,7 +118,7 @@ namespace kamokan {
 			);
 			return make_error_redirect(ErrorReasons::UnsupportedContentType);
 		}
-		catch (const tawashi::TawashiException& e) {
+		catch (const tawashi::Exception& e) {
 			statuslog->error(e.what());
 			return make_error_redirect(e.reason());
 		}

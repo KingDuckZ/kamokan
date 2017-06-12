@@ -24,7 +24,7 @@
 #include <cstddef>
 
 namespace tawashi {
-	class UnsupportedContentTypeException : public TawashiException {
+	class UnsupportedContentTypeException : public Exception {
 	public:
 		explicit UnsupportedContentTypeException (const boost::string_view& parMessage);
 	};

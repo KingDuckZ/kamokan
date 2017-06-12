@@ -27,11 +27,11 @@ namespace tawashi {
 		}
 	} //unnamed namespace
 
-	TawashiException::TawashiException (ErrorReasons parReason, const boost::string_view& parMessage) :
+	Exception::Exception (ErrorReasons parReason, const boost::string_view& parMessage) :
 		std::runtime_error(compose_err_message(parReason, parMessage)),
 		m_reason(parReason)
 	{
 	}
 
-	TawashiException::~TawashiException() noexcept = default;
+	Exception::~Exception() noexcept = default;
 } //namespace tawashi

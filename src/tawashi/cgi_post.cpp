@@ -33,7 +33,7 @@
 
 namespace tawashi {
 	UnsupportedContentTypeException::UnsupportedContentTypeException (const boost::string_view& parMessage) :
-		TawashiException(ErrorReasons::UnsupportedContentType, parMessage)
+		Exception(ErrorReasons::UnsupportedContentType, parMessage)
 	{
 	}
 
