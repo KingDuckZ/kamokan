@@ -47,8 +47,8 @@ target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1
 	PUBLIC $<$<CONFIG:Debug>:SPDLOG_DEBUG_ON>
 	PUBLIC $<$<CONFIG:Debug>:SPDLOG_TRACE_ON>
-	PUBLIC $<$<BOOL:${BUILD_TESTING}>:tawashi_virtual_testing=virtual>
-	PUBLIC $<$<NOT:$<BOOL:${BUILD_TESTING}>>:tawashi_virtual_testing=>
+	PUBLIC $<$<BOOL:${BUILD_TESTING}>:kamokan_virtual_testing=virtual>
+	PUBLIC $<$<NOT:$<BOOL:${BUILD_TESTING}>>:kamokan_virtual_testing=>
 	PUBLIC $<$<BOOL:${BUILD_TESTING}>:KAMOKAN_WITH_TESTING>
 )
 target_compile_options(${PROJECT_NAME}

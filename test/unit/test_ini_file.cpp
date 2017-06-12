@@ -22,7 +22,7 @@
 #include <ciso646>
 
 TEST_CASE ("Test parsing an ini text", "[ini][parser]") {
-	using tawashi::IniFile;
+	using kamokan::IniFile;
 
 	//empty data
 	{

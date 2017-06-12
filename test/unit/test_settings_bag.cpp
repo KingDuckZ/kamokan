@@ -26,8 +26,8 @@
 #include <stdexcept>
 
 TEST_CASE ("Add and retrieve values from SettingsBag", "[settings][ini]") {
-	using tawashi::SettingsBag;
-	using tawashi::IniFile;
+	using kamokan::SettingsBag;
+	using kamokan::IniFile;
 	using curry::SafeStackObject;
 
 	auto statuslog = spdlog::stdout_logger_st("statuslog");

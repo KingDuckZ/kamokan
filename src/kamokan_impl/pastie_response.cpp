@@ -1,18 +1,18 @@
 /* Copyright 2017, Michele Santullo
- * This file is part of "tawashi".
+ * This file is part of "kamokan".
  *
- * "tawashi" is free software: you can redistribute it and/or modify
+ * "kamokan" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * "tawashi" is distributed in the hope that it will be useful,
+ * "kamokan" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
+ * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "pastie_response.hpp"
@@ -32,7 +32,7 @@
 #include <boost/algorithm/string/finder.hpp>
 #include <boost/range/adaptor/transformed.hpp>
 
-namespace tawashi {
+namespace kamokan {
 	namespace {
 		const char g_nolang_token[] = "colourless";
 
@@ -101,7 +101,9 @@ namespace tawashi {
 	{
 	}
 
-	HttpHeader PastieResponse::on_process() {
+	tawashi::HttpHeader PastieResponse::on_process() {
+		using tawashi::ErrorReasons;
+
 		if (m_pastie_not_found)
 			return make_error_redirect(ErrorReasons::PastieNotFound);
 		if (m_token_invalid)
@@ -111,7 +113,7 @@ namespace tawashi {
 		const std::string& query_str(cgi_env().query_string());
 		if (get["m"] == "plain" or query_str.empty()) {
 			m_plain_text = true;
-			return make_header_type_text_utf8();
+			return tawashi::make_header_type_text_utf8();
 		}
 		else if (query_str == g_nolang_token) {
 			m_syntax_highlight = false;
@@ -125,7 +127,7 @@ namespace tawashi {
 			if (m_lang_file.empty())
 				m_lang_file = "default.lang";
 		}
-		return make_header_type_html();
+		return tawashi::make_header_type_html();
 	}
 
 	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
@@ -161,7 +163,7 @@ namespace tawashi {
 			processed_pastie = std::move(*pastie);
 		}
 		else {
-			Escapist houdini;
+			tawashi::Escapist houdini;
 			std::ostringstream oss;
 			oss << R"(<pre><tt><font color="#EDEDED">)";
 			oss << houdini.escape_html(*pastie) << "</font></tt></pre>\n";
@@ -187,4 +189,4 @@ namespace tawashi {
 		else
 			return load_mustache();
 	}
-} //namespace tawashi
+} //namespace kamokan

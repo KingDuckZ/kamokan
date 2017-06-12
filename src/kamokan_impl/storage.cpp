@@ -1,18 +1,18 @@
 /* Copyright 2017, Michele Santullo
- * This file is part of "tawashi".
+ * This file is part of "kamokan".
  *
- * "tawashi" is free software: you can redistribute it and/or modify
+ * "kamokan" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * "tawashi" is distributed in the hope that it will be useful,
+ * "kamokan" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
+ * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "storage.hpp"
@@ -28,7 +28,7 @@
 #include <utility>
 #include <algorithm>
 
-namespace tawashi {
+namespace kamokan {
 	namespace {
 		redis::IncRedis make_incredis (const SettingsBag& parSettings) {
 			using redis::IncRedis;
@@ -48,10 +48,11 @@ namespace tawashi {
 		}
 
 		Storage::SubmissionResult make_submission_result (std::string&& parToken) {
+			using tawashi::ErrorReasons;
 			return Storage::SubmissionResult { std::move(parToken), boost::optional<ErrorReasons>() };
 		}
 
-		Storage::SubmissionResult make_submission_result (ErrorReasons parError) {
+		Storage::SubmissionResult make_submission_result (tawashi::ErrorReasons parError) {
 			return Storage::SubmissionResult { std::string(), boost::make_optional(parError) };
 		}
 	} //unnamed namespace
@@ -84,7 +85,7 @@ namespace tawashi {
 			m_redis->wait_for_connect();
 			auto batch = m_redis->make_batch();
 			batch.select(m_settings->as<uint32_t>("redis_db"));
-			batch.client_setname("tawashi_v" STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH));
+			batch.client_setname("kamokan_v" STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH));
 			batch.throw_if_failed();
 		}
 	}
@@ -95,6 +96,8 @@ namespace tawashi {
 		const boost::string_view& parLang,
 		const std::string& parRemoteIP
 	) const {
+		using tawashi::ErrorReasons;
+
 		if (not is_connected())
 			return make_submission_result(ErrorReasons::RedisDisconnected);
 
@@ -110,7 +113,7 @@ namespace tawashi {
 			statuslog->info(
 				"Submitting pastie of size {} to redis -> \"{}\"",
 				parText.size(),
-				truncated_string(parText, 30)
+				tawashi::truncated_string(parText, 30)
 			);
 		}
 
@@ -155,4 +158,4 @@ namespace tawashi {
 		return *m_settings;
 	}
 #endif
-} //namespace tawashi
+} //namespace kamokan

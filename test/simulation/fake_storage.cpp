@@ -20,7 +20,7 @@
 #include <utility>
 #include <algorithm>
 
-namespace tawashi {
+namespace kamokan {
 	FakeStorage::FakeStorage (const Kakoune::SafePtr<SettingsBag>& parSettings, bool parItsConnected) :
 		Storage(parSettings),
 		m_submission_num(1),
@@ -77,4 +77,4 @@ namespace tawashi {
 	const std::vector<FakeStorage::SubmittedPastie>& FakeStorage::submitted_pasties() const {
 		return m_submitted_pasties;
 	}
-} //namespace tawashi
+} //namespace kamokan

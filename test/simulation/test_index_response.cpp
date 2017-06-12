@@ -55,7 +55,7 @@ R"(Content-type: text/html
 )";
 } //unnamed namespace
 
-namespace tawashi {
+namespace kamokan {
 	class IndexResponseCustomMustache : public IndexResponse {
 	public:
 		IndexResponseCustomMustache (
@@ -71,7 +71,7 @@ namespace tawashi {
 			return g_mustache_html;
 		}
 	};
-} //namespace tawashi
+} //namespace kamokan
 
 TEST_CASE ("Index response", "[index][response]") {
 	using curry::SafeStackObject;
@@ -109,12 +109,12 @@ TEST_CASE ("Index response", "[index][response]") {
 		"  host_path = /\n"
 		"  host_port =\n"
 	);
-	SafeStackObject<tawashi::IniFile> ini(std::move(kamokan_settings));
-	SafeStackObject<tawashi::SettingsBag> settings(ini, "kamokan");
+	SafeStackObject<kamokan::IniFile> ini(std::move(kamokan_settings));
+	SafeStackObject<kamokan::SettingsBag> settings(ini, "kamokan");
 
 	std::stringstream response_stream;
 
-	tawashi::IndexResponseCustomMustache response(settings, &response_stream, fake_env);
+	kamokan::IndexResponseCustomMustache response(settings, &response_stream, fake_env);
 	response.send();
 
 	response_stream.seekg(0);

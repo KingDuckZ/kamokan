@@ -1,18 +1,18 @@
 /* Copyright 2017, Michele Santullo
- * This file is part of "tawashi".
+ * This file is part of "kamokan".
  *
- * "tawashi" is free software: you can redistribute it and/or modify
+ * "kamokan" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * "tawashi" is distributed in the hope that it will be useful,
+ * "kamokan" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
+ * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "response.hpp"
@@ -34,7 +34,7 @@
 #include <cstdint>
 #include <spdlog/spdlog.h>
 
-namespace tawashi {
+namespace kamokan {
 	namespace {
 		//boost::string_ref fetch_page_basename (const cgi::Env& parEnv) {
 		//	const boost::string_ref& path = parEnv.path_info();
@@ -115,7 +115,7 @@ namespace tawashi {
 						oss << ':' << port;
 					}
 				}
-				else if (not host_port.empty() and seems_valid_number<uint16_t>(host_port)) {
+				else if (not host_port.empty() and tawashi::seems_valid_number<uint16_t>(host_port)) {
 					oss << ':' << host_port;
 				}
 			}
@@ -159,8 +159,8 @@ namespace tawashi {
 
 	Response::~Response() noexcept = default;
 
-	HttpHeader Response::on_process() {
-		return HttpHeader();
+	tawashi::HttpHeader Response::on_process() {
+		return tawashi::HttpHeader();
 	}
 
 	void Response::on_mustache_prepare (mstch::map&) {
@@ -183,7 +183,7 @@ namespace tawashi {
 		m_storage.finalize_connection();
 
 		SPDLOG_TRACE(statuslog, "Raising event on_process");
-		HttpHeader http_header = this->on_process();
+		tawashi::HttpHeader http_header = this->on_process();
 		*m_stream_out << http_header;
 
 		if (http_header.body_required()) {
@@ -239,17 +239,19 @@ namespace tawashi {
 		return *m_settings;
 	}
 
-	HttpHeader Response::make_redirect (HttpStatusCodes parCode, const std::string& parLocation) {
+	tawashi::HttpHeader Response::make_redirect (tawashi::HttpStatusCodes parCode, const std::string& parLocation) {
 		std::ostringstream oss;
 		oss << base_uri() << '/' << parLocation;
 
 		auto statuslog = spdlog::get("statuslog");
 		assert(statuslog);
 		statuslog->info("Redirecting to page \"{}\"", oss.str());
-		return HttpHeader(parCode, oss.str());
+		return tawashi::HttpHeader(parCode, oss.str());
 	}
 
-	HttpHeader Response::make_error_redirect (ErrorReasons parReason) {
+	tawashi::HttpHeader Response::make_error_redirect (tawashi::ErrorReasons parReason) {
+		using tawashi::HttpStatusCodes;
+
 		auto statuslog = spdlog::get("statuslog");
 		assert(statuslog);
 		const HttpStatusCodes redir_code = HttpStatusCodes::Code302_Found;
@@ -259,4 +261,4 @@ namespace tawashi {
 		oss << "error.cgi?reason=" << parReason._to_integral();
 		return make_redirect(redir_code, oss.str());
 	}
-} //namespace tawashi
+} //namespace kamokan

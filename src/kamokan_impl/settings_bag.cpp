@@ -1,18 +1,18 @@
 /* Copyright 2017, Michele Santullo
- * This file is part of "tawashi".
+ * This file is part of "kamokan".
  *
- * "tawashi" is free software: you can redistribute it and/or modify
+ * "kamokan" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * "tawashi" is distributed in the hope that it will be useful,
+ * "kamokan" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
+ * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "settings_bag.hpp"
@@ -24,9 +24,9 @@
 #include <sstream>
 #include <iostream>
 
-namespace tawashi {
+namespace kamokan {
 	namespace {
-		const IniFile::KeyValueMapType* get_tawashi_node (const IniFile& parIni, boost::string_view parSectionName) {
+		const IniFile::KeyValueMapType* get_kamokan_node (const IniFile& parIni, boost::string_view parSectionName) {
 			auto it_found = parIni.parsed().find(parSectionName);
 			if (parIni.parsed().end() != it_found) {
 				return &it_found->second;
@@ -41,7 +41,7 @@ namespace tawashi {
 
 	SettingsBag::SettingsBag (const Kakoune::SafePtr<IniFile>& parIni, boost::string_view parSectionName) :
 		m_ini(parIni),
-		m_values(get_tawashi_node(*parIni, parSectionName))
+		m_values(get_kamokan_node(*parIni, parSectionName))
 	{
 		assert(m_values);
 	}
@@ -97,4 +97,4 @@ namespace tawashi {
 	template bool SettingsBag::as<bool> (boost::string_view parIndex) const;
 	template uint16_t SettingsBag::as<uint16_t> (boost::string_view parIndex) const;
 	template uint32_t SettingsBag::as<uint32_t> (boost::string_view parIndex) const;
-} //namespace tawashi
+} //namespace kamokan

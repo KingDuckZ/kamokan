@@ -57,16 +57,16 @@ namespace {
 	}
 
 	template <typename T>
-	std::unique_ptr<tawashi::Response> make_response (
-		const Kakoune::SafePtr<tawashi::SettingsBag>& parSettings,
-		const Kakoune::SafePtr<tawashi::cgi::Env>& parCgiEnv
+	std::unique_ptr<kamokan::Response> make_response (
+		const Kakoune::SafePtr<kamokan::SettingsBag>& parSettings,
+		const Kakoune::SafePtr<kamokan::cgi::Env>& parCgiEnv
 	) {
-		return static_cast<std::unique_ptr<tawashi::Response>>(
+		return static_cast<std::unique_ptr<kamokan::Response>>(
 			std::make_unique<T>(parSettings, &std::cout, parCgiEnv)
 		);
 	}
 
-	void fill_defaults (tawashi::SettingsBag& parSettings) {
+	void fill_defaults (kamokan::SettingsBag& parSettings) {
 		parSettings.add_default("redis_server", "127.0.0.1");
 		parSettings.add_default("redis_port", "6379");
 		parSettings.add_default("redis_mode", "sock");
@@ -105,9 +105,9 @@ namespace {
 		std::cout << "config_file_path(): \"" << config_file_path() << "\"\n";
 	}
 
-	curry::SafeStackObject<tawashi::IniFile> load_ini() {
+	curry::SafeStackObject<kamokan::IniFile> load_ini() {
 		using curry::SafeStackObject;
-		using tawashi::IniFile;
+		using kamokan::IniFile;
 		using std::istream_iterator;
 
 		std::ifstream conf(config_file_path());
@@ -115,7 +115,7 @@ namespace {
 		return SafeStackObject<IniFile>(istream_iterator<char>(conf), istream_iterator<char>());
 	}
 
-	std::shared_ptr<spdlog::logger> setup_logging (const tawashi::SettingsBag& parSettings) {
+	std::shared_ptr<spdlog::logger> setup_logging (const kamokan::SettingsBag& parSettings) {
 		//Prepare the logger
 		spdlog::set_pattern("[%Y-%m-%d %T %z] - %v");
 		spdlog::set_level(spdlog::level::trace); //set to maximum possible here
@@ -134,12 +134,12 @@ namespace {
 
 int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	using curry::SafeStackObject;
-	using tawashi::IndexResponse;
-	using tawashi::SubmitPasteResponse;
-	using tawashi::QuickSubmitPasteResponse;
-	using tawashi::PastieResponse;
-	using tawashi::ErrorResponse;
-	using tawashi::Response;
+	using kamokan::IndexResponse;
+	using kamokan::SubmitPasteResponse;
+	using kamokan::QuickSubmitPasteResponse;
+	using kamokan::PastieResponse;
+	using kamokan::ErrorResponse;
+	using kamokan::Response;
 	using tawashi::RequestMethodType;
 
 	if (2 == parArgc and boost::string_view(parArgv[1]) == "--show-paths") {
@@ -147,8 +147,8 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		return 0;
 	}
 
-	SafeStackObject<tawashi::IniFile> ini = load_ini();
-	auto settings = SafeStackObject<tawashi::SettingsBag>(ini, "kamokan");
+	SafeStackObject<kamokan::IniFile> ini = load_ini();
+	auto settings = SafeStackObject<kamokan::SettingsBag>(ini, "kamokan");
 	fill_defaults(*settings);
 
 	auto statuslog = setup_logging(*settings);
@@ -158,7 +158,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		statuslog->info("Loaded config: \"{}\"", config_file_path());
 
 		auto cgi_env = SafeStackObject<tawashi::cgi::Env>(parEnvp, settings->at("host_path"));
-		tawashi::ResponseFactory resp_factory(settings, cgi_env);
+		kamokan::ResponseFactory resp_factory(settings, cgi_env);
 		SPDLOG_TRACE(statuslog, "Registering makers in the response factory");
 		resp_factory.register_maker("index.cgi", RequestMethodType::GET, &make_response<IndexResponse>);
 		resp_factory.register_maker("", RequestMethodType::GET, &make_response<IndexResponse>);

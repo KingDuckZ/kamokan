@@ -29,7 +29,7 @@
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 
-namespace tawashi {
+namespace kamokan {
 	class SubmitPasteResponseWithFakeStorage : public SubmitPasteResponse {
 	public:
 		SubmitPasteResponseWithFakeStorage (
@@ -62,7 +62,7 @@ namespace tawashi {
 		FakeStorage m_fake_storage;
 		std::string m_post_data;
 	};
-} //namespace tawashi
+} //namespace kamokan
 
 TEST_CASE ("Submit paste response", "[submitpaste][response]") {
 	using curry::SafeStackObject;
@@ -121,11 +121,11 @@ TEST_CASE ("Submit paste response", "[submitpaste][response]") {
 		"  min_pastie_size = 1\n"
 		"  truncate_long_pasties = no\n"
 	);
-	SafeStackObject<tawashi::IniFile> ini(std::move(kamokan_settings));
-	SafeStackObject<tawashi::SettingsBag> settings(ini, "kamokan");
+	SafeStackObject<kamokan::IniFile> ini(std::move(kamokan_settings));
+	SafeStackObject<kamokan::SettingsBag> settings(ini, "kamokan");
 
 	std::ostringstream oss;
-	tawashi::SubmitPasteResponseWithFakeStorage submit_response(
+	kamokan::SubmitPasteResponseWithFakeStorage submit_response(
 		settings,
 		&oss,
 		fake_env,

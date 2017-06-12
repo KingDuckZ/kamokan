@@ -26,7 +26,7 @@
 #	error "Can't compile this class if test mode is disabled"
 #endif
 
-namespace tawashi {
+namespace kamokan {
 	class FakeStorage : public Storage {
 	public:
 		struct SubmittedPastie {
@@ -38,19 +38,19 @@ namespace tawashi {
 		};
 
 		FakeStorage (const Kakoune::SafePtr<SettingsBag>& parSettings, bool parItsConnected);
-		tawashi_virtual_testing ~FakeStorage();
+		kamokan_virtual_testing ~FakeStorage();
 
-		tawashi_virtual_testing void connect_async();
-		tawashi_virtual_testing bool is_connected() const;
-		tawashi_virtual_testing void finalize_connection();
-		tawashi_virtual_testing SubmissionResult submit_pastie (
+		kamokan_virtual_testing void connect_async();
+		kamokan_virtual_testing bool is_connected() const;
+		kamokan_virtual_testing void finalize_connection();
+		kamokan_virtual_testing SubmissionResult submit_pastie (
 			const boost::string_view& parText,
 			uint32_t parExpiry,
 			const boost::string_view& parLang,
 			const std::string& parRemoteIP
 		) const;
 
-		tawashi_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_view& parToken) const;
+		kamokan_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_view& parToken) const;
 
 		const std::vector<SubmittedPastie>& submitted_pasties() const;
 
@@ -59,4 +59,4 @@ namespace tawashi {
 		mutable int64_t m_submission_num;
 		bool m_its_connected;
 	};
-} //namespace tawashi
+} //namespace kamokan

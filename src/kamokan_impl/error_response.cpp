@@ -1,18 +1,18 @@
 /* Copyright 2017, Michele Santullo
- * This file is part of "tawashi".
+ * This file is part of "kamokan".
  *
- * "tawashi" is free software: you can redistribute it and/or modify
+ * "kamokan" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * "tawashi" is distributed in the hope that it will be useful,
+ * "kamokan" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
+ * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "error_response.hpp"
@@ -26,7 +26,7 @@
 #include <string>
 #include <cassert>
 
-namespace tawashi {
+namespace kamokan {
 	ErrorResponse::ErrorResponse (
 		const Kakoune::SafePtr<SettingsBag>& parSettings,
 		std::ostream* parStreamOut,
@@ -37,6 +37,8 @@ namespace tawashi {
 	}
 
 	void ErrorResponse::on_mustache_prepare (mstch::map& parContext) {
+		using tawashi::ErrorReasons;
+
 		auto get = cgi_env().query_string_split();
 		const int reason_int = boost::lexical_cast<int>(get["reason"]);
 		ErrorReasons reason_code(ErrorReasons::UnkownReason);
@@ -55,7 +57,7 @@ namespace tawashi {
 			"Unsupported CONTENT_TYPE.",
 			"Invalid pastie token."
 		};
-		constexpr const auto lengths = string_lengths(err_descs);
+		constexpr const auto lengths = tawashi::string_lengths(err_descs);
 		static_assert(err_descs.static_size == lengths.static_size, "Mismatching array sizes between strings and their lengths");
 
 #if !defined(NDEBUG)
@@ -67,4 +69,4 @@ namespace tawashi {
 		parContext["error_message"] = std::string(err_descs[reason_code], lengths[reason_code]);
 		parContext["error_id"] = std::to_string(reason_code);
 	}
-} //namespace tawashi
+} //namespace kamokan

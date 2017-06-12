@@ -1,18 +1,18 @@
 /* Copyright 2017, Michele Santullo
- * This file is part of "tawashi".
+ * This file is part of "kamokan".
  *
- * "tawashi" is free software: you can redistribute it and/or modify
+ * "kamokan" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * "tawashi" is distributed in the hope that it will be useful,
+ * "kamokan" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
+ * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "submit_paste_response.hpp"
@@ -29,17 +29,17 @@
 #include <cstdint>
 #include <spdlog/spdlog.h>
 
-namespace tawashi {
+namespace kamokan {
 	namespace {
 		const char g_post_key[] = "pastie";
 		const char g_language_key[] = "lang";
 		const char g_duration_key[] = "ttl";
 
-		class MissingPostVarError : public TawashiException {
+		class MissingPostVarError : public tawashi::TawashiException {
 		public:
 			explicit MissingPostVarError(const boost::string_view& parKey) :
 				TawashiException(
-					ErrorReasons::MissingPostVariable,
+					tawashi::ErrorReasons::MissingPostVariable,
 					"Error retrieving POST variable \"" + std::string(parKey.begin(), parKey.end()) + "\""
 				)
 			{}
@@ -94,7 +94,9 @@ namespace tawashi {
 	{
 	}
 
-	HttpHeader SubmitPasteResponse::on_process() {
+	tawashi::HttpHeader SubmitPasteResponse::on_process() {
+		using tawashi::ErrorReasons;
+
 		boost::string_view pastie;
 		boost::string_view lang;
 		boost::string_view duration;
@@ -109,14 +111,14 @@ namespace tawashi {
 			lang = get_value_from_post_log_failure(post, make_string_view(g_language_key));
 			duration = get_value_from_post_log_failure(post, make_string_view(g_duration_key));
 		}
-		catch (const UnsupportedContentTypeException& err) {
+		catch (const tawashi::UnsupportedContentTypeException& err) {
 			statuslog->info(
 				"Unsupported content type exception: \"{}\"",
 				err.what()
 			);
 			return make_error_redirect(ErrorReasons::UnsupportedContentType);
 		}
-		catch (const TawashiException& e) {
+		catch (const tawashi::TawashiException& e) {
 			statuslog->error(e.what());
 			return make_error_redirect(e.reason());
 		}
@@ -163,15 +165,16 @@ namespace tawashi {
 		const boost::string_view& parLang
 	) -> StringOrHeader {
 		auto& storage = this->storage();
-		std::string remote_ip = guess_real_remote_ip(cgi_env());
+		std::string remote_ip = tawashi::guess_real_remote_ip(cgi_env());
 		Storage::SubmissionResult submission_res = storage.submit_pastie(parText, parExpiry, parLang, remote_ip);
 		if (not submission_res.error)
-			return std::make_pair(boost::make_optional(std::move(submission_res.token)), HttpHeader());
+			return std::make_pair(boost::make_optional(std::move(submission_res.token)), tawashi::HttpHeader());
 		else
 			return std::make_pair(boost::optional<std::string>(), make_error_redirect(*submission_res.error));
 	}
 
-	HttpHeader SubmitPasteResponse::make_success_response (std::string&& parPastieParam) {
+	tawashi::HttpHeader SubmitPasteResponse::make_success_response (std::string&& parPastieParam) {
+		using tawashi::HttpStatusCodes;
 		return this->make_redirect(HttpStatusCodes::Code303_SeeOther, std::move(parPastieParam));
 	}
-} //namespace tawashi
+} //namespace kamokan

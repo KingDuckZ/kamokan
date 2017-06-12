@@ -1,18 +1,18 @@
 /* Copyright 2017, Michele Santullo
- * This file is part of "tawashi".
+ * This file is part of "kamokan".
  *
- * "tawashi" is free software: you can redistribute it and/or modify
+ * "kamokan" is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * "tawashi" is distributed in the hope that it will be useful,
+ * "kamokan" is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
+ * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #pragma once
@@ -29,11 +29,14 @@
 #include <memory>
 
 namespace tawashi {
-	class SettingsBag;
-
 	namespace cgi {
 		class Env;
 	} //namespace cgi
+} //namespace tawashi
+
+namespace kamokan {
+	class SettingsBag;
+	namespace cgi = tawashi::cgi;
 
 	class Response {
 	public:
@@ -50,18 +53,18 @@ namespace tawashi {
 		);
 
 		const cgi::Env& cgi_env() const;
-		tawashi_virtual_testing const cgi::PostMapType& cgi_post() const;
+		kamokan_virtual_testing const cgi::PostMapType& cgi_post() const;
 
 		const std::string& base_uri() const;
 		virtual boost::string_view page_basename() const = 0;
-		tawashi_virtual_testing const Storage& storage() const;
+		kamokan_virtual_testing const Storage& storage() const;
 		const SettingsBag& settings() const;
 		virtual std::string load_mustache() const;
-		HttpHeader make_redirect (HttpStatusCodes parCode, const std::string& parLocation);
-		HttpHeader make_error_redirect (ErrorReasons parReason);
+		tawashi::HttpHeader make_redirect (tawashi::HttpStatusCodes parCode, const std::string& parLocation);
+		tawashi::HttpHeader make_error_redirect (tawashi::ErrorReasons parReason);
 
 	private:
-		virtual HttpHeader on_process();
+		virtual tawashi::HttpHeader on_process();
 		virtual void on_mustache_prepare (mstch::map& parContext);
 		virtual std::string on_mustache_retrieve();
 
@@ -72,4 +75,4 @@ namespace tawashi {
 		std::string m_base_uri;
 		std::ostream* m_stream_out;
 	};
-} //namespace tawashi
+} //namespace kamokan
