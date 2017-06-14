@@ -62,7 +62,7 @@ namespace kamokan {
 		return submission_res;
 	}
 
-	boost::optional<std::string> FakeStorage::retrieve_pastie (const boost::string_view& parToken) const {
+	Storage::RetrievedPastie FakeStorage::retrieve_pastie (const boost::string_view& parToken) const {
 		auto it_found = std::find_if(
 			m_submitted_pasties.begin(),
 			m_submitted_pasties.end(),
@@ -71,9 +71,9 @@ namespace kamokan {
 			}
 		);
 		if (m_submitted_pasties.end() == it_found)
-			return boost::optional<std::string>();
+			return RetrievedPastie {boost::optional<std::string>(), false};
 		else
-			return boost::make_optional(it_found->text);
+			return RetrievedPastie {boost::make_optional(it_found->text), it_found->self_destruct};
 	}
 
 	const std::vector<FakeStorage::SubmittedPastie>& FakeStorage::submitted_pasties() const {

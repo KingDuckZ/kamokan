@@ -132,13 +132,13 @@ namespace kamokan {
 
 	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
 		boost::string_view token = cgi::drop_arguments(cgi_env().request_uri_relative());
-		boost::optional<std::string> pastie = this->storage().retrieve_pastie(token);
+		Storage::RetrievedPastie pastie_info = this->storage().retrieve_pastie(token);
 
 		if (not is_valid_token(token, settings().as<uint32_t>("max_token_length"))) {
 			m_token_invalid = true;
 			return;
 		}
-		if (not pastie) {
+		if (not pastie_info.pastie) {
 			m_pastie_not_found = true;
 			return;
 		}
@@ -160,13 +160,13 @@ namespace kamokan {
 		std::string processed_pastie;
 		if (m_syntax_highlight) {
 			//TODO: redirect to "pastie not found" if !pastie
-			processed_pastie = std::move(*pastie);
+			processed_pastie = std::move(*pastie_info.pastie);
 		}
 		else {
 			tawashi::Escapist houdini;
 			std::ostringstream oss;
 			oss << R"(<pre><tt><font color="#EDEDED">)";
-			oss << houdini.escape_html(*pastie) << "</font></tt></pre>\n";
+			oss << houdini.escape_html(*pastie_info.pastie) << "</font></tt></pre>\n";
 			processed_pastie = oss.str();
 		}
 
@@ -181,6 +181,7 @@ namespace kamokan {
 		parContext["pastie_lines"] = pastie_to_numbered_lines(
 			boost::get<std::string>(parContext["pastie"])
 		);
+		parContext["self_destructed"] = pastie_info.self_destructed;
 	}
 
 	std::string PastieResponse::on_mustache_retrieve() {

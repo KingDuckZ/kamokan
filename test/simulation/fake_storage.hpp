@@ -52,7 +52,7 @@ namespace kamokan {
 			const std::string& parRemoteIP
 		) const override;
 
-		kamokan_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_view& parToken) const override;
+		kamokan_virtual_testing Storage::RetrievedPastie retrieve_pastie (const boost::string_view& parToken) const override;
 
 		const std::vector<SubmittedPastie>& submitted_pasties() const;
 

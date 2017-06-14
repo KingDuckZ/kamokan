@@ -38,6 +38,10 @@ namespace kamokan {
 			std::string token;
 			boost::optional<tawashi::ErrorReasons> error;
 		};
+		struct RetrievedPastie {
+			boost::optional<std::string> pastie;
+			bool self_destructed;
+		};
 
 		explicit Storage (const Kakoune::SafePtr<SettingsBag>& parSettings);
 		kamokan_virtual_testing ~Storage();
@@ -53,7 +57,7 @@ namespace kamokan {
 			const std::string& parRemoteIP
 		) const;
 
-		kamokan_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_view& parToken) const;
+		kamokan_virtual_testing RetrievedPastie retrieve_pastie (const boost::string_view& parToken) const;
 
 #if defined(KAMOKAN_WITH_TESTING)
 		const SettingsBag& settings() const;

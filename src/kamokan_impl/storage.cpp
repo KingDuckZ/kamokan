@@ -137,16 +137,18 @@ namespace kamokan {
 		return make_submission_result(ErrorReasons::PastieNotSaved);
 	}
 
-	boost::optional<std::string> Storage::retrieve_pastie (const boost::string_view& parToken) const {
+	auto Storage::retrieve_pastie (const boost::string_view& parToken) const -> RetrievedPastie {
 		using opt_string = redis::IncRedis::opt_string;
 		using opt_string_list = redis::IncRedis::opt_string_list;
 
+		RetrievedPastie retval;
 		opt_string_list pastie_reply = m_redis->hmget(parToken, "pastie", "selfdes");
-		opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
+		retval.pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
 		opt_string selfdes = (pastie_reply and not pastie_reply->size() > 1 ? (*pastie_reply)[1] : opt_string());
 
 		if (selfdes and string_conv<bool>(*selfdes)) {
 			const bool deleted = m_redis->del(parToken);
+			retval.self_destructed = deleted;
 			if (not deleted) {
 				auto statuslog = spdlog::get("statuslog");
 				statuslog->error("Pastie \"{}\" was marked as self-destructing but DEL failed to delete it", parToken);
@@ -156,13 +158,13 @@ namespace kamokan {
 #if defined(SPDLOG_DEBUG_ON)
 		{
 			auto statuslog = spdlog::get("statuslog");
-			if (pastie)
-				statuslog->debug("Retrieving pastie with token \"{}\" gave a result of size {}", parToken, pastie->size());
+			if (retval.pastie)
+				statuslog->debug("Retrieving pastie with token \"{}\" gave a result of size {}", parToken, retval.pastie->size());
 			else
 				statuslog->debug("Retrieving pastie with token \"{}\" gave no results", parToken);
 		}
 #endif
-		return pastie;
+		return retval;
 	}
 
 #if defined(KAMOKAN_WITH_TESTING)
