@@ -24,7 +24,7 @@ namespace kamokan {
 		if (parStr == "true" or parStr == "yes" or parStr == "1" or parStr == "on") {
 			return true;
 		}
-		else if (parStr == "false" or parStr == "no" or parStr == "0" or parStr == "off") {
+		else if (parStr == "" or parStr == "false" or parStr == "no" or parStr == "0" or parStr == "off") {
 			return false;
 		}
 		else {
