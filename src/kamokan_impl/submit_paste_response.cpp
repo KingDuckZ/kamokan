@@ -23,6 +23,7 @@
 #include "duckhandy/lexical_cast.hpp"
 #include "tawashi_exception.hpp"
 #include "ip_utils.hpp"
+#include "string_conv.hpp"
 #include <ciso646>
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
@@ -34,6 +35,7 @@ namespace kamokan {
 		const char g_post_key[] = "pastie";
 		const char g_language_key[] = "lang";
 		const char g_duration_key[] = "ttl";
+		const char g_self_destruct[] = "selfdes";
 
 		class MissingPostVarError : public tawashi::Exception {
 		public:
@@ -100,6 +102,7 @@ namespace kamokan {
 		boost::string_view pastie;
 		boost::string_view lang;
 		boost::string_view duration;
+		bool self_destruct;
 
 		auto statuslog = spdlog::get("statuslog");
 		assert(statuslog);
@@ -110,6 +113,7 @@ namespace kamokan {
 			pastie = get_value_from_post(post, make_string_view(g_post_key));
 			lang = get_value_from_post_log_failure(post, make_string_view(g_language_key));
 			duration = get_value_from_post_log_failure(post, make_string_view(g_duration_key));
+			self_destruct = string_conv<bool>(get_value_from_post_log_failure(post, make_string_view(g_self_destruct)));
 		}
 		catch (const tawashi::UnsupportedContentTypeException& err) {
 			statuslog->info(
@@ -139,7 +143,7 @@ namespace kamokan {
 		//TODO: replace boost's lexical_cast with mine when I have some checks
 		//over invalid inputs
 		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
-		StringOrHeader submit_result = submit_to_storage(pastie, duration_int, lang);
+		StringOrHeader submit_result = submit_to_storage(pastie, duration_int, lang, self_destruct);
 		const auto& token = submit_result.first;
 
 		if (token) {
@@ -162,11 +166,12 @@ namespace kamokan {
 	auto SubmitPasteResponse::submit_to_storage (
 		const boost::string_view& parText,
 		uint32_t parExpiry,
-		const boost::string_view& parLang
+		const boost::string_view& parLang,
+		bool parSelfDestruct
 	) -> StringOrHeader {
 		auto& storage = this->storage();
 		std::string remote_ip = tawashi::guess_real_remote_ip(cgi_env());
-		Storage::SubmissionResult submission_res = storage.submit_pastie(parText, parExpiry, parLang, remote_ip);
+		Storage::SubmissionResult submission_res = storage.submit_pastie(parText, parExpiry, parLang, parSelfDestruct, remote_ip);
 		if (not submission_res.error)
 			return std::make_pair(boost::make_optional(std::move(submission_res.token)), tawashi::HttpHeader());
 		else

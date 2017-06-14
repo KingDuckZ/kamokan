@@ -35,22 +35,24 @@ namespace kamokan {
 			std::string remote_ip;
 			std::string token;
 			uint32_t expiry;
+			bool self_destruct;
 		};
 
 		FakeStorage (const Kakoune::SafePtr<SettingsBag>& parSettings, bool parItsConnected);
 		kamokan_virtual_testing ~FakeStorage();
 
-		kamokan_virtual_testing void connect_async();
-		kamokan_virtual_testing bool is_connected() const;
-		kamokan_virtual_testing void finalize_connection();
+		kamokan_virtual_testing void connect_async() override;
+		kamokan_virtual_testing bool is_connected() const override;
+		kamokan_virtual_testing void finalize_connection() override;
 		kamokan_virtual_testing SubmissionResult submit_pastie (
 			const boost::string_view& parText,
 			uint32_t parExpiry,
 			const boost::string_view& parLang,
+			bool parSelfDestruct,
 			const std::string& parRemoteIP
-		) const;
+		) const override;
 
-		kamokan_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_view& parToken) const;
+		kamokan_virtual_testing boost::optional<std::string> retrieve_pastie (const boost::string_view& parToken) const override;
 
 		const std::vector<SubmittedPastie>& submitted_pasties() const;
 

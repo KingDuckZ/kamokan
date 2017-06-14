@@ -22,6 +22,7 @@
 #include "duckhandy/stringize.h"
 #include "spdlog.hpp"
 #include "truncated_string.hpp"
+#include "string_conv.hpp"
 #include <cassert>
 #include <ciso646>
 #include <string>
@@ -94,6 +95,7 @@ namespace kamokan {
 		const boost::string_view& parText,
 		uint32_t parExpiry,
 		const boost::string_view& parLang,
+		bool parSelfDestruct,
 		const std::string& parRemoteIP
 	) const {
 		using tawashi::ErrorReasons;
@@ -123,7 +125,8 @@ namespace kamokan {
 		if (redis.hmset(token,
 			"pastie", parText,
 			"max_ttl", dhandy::lexical_cast<std::string>(parExpiry),
-			"lang", parLang)
+			"lang", parLang,
+			"selfdes", (parSelfDestruct ? "1" : "0"))
 		) {
 			redis.set(parRemoteIP, "");
 			redis.expire(parRemoteIP, m_settings->as<uint32_t>("resubmit_wait"));
@@ -138,8 +141,17 @@ namespace kamokan {
 		using opt_string = redis::IncRedis::opt_string;
 		using opt_string_list = redis::IncRedis::opt_string_list;
 
-		opt_string_list pastie_reply = m_redis->hmget(parToken, "pastie");
+		opt_string_list pastie_reply = m_redis->hmget(parToken, "pastie", "selfdes");
 		opt_string pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
+		opt_string selfdes = (pastie_reply and not pastie_reply->size() > 1 ? (*pastie_reply)[1] : opt_string());
+
+		if (selfdes and string_conv<bool>(*selfdes)) {
+			const bool deleted = m_redis->del(parToken);
+			if (not deleted) {
+				auto statuslog = spdlog::get("statuslog");
+				statuslog->error("Pastie \"{}\" was marked as self-destructing but DEL failed to delete it", parToken);
+			}
+		}
 
 #if defined(SPDLOG_DEBUG_ON)
 		{

@@ -49,6 +49,7 @@ namespace kamokan {
 			const boost::string_view& parText,
 			uint32_t parExpiry,
 			const boost::string_view& parLang,
+			bool parSelfDestruct,
 			const std::string& parRemoteIP
 		) const;
 

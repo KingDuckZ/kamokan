@@ -50,6 +50,11 @@ namespace kamokan {
 		typedef std::pair<boost::optional<std::string>, tawashi::HttpHeader> StringOrHeader;
 
 		virtual tawashi::HttpHeader on_process() override;
-		StringOrHeader submit_to_storage (const boost::string_view& parText, uint32_t parExpiry, const boost::string_view& parLang);
+		StringOrHeader submit_to_storage (
+			const boost::string_view& parText,
+			uint32_t parExpiry,
+			const boost::string_view& parLang,
+			bool parSelfDestruct
+		);
 	};
 } //namespace kamokan

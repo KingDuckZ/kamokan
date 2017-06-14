@@ -44,6 +44,7 @@ namespace kamokan {
 		const boost::string_view& parText,
 		uint32_t parExpiry,
 		const boost::string_view& parLang,
+		bool parSelfDestruct,
 		const std::string& parRemoteIP
 	) const {
 		SubmittedPastie pastie;
@@ -53,6 +54,7 @@ namespace kamokan {
 		pastie.lang = std::string(parLang);
 		pastie.remote_ip = parRemoteIP;
 		pastie.token = token;
+		pastie.self_destruct = parSelfDestruct;
 		m_submitted_pasties.push_back(std::move(pastie));
 
 		Storage::SubmissionResult submission_res;
