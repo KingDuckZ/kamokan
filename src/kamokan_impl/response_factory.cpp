@@ -34,11 +34,13 @@ namespace kamokan {
 		boost::container::flat_map<std::string, ResponseMakerFunc> makers_post;
 		std::array<ResponseMakerFunc, tawashi::RequestMethodType::_size()> jolly_makers;
 		Kakoune::SafePtr<tawashi::cgi::Env> cgi_env;
+		std::chrono::time_point<std::chrono::steady_clock> time0;
 	};
 
 	ResponseFactory::ResponseFactory (const Kakoune::SafePtr<SettingsBag>& parSettings, const Kakoune::SafePtr<tawashi::cgi::Env>& parCgiEnv) :
 		m_local_data(std::make_unique<LocalData>())
 	{
+		m_local_data->time0 = std::chrono::steady_clock::now();
 		m_local_data->settings = parSettings;
 		m_local_data->cgi_env = parCgiEnv;
 		std::fill(m_local_data->jolly_makers.begin(), m_local_data->jolly_makers.end(), nullptr);
@@ -61,16 +63,23 @@ namespace kamokan {
 
 		auto maker_it = makers.find(name);
 		if (makers.end() != maker_it) {
-			return maker_it->second(m_local_data->settings, m_local_data->cgi_env);
+			return make_response(maker_it->second);
 		}
 		else if (m_local_data->jolly_makers[parReqType]) {
 			spdlog::get("statuslog")->info("no exact match found for \"{}\", assuming it's a pastie's token", name);
-			return m_local_data->jolly_makers[parReqType](m_local_data->settings, m_local_data->cgi_env);
+			return make_response(m_local_data->jolly_makers[parReqType]);
 		}
 		else {
 			spdlog::get("statuslog")->critical("no exact match found for \"{}\" with method {} and no jolly maker given, this should not happen", name, parReqType._to_string());
 			return std::unique_ptr<Response>();
 		}
+	}
+
+	std::unique_ptr<Response> ResponseFactory::make_response (ResponseMakerFunc parMaker) const {
+		auto retval = parMaker(m_local_data->settings, m_local_data->cgi_env);
+		assert(retval);
+		retval->set_app_start_time(m_local_data->time0);
+		return retval;
 	}
 
 	void ResponseFactory::register_maker (std::string&& parName, ResponseMakerFunc parMaker) {
@@ -91,5 +100,10 @@ namespace kamokan {
 
 	void ResponseFactory::register_jolly_maker (ResponseMakerFunc parMaker, tawashi::RequestMethodType parReqType) {
 		m_local_data->jolly_makers[parReqType] = parMaker;
+	}
+
+	void ResponseFactory::set_app_start_time (const std::chrono::time_point<std::chrono::steady_clock>& parTime) {
+		assert(parTime <= m_local_data->time0);
+		m_local_data->time0 = parTime;
 	}
 } //namespace kamokan

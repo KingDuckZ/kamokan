@@ -36,6 +36,7 @@
 #include <iterator>
 #include <ciso646>
 #include <iostream>
+#include <chrono>
 
 //www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4150.pdf
 
@@ -142,6 +143,8 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	using kamokan::Response;
 	using tawashi::RequestMethodType;
 
+	std::chrono::time_point<std::chrono::steady_clock> app_start_time = std::chrono::steady_clock::now();
+
 	if (2 == parArgc and boost::string_view(parArgv[1]) == "--show-paths") {
 		print_buildtime_info();
 		return 0;
@@ -166,6 +169,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		resp_factory.register_maker("paste.cgi", RequestMethodType::POST, &make_response<SubmitPasteResponse>);
 		resp_factory.register_maker("error.cgi", RequestMethodType::GET, &make_response<ErrorResponse>);
 		resp_factory.register_jolly_maker(&make_response<PastieResponse>, RequestMethodType::GET);
+		resp_factory.set_app_start_time(app_start_time);
 
 		std::unique_ptr<Response> response = resp_factory.make_response(
 			tawashi::cgi::drop_arguments(cgi_env->request_uri_relative()),

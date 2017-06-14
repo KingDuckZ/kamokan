@@ -27,6 +27,7 @@
 #include <iostream>
 #include <boost/utility/string_view.hpp>
 #include <memory>
+#include <chrono>
 
 namespace tawashi {
 	namespace cgi {
@@ -43,6 +44,7 @@ namespace kamokan {
 		virtual ~Response() noexcept;
 
 		void send();
+		void set_app_start_time (const std::chrono::time_point<std::chrono::steady_clock>& parTime);
 
 	protected:
 		Response (
@@ -71,6 +73,7 @@ namespace kamokan {
 		Storage m_storage;
 		Kakoune::SafePtr<cgi::Env> m_cgi_env;
 		Kakoune::SafePtr<SettingsBag> m_settings;
+		std::chrono::time_point<std::chrono::steady_clock> m_time0;
 		std::string m_website_root;
 		std::string m_base_uri;
 		std::ostream* m_stream_out;

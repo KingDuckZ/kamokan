@@ -21,6 +21,7 @@
 #include "kakoune/safe_ptr.hh"
 #include "request_method_type.hpp"
 #include <memory>
+#include <chrono>
 
 namespace tawashi {
 	namespace cgi {
@@ -43,9 +44,12 @@ namespace kamokan {
 		void register_maker (std::string&& parName, ResponseMakerFunc parMaker);
 		void register_maker (std::string&& parName, tawashi::RequestMethodType parReqType, ResponseMakerFunc parMaker);
 		void register_jolly_maker (ResponseMakerFunc parMaker, tawashi::RequestMethodType parReqType);
+		void set_app_start_time (const std::chrono::time_point<std::chrono::steady_clock>& parTime);
 
 	private:
 		struct LocalData;
+
+		std::unique_ptr<Response> make_response (ResponseMakerFunc parMaker) const;
 
 		std::unique_ptr<LocalData> m_local_data;
 	};

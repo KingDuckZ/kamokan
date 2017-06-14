@@ -135,6 +135,7 @@ namespace kamokan {
 		//m_page_basename(fetch_page_basename(m_cgi_env)),
 		m_cgi_env(parCgiEnv),
 		m_settings(parSettings),
+		m_time0(std::chrono::steady_clock::now()),
 		m_website_root(make_root_path(*parSettings)),
 		m_base_uri(make_base_uri(m_settings, m_cgi_env)),
 		m_stream_out(parStreamOut)
@@ -187,9 +188,16 @@ namespace kamokan {
 		*m_stream_out << http_header;
 
 		if (http_header.body_required()) {
+			using std::chrono::steady_clock;
+			using std::chrono::milliseconds;
+			using std::chrono::duration_cast;
+
 			SPDLOG_TRACE(statuslog, "Raising event on_mustache_prepare");
 			this->on_mustache_prepare(mustache_context);
 
+			const auto time1 = steady_clock::now();
+			const int page_time = duration_cast<milliseconds>(time1 - m_time0).count();
+			mustache_context["page_time"] = page_time;
 			SPDLOG_TRACE(statuslog, "Rendering in mustache");
 			*m_stream_out << mstch::render(
 				on_mustache_retrieve(),
@@ -260,5 +268,10 @@ namespace kamokan {
 		std::ostringstream oss;
 		oss << "error.cgi?reason=" << parReason._to_integral();
 		return make_redirect(redir_code, oss.str());
+	}
+
+	void Response::set_app_start_time (const std::chrono::time_point<std::chrono::steady_clock>& parTime) {
+		assert(parTime <= m_time0);
+		m_time0 = parTime;
 	}
 } //namespace kamokan
