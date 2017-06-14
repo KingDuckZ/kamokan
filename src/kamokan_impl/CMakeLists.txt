@@ -19,6 +19,7 @@ add_library(${PROJECT_NAME} STATIC
 	error_response.cpp
 	quick_submit_paste_response.cpp
 	storage.cpp
+	string_conv.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

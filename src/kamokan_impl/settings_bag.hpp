@@ -22,6 +22,7 @@
 #if defined(SPDLOG_DEBUG_ON)
 #	include "spdlog.hpp"
 #endif
+#include "string_conv.hpp"
 #include <map>
 #include <boost/utility/string_view.hpp>
 #include <functional>
@@ -45,9 +46,9 @@ namespace kamokan {
 		const IniFile::KeyValueMapType* m_values;
 	};
 
-	template <>
-	inline boost::string_view SettingsBag::as (boost::string_view parIndex) const {
-		return (*this)[parIndex];
+	template <typename T>
+	inline T SettingsBag::as (boost::string_view parIndex) const {
+		return string_conv<T>(this->at(parIndex));
 	}
 
 	inline const boost::string_view& SettingsBag::at (boost::string_view parIndex) const {
