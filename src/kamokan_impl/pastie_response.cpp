@@ -182,6 +182,8 @@ namespace kamokan {
 			boost::get<std::string>(parContext["pastie"])
 		);
 		parContext["self_destructed"] = pastie_info.self_destructed;
+		parContext["pastie_token"] = token;
+		parContext["pastie_page"] = true;
 	}
 
 	std::string PastieResponse::on_mustache_retrieve() {

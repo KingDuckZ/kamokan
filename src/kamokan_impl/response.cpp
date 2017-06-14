@@ -174,6 +174,7 @@ namespace kamokan {
 		statuslog->info("Sending response");
 		SPDLOG_TRACE(statuslog, "Preparing mustache dictionary");
 		mstch::map mustache_context {
+			{"pastie_page", false},
 			{"version", boost::string_view{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
 			{"tawashi_version", tawashi::version()},
 			{"base_uri", base_uri()},
