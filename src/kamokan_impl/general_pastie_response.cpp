@@ -15,7 +15,7 @@
  * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "pastie_retrieving_response.hpp"
+#include "general_pastie_response.hpp"
 #include "cgi_env.hpp"
 #include "settings_bag.hpp"
 #include "error_reasons.hpp"
@@ -57,7 +57,7 @@ namespace kamokan {
 		}
 	} //unnamed namespace
 
-	PastieRetrievingResponse::PastieRetrievingResponse (
+	GeneralPastieResponse::GeneralPastieResponse (
 		const Kakoune::SafePtr<SettingsBag>& parSettings,
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
@@ -66,7 +66,7 @@ namespace kamokan {
 	{
 	}
 
-	tawashi::HttpHeader PastieRetrievingResponse::on_process() {
+	tawashi::HttpHeader GeneralPastieResponse::on_process() {
 		using tawashi::ErrorReasons;
 
 		boost::string_view token = get_search_token(cgi_env());
@@ -84,10 +84,10 @@ namespace kamokan {
 		assert(not token_invalid());
 		assert(not pastie_not_found());
 
-		return this->on_retrieving_process();
+		return this->on_general_pastie_process();
 	}
 
-	void PastieRetrievingResponse::on_mustache_prepare (mstch::map& parContext) {
+	void GeneralPastieResponse::on_mustache_prepare (mstch::map& parContext) {
 		assert(m_pastie_info.pastie);
 		assert(not token_invalid());
 		assert(not pastie_not_found());
@@ -102,12 +102,12 @@ namespace kamokan {
 		parContext["pastie_page"] = true;
 	}
 
-	bool PastieRetrievingResponse::token_invalid() const {
+	bool GeneralPastieResponse::token_invalid() const {
 		assert(m_pastie_info.valid_token or not m_pastie_info.pastie);
 		return not m_pastie_info.valid_token;
 	}
 
-	bool PastieRetrievingResponse::pastie_not_found() const {
+	bool GeneralPastieResponse::pastie_not_found() const {
 		return not m_pastie_info.pastie;
 	}
 } //namespace kamokan

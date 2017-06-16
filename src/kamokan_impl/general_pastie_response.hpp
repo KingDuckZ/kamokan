@@ -21,9 +21,9 @@
 #include <string>
 
 namespace kamokan {
-	class PastieRetrievingResponse : public Response {
+	class GeneralPastieResponse : public Response {
 	public:
-		PastieRetrievingResponse (
+		GeneralPastieResponse (
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
@@ -37,7 +37,7 @@ namespace kamokan {
 		virtual tawashi::HttpHeader on_process() override final;
 		virtual void on_mustache_prepare (mstch::map& parContext) override final;
 		virtual std::string on_pastie_prepare (std::string&& parPastie) = 0;
-		virtual tawashi::HttpHeader on_retrieving_process() = 0;
+		virtual tawashi::HttpHeader on_general_pastie_process() = 0;
 
 		Storage::RetrievedPastie m_pastie_info;
 	};

@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "pastie_retrieving_response.hpp"
+#include "general_pastie_response.hpp"
 
 namespace kamokan {
-	class EditResponse : public PastieRetrievingResponse {
+	class EditResponse : public GeneralPastieResponse {
 	public:
 		EditResponse (
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
@@ -35,6 +35,6 @@ namespace kamokan {
 
 	private:
 		virtual std::string on_pastie_prepare (std::string&& parPastie) override;
-		virtual tawashi::HttpHeader on_retrieving_process() override;
+		virtual tawashi::HttpHeader on_general_pastie_process() override;
 	};
 } //namespace kamokan

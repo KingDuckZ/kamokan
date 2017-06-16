@@ -24,11 +24,11 @@ namespace kamokan {
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		PastieRetrievingResponse(parSettings, parStreamOut, parCgiEnv)
+		GeneralPastieResponse(parSettings, parStreamOut, parCgiEnv)
 	{
 	}
 
-	tawashi::HttpHeader EditResponse::on_retrieving_process() {
+	tawashi::HttpHeader EditResponse::on_general_pastie_process() {
 		return tawashi::make_header_type_html();
 	}
 

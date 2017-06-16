@@ -21,7 +21,7 @@ add_library(${PROJECT_NAME} STATIC
 	storage.cpp
 	string_conv.cpp
 	edit_response.cpp
-	pastie_retrieving_response.cpp
+	general_pastie_response.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

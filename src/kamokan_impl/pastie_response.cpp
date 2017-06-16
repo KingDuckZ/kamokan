@@ -43,14 +43,14 @@ namespace kamokan {
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		PastieRetrievingResponse(parSettings, parStreamOut, parCgiEnv),
+		GeneralPastieResponse(parSettings, parStreamOut, parCgiEnv),
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false),
 		m_syntax_highlight(true)
 	{
 	}
 
-	tawashi::HttpHeader PastieResponse::on_retrieving_process() {
+	tawashi::HttpHeader PastieResponse::on_general_pastie_process() {
 		auto get = cgi_env().query_string_split();
 		const std::string& query_str(cgi_env().query_string());
 		if (get["m"] == "plain" or query_str.empty()) {
