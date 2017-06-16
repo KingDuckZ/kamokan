@@ -111,7 +111,7 @@ namespace kamokan {
 			if (not host_port.empty()) {
 				if (host_port == "from_downstream") {
 					const uint16_t port = parCgiEnv->server_port();
-					if ((80 != port and not parCgiEnv->https()) or 443 != port and parCgiEnv->https()) {
+					if ((80 != port and not parCgiEnv->https()) or (443 != port and parCgiEnv->https())) {
 						oss << ':' << port;
 					}
 				}
