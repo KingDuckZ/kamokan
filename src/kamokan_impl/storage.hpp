@@ -24,6 +24,7 @@
 #include <boost/utility/string_view.hpp>
 #include <boost/optional.hpp>
 #include <string>
+#include <utility>
 
 namespace redis {
 	class IncRedis;
@@ -39,8 +40,13 @@ namespace kamokan {
 			boost::optional<tawashi::ErrorReasons> error;
 		};
 		struct RetrievedPastie {
+			RetrievedPastie();
+			RetrievedPastie (boost::optional<std::string>&& parPastie, bool parSelfDestructed, bool parValidToken);
+			~RetrievedPastie() = default;
+
 			boost::optional<std::string> pastie;
 			bool self_destructed;
+			bool valid_token;
 		};
 
 		explicit Storage (const Kakoune::SafePtr<SettingsBag>& parSettings);
@@ -57,7 +63,7 @@ namespace kamokan {
 			const std::string& parRemoteIP
 		) const;
 
-		kamokan_virtual_testing RetrievedPastie retrieve_pastie (const boost::string_view& parToken) const;
+		kamokan_virtual_testing RetrievedPastie retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const;
 
 #if defined(KAMOKAN_WITH_TESTING)
 		const SettingsBag& settings() const;
@@ -67,4 +73,15 @@ namespace kamokan {
 		std::unique_ptr<redis::IncRedis> m_redis;
 		Kakoune::SafePtr<SettingsBag> m_settings;
 	};
+
+	inline Storage::RetrievedPastie::RetrievedPastie (
+		boost::optional<std::string>&& parPastie,
+		bool parSelfDestructed,
+		bool parValidToken
+	) :
+		pastie(std::move(parPastie)),
+		self_destructed(parSelfDestructed),
+		valid_token(parValidToken)
+	{
+	}
 } //namespace kamokan

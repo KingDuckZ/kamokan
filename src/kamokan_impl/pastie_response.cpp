@@ -63,28 +63,6 @@ namespace kamokan {
 				})
 			);
 		}
-
-		bool is_valid_token (const boost::string_view& parToken, uint32_t parMaxLen) {
-			if (parToken.empty())
-				return false;
-			if (parMaxLen > 0 and parToken.size() > parMaxLen)
-				return false;
-
-			auto it_mark = std::find(parToken.begin(), parToken.end(), '?');
-			if (parToken.begin() == it_mark)
-				return false;
-			for (auto it_ch = parToken.begin(); it_ch != it_mark; ++it_ch) {
-				if (*it_ch < 'a' or *it_ch > 'z') {
-					spdlog::get("statuslog")->info(
-						"Token's byte {} is invalid; value={}",
-						it_ch - parToken.begin(),
-						static_cast<int>(*it_ch)
-					);
-					return false;
-				}
-			}
-			return true;
-		}
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (
@@ -132,16 +110,13 @@ namespace kamokan {
 
 	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
 		boost::string_view token = cgi::drop_arguments(cgi_env().request_uri_relative());
-		Storage::RetrievedPastie pastie_info = this->storage().retrieve_pastie(token);
+		Storage::RetrievedPastie pastie_info =
+			storage().retrieve_pastie(token, settings().as<uint32_t>("max_token_length"));
 
-		if (not is_valid_token(token, settings().as<uint32_t>("max_token_length"))) {
-			m_token_invalid = true;
+		m_token_invalid = not pastie_info.valid_token;
+		m_pastie_not_found = not pastie_info.pastie;
+		if (m_token_invalid or m_pastie_not_found)
 			return;
-		}
-		if (not pastie_info.pastie) {
-			m_pastie_not_found = true;
-			return;
-		}
 
 		srchilite::SourceHighlight highlighter;
 		highlighter.setDataDir(settings().as<std::string>("langmap_dir"));

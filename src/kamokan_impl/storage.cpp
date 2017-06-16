@@ -56,7 +56,36 @@ namespace kamokan {
 		Storage::SubmissionResult make_submission_result (tawashi::ErrorReasons parError) {
 			return Storage::SubmissionResult { std::string(), boost::make_optional(parError) };
 		}
+
+		bool is_valid_token (const boost::string_view& parToken, uint32_t parMaxLen) {
+			if (parToken.empty())
+				return false;
+			if (parMaxLen > 0 and parToken.size() > parMaxLen)
+				return false;
+
+			auto it_mark = std::find(parToken.begin(), parToken.end(), '?');
+			if (parToken.begin() == it_mark)
+				return false;
+			for (auto it_ch = parToken.begin(); it_ch != it_mark; ++it_ch) {
+				if (*it_ch < 'a' or *it_ch > 'z') {
+					spdlog::get("statuslog")->info(
+						"Token's byte {} is invalid; value={}",
+						it_ch - parToken.begin(),
+						static_cast<int>(*it_ch)
+					);
+					return false;
+				}
+			}
+			return true;
+		}
 	} //unnamed namespace
+
+	Storage::RetrievedPastie::RetrievedPastie() :
+		pastie(),
+		self_destructed(false),
+		valid_token(false)
+	{
+	}
 
 	Storage::Storage (const Kakoune::SafePtr<SettingsBag>& parSettings) :
 		m_redis(nullptr),
@@ -137,11 +166,15 @@ namespace kamokan {
 		return make_submission_result(ErrorReasons::PastieNotSaved);
 	}
 
-	auto Storage::retrieve_pastie (const boost::string_view& parToken) const -> RetrievedPastie {
+	auto Storage::retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const -> RetrievedPastie {
 		using opt_string = redis::IncRedis::opt_string;
 		using opt_string_list = redis::IncRedis::opt_string_list;
 
 		RetrievedPastie retval;
+		retval.valid_token = is_valid_token(parToken, parMaxTokenLen);
+		if (not retval.valid_token)
+			return retval;
+
 		opt_string_list pastie_reply = m_redis->hmget(parToken, "pastie", "selfdes");
 		retval.pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
 		opt_string selfdes = (pastie_reply and not pastie_reply->size() > 1 ? (*pastie_reply)[1] : opt_string());

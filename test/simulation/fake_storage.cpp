@@ -62,7 +62,7 @@ namespace kamokan {
 		return submission_res;
 	}
 
-	Storage::RetrievedPastie FakeStorage::retrieve_pastie (const boost::string_view& parToken) const {
+	Storage::RetrievedPastie FakeStorage::retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const {
 		auto it_found = std::find_if(
 			m_submitted_pasties.begin(),
 			m_submitted_pasties.end(),
@@ -70,10 +70,12 @@ namespace kamokan {
 				return pastie.token == parToken;
 			}
 		);
-		if (m_submitted_pasties.end() == it_found)
-			return RetrievedPastie {boost::optional<std::string>(), false};
+		if (parToken.size() > static_cast<std::size_t>(parMaxTokenLen))
+			return RetrievedPastie (boost::optional<std::string>(), false, false);
+		else if (m_submitted_pasties.end() == it_found)
+			return RetrievedPastie (boost::optional<std::string>(), false, true);
 		else
-			return RetrievedPastie {boost::make_optional(it_found->text), it_found->self_destruct};
+			return RetrievedPastie (boost::make_optional(it_found->text), it_found->self_destruct, true);
 	}
 
 	const std::vector<FakeStorage::SubmittedPastie>& FakeStorage::submitted_pasties() const {
