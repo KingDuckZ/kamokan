@@ -43,18 +43,21 @@ namespace kamokan {
 		);
 
 	protected:
-		virtual boost::string_view page_basename() const override { assert(false); return boost::string_view(""); }
+		virtual boost::string_view page_basename() const override { return boost::string_view("saved"); }
 		virtual tawashi::HttpHeader make_success_response (std::string&& parPastieParam);
 
 	private:
 		typedef std::pair<boost::optional<std::string>, tawashi::HttpHeader> StringOrHeader;
 
 		virtual tawashi::HttpHeader on_process() override;
+		virtual void on_mustache_prepare (mstch::map& parContext) override;
 		StringOrHeader submit_to_storage (
 			const boost::string_view& parText,
 			uint32_t parExpiry,
 			const boost::string_view& parLang,
 			bool parSelfDestruct
 		);
+
+		std::string m_pastie_token;
 	};
 } //namespace kamokan

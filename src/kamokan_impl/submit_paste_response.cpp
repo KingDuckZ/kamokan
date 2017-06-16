@@ -29,6 +29,7 @@
 #include <boost/lexical_cast.hpp>
 #include <cstdint>
 #include <spdlog/spdlog.h>
+#include <utility>
 
 namespace kamokan {
 	namespace {
@@ -144,18 +145,22 @@ namespace kamokan {
 		//over invalid inputs
 		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
 		StringOrHeader submit_result = submit_to_storage(pastie, duration_int, lang, self_destruct);
-		const auto& token = submit_result.first;
+		const boost::optional<std::string>& token = submit_result.first;
 
 		if (token) {
+			m_pastie_token = std::move(*token);
 			std::ostringstream oss;
-			oss << *token;
+			oss << m_pastie_token;
 			if (not lang.empty())
 				oss << '?' << lang;
 
 			std::string redirect = oss.str();
-			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", *token, redirect);
+			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", m_pastie_token, redirect);
 
-			return this->make_success_response(std::move(redirect));
+			if (self_destruct)
+				return tawashi::make_header_type_html();
+			else
+				return this->make_success_response(std::move(redirect));
 		}
 		else {
 			statuslog->info("Empty pastie token (possibly due to a previous failure)");
@@ -181,5 +186,9 @@ namespace kamokan {
 	tawashi::HttpHeader SubmitPasteResponse::make_success_response (std::string&& parPastieParam) {
 		using tawashi::HttpStatusCodes;
 		return this->make_redirect(HttpStatusCodes::Code303_SeeOther, std::move(parPastieParam));
+	}
+
+	void SubmitPasteResponse::on_mustache_prepare (mstch::map& parContext) {
+		parContext["pastie_token"] = std::move(m_pastie_token);
 	}
 } //namespace kamokan
