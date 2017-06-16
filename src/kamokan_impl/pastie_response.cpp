@@ -27,10 +27,6 @@
 #include <sstream>
 #include <algorithm>
 #include <cassert>
-#include <boost/algorithm/string/find_iterator.hpp>
-#include <boost/range/iterator_range_core.hpp>
-#include <boost/algorithm/string/finder.hpp>
-#include <boost/range/adaptor/transformed.hpp>
 
 namespace kamokan {
 	namespace {
@@ -40,29 +36,6 @@ namespace kamokan {
 			//TODO: make sure the file exists or throw or do something
 			return parSettings.as<std::string>("highlight_css");
 		}
-
-		mstch::array pastie_to_numbered_lines (boost::string_view parPastie) {
-			using boost::string_view;
-			using string_view_iterator = string_view::const_iterator;
-			using boost::split_iterator;
-			using boost::token_finder;
-			using boost::adaptors::transformed;
-			using MatchRange = boost::iterator_range<string_view_iterator>;
-
-			int line_num = 1;
-			return boost::copy_range<mstch::array>(
-				boost::make_iterator_range(
-					split_iterator<string_view_iterator>(parPastie, token_finder([](char c){return '\n'==c;})),
-					split_iterator<string_view_iterator>()
-				) |
-				transformed([&line_num,parPastie](const MatchRange& r) {
-					return mstch::map {
-						{"number", line_num++},
-						{"line", parPastie.substr(r.begin() - parPastie.begin(), r.size())}
-					};
-				})
-			);
-		}
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (
@@ -70,23 +43,14 @@ namespace kamokan {
 		std::ostream* parStreamOut,
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
-		Response(parSettings, parStreamOut, parCgiEnv, true),
+		PastieRetrievingResponse(parSettings, parStreamOut, parCgiEnv),
 		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false),
-		m_syntax_highlight(true),
-		m_pastie_not_found(false),
-		m_token_invalid(false)
+		m_syntax_highlight(true)
 	{
 	}
 
-	tawashi::HttpHeader PastieResponse::on_process() {
-		using tawashi::ErrorReasons;
-
-		if (m_pastie_not_found)
-			return make_error_redirect(ErrorReasons::PastieNotFound);
-		if (m_token_invalid)
-			return make_error_redirect(ErrorReasons::InvalidToken);
-
+	tawashi::HttpHeader PastieResponse::on_retrieving_process() {
 		auto get = cgi_env().query_string_split();
 		const std::string& query_str(cgi_env().query_string());
 		if (get["m"] == "plain" or query_str.empty()) {
@@ -108,16 +72,7 @@ namespace kamokan {
 		return tawashi::make_header_type_html();
 	}
 
-	void PastieResponse::on_mustache_prepare (mstch::map& parContext) {
-		boost::string_view token = cgi::drop_arguments(cgi_env().request_uri_relative());
-		Storage::RetrievedPastie pastie_info =
-			storage().retrieve_pastie(token, settings().as<uint32_t>("max_token_length"));
-
-		m_token_invalid = not pastie_info.valid_token;
-		m_pastie_not_found = not pastie_info.pastie;
-		if (m_token_invalid or m_pastie_not_found)
-			return;
-
+	std::string PastieResponse::on_pastie_prepare (std::string&& parPastie) {
 		srchilite::SourceHighlight highlighter;
 		highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
 		highlighter.setGenerateEntireDoc(false);
@@ -134,14 +89,13 @@ namespace kamokan {
 
 		std::string processed_pastie;
 		if (m_syntax_highlight) {
-			//TODO: redirect to "pastie not found" if !pastie
-			processed_pastie = std::move(*pastie_info.pastie);
+			processed_pastie = std::move(parPastie);
 		}
 		else {
 			tawashi::Escapist houdini;
 			std::ostringstream oss;
 			oss << R"(<pre><tt><font color="#EDEDED">)";
-			oss << houdini.escape_html(*pastie_info.pastie) << "</font></tt></pre>\n";
+			oss << houdini.escape_html(parPastie) << "</font></tt></pre>\n";
 			processed_pastie = oss.str();
 		}
 
@@ -152,13 +106,7 @@ namespace kamokan {
 			processed_pastie = oss.str();
 		}
 
-		parContext["pastie"] = std::move(processed_pastie);
-		parContext["pastie_lines"] = pastie_to_numbered_lines(
-			boost::get<std::string>(parContext["pastie"])
-		);
-		parContext["self_destructed"] = pastie_info.self_destructed;
-		parContext["pastie_token"] = token;
-		parContext["pastie_page"] = true;
+		return processed_pastie;
 	}
 
 	std::string PastieResponse::on_mustache_retrieve() {

@@ -17,30 +17,28 @@
 
 #pragma once
 
-#include "pastie_retrieving_response.hpp"
+#include "response.hpp"
 #include <string>
-#include <boost/utility/string_view.hpp>
 
 namespace kamokan {
-	class PastieResponse final : public PastieRetrievingResponse {
+	class PastieRetrievingResponse : public Response {
 	public:
-		PastieResponse (
+		PastieRetrievingResponse (
 			const Kakoune::SafePtr<SettingsBag>& parSettings,
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 		);
 
 	protected:
-		virtual boost::string_view page_basename() const override { return boost::string_view("pastie"); }
+		bool pastie_not_found() const;
+		bool token_invalid() const;
 
 	private:
-		virtual std::string on_mustache_retrieve() override;
-		virtual std::string on_pastie_prepare (std::string&& parPastie) override;
-		virtual tawashi::HttpHeader on_retrieving_process() override;
+		virtual tawashi::HttpHeader on_process() override final;
+		virtual void on_mustache_prepare (mstch::map& parContext) override final;
+		virtual std::string on_pastie_prepare (std::string&& parPastie) = 0;
+		virtual tawashi::HttpHeader on_retrieving_process() = 0;
 
-		std::string m_lang_file;
-		std::string m_langmap_dir;
-		bool m_plain_text;
-		bool m_syntax_highlight;
+		Storage::RetrievedPastie m_pastie_info;
 	};
 } //namespace kamokan
