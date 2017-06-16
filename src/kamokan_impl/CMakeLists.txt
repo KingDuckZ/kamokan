@@ -20,6 +20,7 @@ add_library(${PROJECT_NAME} STATIC
 	quick_submit_paste_response.cpp
 	storage.cpp
 	string_conv.cpp
+	edit_response.cpp
 	pastie_retrieving_response.cpp
 )
 

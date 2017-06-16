@@ -21,6 +21,7 @@
 #include "pastie_response.hpp"
 #include "index_response.hpp"
 #include "error_response.hpp"
+#include "edit_response.hpp"
 #include "response_factory.hpp"
 #include "cgi_env.hpp"
 #include "ini_file.hpp"
@@ -140,6 +141,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 	using kamokan::QuickSubmitPasteResponse;
 	using kamokan::PastieResponse;
 	using kamokan::ErrorResponse;
+	using kamokan::EditResponse;
 	using kamokan::Response;
 	using tawashi::RequestMethodType;
 
@@ -168,6 +170,7 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 		resp_factory.register_maker("", RequestMethodType::POST, &make_response<QuickSubmitPasteResponse>);
 		resp_factory.register_maker("paste.cgi", RequestMethodType::POST, &make_response<SubmitPasteResponse>);
 		resp_factory.register_maker("error.cgi", RequestMethodType::GET, &make_response<ErrorResponse>);
+		resp_factory.register_maker("edit.cgi", RequestMethodType::GET, &make_response<EditResponse>);
 		resp_factory.register_jolly_maker(&make_response<PastieResponse>, RequestMethodType::GET);
 		resp_factory.set_app_start_time(app_start_time);
 
