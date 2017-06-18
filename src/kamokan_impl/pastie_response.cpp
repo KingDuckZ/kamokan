@@ -27,21 +27,81 @@
 #include <sstream>
 #include <algorithm>
 #include <cassert>
+#include <boost/algorithm/string/find_iterator.hpp>
+#include <boost/range/iterator_range_core.hpp>
+#include <boost/algorithm/string/finder.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 
 namespace kamokan {
 	namespace {
 		const char g_nolang_token[] = "colourless";
+
+		struct SplitHighlightedPastie {
+			std::string comment;
+			std::string text;
+		};
 
 		std::string highlight_css_path (const SettingsBag& parSettings) {
 			//TODO: make sure the file exists or throw or do something
 			return parSettings.as<std::string>("highlight_css");
 		}
 
-		std::string strip_tags_from_highlighted (const std::string& parPastie) {
-			boost::string_view pastie(parPastie);
-			auto beg_stripped = pastie.substr(pastie.find("<tt>") + 4);
-			auto end_stripped = beg_stripped.substr(0, beg_stripped.size() - 12);
-			return std::string(end_stripped);
+		SplitHighlightedPastie strip_tags_from_highlighted (std::string parPastie) {
+			//I'm expecting some comment at the beginning, like:
+			//		<!-- Generator: GNU source-highlight 3.1.8
+			//		by Lorenzo Bettini
+			//		http://www.lorenzobettini.it
+			//		http://www.gnu.org/software/src-highlite -->
+
+			SplitHighlightedPastie retval;
+			{
+				const auto comment_start = parPastie.find("<!--");
+				if (parPastie.npos != comment_start) {
+					const auto comment_len = parPastie.find("-->") - comment_start + 3;
+					retval.comment = parPastie.substr(comment_start, comment_len);
+					parPastie.erase(comment_start, comment_len);
+				}
+			}
+
+			{
+				const auto pre_start = parPastie.find("<pre><tt>");
+				if (parPastie.npos != pre_start) {
+					parPastie.erase(pre_start, 9);
+				}
+			}
+
+			{
+				const auto pre_cl_start = parPastie.find("</tt></pre>");
+				if (parPastie.npos != pre_cl_start) {
+					parPastie.erase(pre_cl_start, 11);
+				}
+			}
+
+			retval.text = std::move(parPastie);
+			return retval;
+		}
+
+		mstch::array pastie_to_numbered_lines (boost::string_view parPastie) {
+			using boost::string_view;
+			using string_view_iterator = string_view::const_iterator;
+			using boost::split_iterator;
+			using boost::token_finder;
+			using boost::adaptors::transformed;
+			using MatchRange = boost::iterator_range<string_view_iterator>;
+
+			int line_num = 1;
+			return boost::copy_range<mstch::array>(
+				boost::make_iterator_range(
+					split_iterator<string_view_iterator>(parPastie, token_finder([](char c){return '\n'==c;})),
+					split_iterator<string_view_iterator>()
+				) |
+				transformed([&line_num,parPastie](const MatchRange& r) {
+					return mstch::map {
+						{"number", line_num++},
+						{"line", parPastie.substr(r.begin() - parPastie.begin(), r.size())}
+					};
+				})
+			);
 		}
 	} //unnamed namespace
 
@@ -79,7 +139,7 @@ namespace kamokan {
 		return tawashi::make_header_type_html();
 	}
 
-	std::string PastieResponse::on_pastie_prepare (std::string&& parPastie) {
+	void PastieResponse::on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) {
 		srchilite::SourceHighlight highlighter;
 		highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
 		highlighter.setGenerateEntireDoc(false);
@@ -95,6 +155,7 @@ namespace kamokan {
 		highlighter.setGenerateLineNumbers(false);
 
 		std::string processed_pastie;
+		std::string highlight_comment;
 		if (m_syntax_highlight) {
 			processed_pastie = std::move(parPastie);
 		}
@@ -107,10 +168,16 @@ namespace kamokan {
 			std::istringstream iss(std::move(processed_pastie));
 			std::ostringstream oss;
 			highlighter.highlight(iss, oss, m_lang_file);
-			processed_pastie = strip_tags_from_highlighted(oss.str());
+			SplitHighlightedPastie split = strip_tags_from_highlighted(oss.str());
+			processed_pastie = std::move(split.text);
+			highlight_comment = std::move(split.comment);
 		}
 
-		return processed_pastie;
+		parContext["pastie"] = std::move(processed_pastie);
+		parContext["pastie_lines"] = pastie_to_numbered_lines(
+			boost::get<std::string>(parContext["pastie"])
+		);
+		parContext["highlight_comment"] = std::move(highlight_comment);
 	}
 
 	std::string PastieResponse::on_mustache_retrieve() {

@@ -36,8 +36,8 @@ namespace kamokan {
 	private:
 		virtual tawashi::HttpHeader on_process() override final;
 		virtual void on_mustache_prepare (mstch::map& parContext) override final;
-		virtual std::string on_pastie_prepare (std::string&& parPastie) = 0;
 		virtual tawashi::HttpHeader on_general_pastie_process() = 0;
+		virtual void on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) = 0;
 
 		Storage::RetrievedPastie m_pastie_info;
 	};
