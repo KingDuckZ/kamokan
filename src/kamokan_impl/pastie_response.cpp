@@ -40,7 +40,7 @@ namespace kamokan {
 		std::string strip_tags_from_highlighted (const std::string& parPastie) {
 			boost::string_view pastie(parPastie);
 			auto beg_stripped = pastie.substr(pastie.find("<tt>") + 4);
-			auto end_stripped = beg_stripped.substr(0, beg_stripped.size() - 11);
+			auto end_stripped = beg_stripped.substr(0, beg_stripped.size() - 12);
 			return std::string(end_stripped);
 		}
 	} //unnamed namespace
