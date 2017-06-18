@@ -15,12 +15,144 @@
  * along with "tawashi".  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//#define HTML_ESCAPE_WITH_HOUDINI
+
 #include "escapist.hpp"
 #include "houdini.h"
 #include <cstddef>
 #include <cassert>
+#if !defined(HTML_ESCAPE_WITH_HOUDINI)
+#	include <algorithm>
+#endif
 
 namespace tawashi {
+	namespace {
+#if !defined(HTML_ESCAPE_WITH_HOUDINI)
+		[[gnu::pure]]
+		uint32_t count_bits_set (uint32_t parVal) {
+			auto& v = parVal;
+			v = v - ((v >> 1) & 0x55555555); // reuse input as temporary
+			v = (v & 0x33333333) + ((v >> 2) & 0x33333333); // temp
+			return ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
+		}
+#endif
+
+#if !defined(HTML_ESCAPE_WITH_HOUDINI)
+		template <uint32_t I, char Haystack, char... HaystackRest>
+		struct find_impl {
+			static uint32_t find (char parNeedle) {
+				return (Haystack == parNeedle ?
+					I : find_impl<I + 1, HaystackRest...>::find(parNeedle)
+				);
+			}
+		};
+		template <uint32_t I, char Haystack>
+		struct find_impl<I, Haystack> {
+			static uint32_t find (char parNeedle) {
+				return (Haystack == parNeedle ? I : I + 1);
+			}
+		};
+		template <char... Haystack>
+		[[gnu::pure,gnu::flatten]]
+		uint32_t find (char parNeedle) {
+			return find_impl<0, Haystack...>::find(parNeedle);
+		}
+#endif
+
+#if !defined(HTML_ESCAPE_WITH_HOUDINI)
+		template <char... Needle, std::size_t... Sizes>
+		void slow_copy (const char* parSource, std::string& parDest, uint32_t parCount, const char (&...parWith)[Sizes]) {
+			std::array<const char*, sizeof...(Needle)> withs {parWith...};
+			std::array<uint32_t, sizeof...(Needle)> sizes {(static_cast<uint32_t>(Sizes) - 1)...};
+
+			for (uint32_t z = 0; z < parCount; ++z) {
+				const uint32_t match_index = find<Needle...>(parSource[z]);
+				if (sizeof...(Needle) > match_index)
+					parDest.append(withs[match_index], sizes[match_index]);
+				else
+					parDest.push_back(parSource[z]);
+			}
+		}
+#endif
+
+#if !defined(HTML_ESCAPE_WITH_HOUDINI)
+		template <char... Needle, std::size_t... Sizes>
+		std::string replace_with (const boost::string_view& parStr, const char (&...parWith)[Sizes]) {
+			//Setup data
+			static_assert(sizeof...(Needle) == sizeof...(Sizes), "Size mismatch");
+			const std::array<uint32_t, sizeof...(Needle)> packs = {
+				(compl static_cast<uint32_t>(0) / 0xFF * Needle)...
+			};
+			const std::array<char, sizeof...(Needle)> needles = { Needle... };
+			const std::array<unsigned int, sizeof...(Needle)> sizes = {
+				(static_cast<unsigned int>(Sizes) - 1)...
+			};
+
+			//Calculate the new string's size
+			const unsigned int pre_bytes = reinterpret_cast<uintptr_t>(parStr.data()) % alignof(decltype(packs[0]));
+			const unsigned int in_size = static_cast<unsigned int>(parStr.size());
+			unsigned int new_size = in_size;
+			unsigned int replace_count = 0;
+			for (unsigned int z = 0; z < pre_bytes; ++z) {
+				const auto needle_index = find<Needle...>(parStr[z]);
+				if (sizeof...(Needle) > needle_index) {
+					new_size += sizes[needle_index] - 1;
+					++replace_count;
+				}
+			}
+
+			assert(0 == (reinterpret_cast<uintptr_t>(parStr.data()) + pre_bytes) % alignof(decltype(packs[0])));
+			const uint32_t c1 = 0x01010101UL;
+			const uint32_t c2 = 0x80808080UL;
+			const unsigned int post_bytes = (in_size - pre_bytes) % alignof(decltype(packs[0]));
+			for (unsigned int z = pre_bytes; z < in_size - post_bytes; z += sizeof(packs[0])) {
+				const uint32_t& val = *reinterpret_cast<const uint32_t*>(parStr.data() + z);
+				for (unsigned int i = 0; i < sizeof...(Needle); ++i) {
+					const uint32_t t = val xor packs[i];
+					const uint32_t has_zero = (t - c1) bitand compl t bitand c2;
+					new_size += (sizes[i] - 1) * count_bits_set(has_zero);
+					replace_count += count_bits_set(has_zero);
+				}
+			}
+
+			for (unsigned int z = in_size - post_bytes; z < in_size; ++z) {
+				const auto needle_index = find<Needle...>(parStr[z]);
+				if (sizeof...(Needle) > needle_index) {
+					new_size += sizes[needle_index] - 1;
+					++replace_count;
+				}
+			}
+
+			if (not replace_count)
+				return std::string(parStr);
+
+			//Make the new string
+			std::string retval;
+			assert(new_size >= in_size);
+			retval.reserve(new_size);
+			slow_copy<Needle...>(parStr.data(), retval, pre_bytes, parWith...);
+			for (unsigned int z = pre_bytes; z < in_size - post_bytes; z += sizeof(packs[0])) {
+				const uint32_t& val = *reinterpret_cast<const uint32_t*>(parStr.data() + z);
+				uint32_t escape_bytes = 0;
+				for (uint32_t pack : packs) {
+					const uint32_t t = val xor pack;
+					escape_bytes = (t - c1) bitand compl t bitand c2;
+					if (escape_bytes)
+						break;
+				}
+				if (escape_bytes)
+					slow_copy<Needle...>(parStr.data() + z, retval, sizeof(packs[0]), parWith...);
+				else
+					retval.append(parStr.data() + z, sizeof(packs[0]));
+			}
+			slow_copy<Needle...>(parStr.data() + in_size - post_bytes, retval, post_bytes, parWith...);
+
+			assert(new_size == retval.size());
+			return retval;
+		}
+#endif
+	} //unnamed namespace
+
 	Escapist::Escapist() :
 		m_gh_buf(new(&m_gh_buf_mem) gh_buf GH_BUF_INIT)
 	{
@@ -75,6 +207,7 @@ namespace tawashi {
 		if (parHtml.empty())
 			return std::string();
 
+#if defined(HTML_ESCAPE_WITH_HOUDINI)
 		assert(m_gh_buf);
 		gh_buf* const buf = static_cast<gh_buf*>(m_gh_buf);
 
@@ -88,5 +221,8 @@ namespace tawashi {
 			return std::string(parHtml);
 		else
 			return std::string(buf->ptr, buf->size);
+#else
+		return replace_with<'&', '>', '<', '/', '"', '\''>(parHtml, "&amp;", "&gt;", "&lt;", "&#x2F;", "&quot;", "&#x27;");
+#endif
 	}
 } //namespace tawashi
