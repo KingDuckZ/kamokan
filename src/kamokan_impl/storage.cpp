@@ -177,7 +177,7 @@ namespace kamokan {
 
 		opt_string_list pastie_reply = m_redis->hmget(parToken, "pastie", "selfdes");
 		retval.pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
-		opt_string selfdes = (pastie_reply and not pastie_reply->size() > 1 ? (*pastie_reply)[1] : opt_string());
+		opt_string selfdes = (pastie_reply and pastie_reply->size() > 1 ? (*pastie_reply)[1] : opt_string());
 
 		if (selfdes and string_conv<bool>(*selfdes)) {
 			const bool deleted = m_redis->del(parToken);
