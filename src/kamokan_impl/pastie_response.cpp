@@ -178,6 +178,7 @@ namespace kamokan {
 			boost::get<std::string>(parContext["pastie"])
 		);
 		parContext["highlight_comment"] = std::move(highlight_comment);
+		parContext["colourless"] = not m_syntax_highlight;
 	}
 
 	std::string PastieResponse::on_mustache_retrieve() {
