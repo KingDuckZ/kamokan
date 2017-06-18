@@ -69,6 +69,7 @@ namespace kamokan {
 		virtual tawashi::HttpHeader on_process();
 		virtual void on_mustache_prepare (mstch::map& parContext);
 		virtual std::string on_mustache_retrieve();
+		virtual bool is_submit_page() { return false; }
 
 		Storage m_storage;
 		Kakoune::SafePtr<cgi::Env> m_cgi_env;

@@ -67,7 +67,6 @@ namespace kamokan {
 
 		parContext["self_destructed"] = m_pastie_info.self_destructed;
 		parContext["pastie_token"] = get_search_token(cgi_env());
-		parContext["pastie_page"] = true;
 
 		this->on_general_mustache_prepare(std::move(*m_pastie_info.pastie), parContext);
 	}

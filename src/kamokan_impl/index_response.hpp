@@ -31,6 +31,7 @@ namespace kamokan {
 
 	protected:
 		virtual boost::string_view page_basename() const override { return boost::string_view("index"); }
+		virtual bool is_submit_page() override { return true; }
 
 	private:
 	};
