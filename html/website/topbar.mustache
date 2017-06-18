@@ -1,13 +1,22 @@
 	<div id="topbar">
-		<p id="version">kamokan {{version}}</p>
-		<a href="{{base_uri}}"><img src="Pictures/kamokan-icon.png" alt="kamokan icon" class="icon"></a>
-		<a href="save.html"><input type="image" src="Pictures/save-ink.png" alt="Submit" class="icon-green" title="Paste"/></a>
+		<p id="version">KamoKan</p>
+		<a href="{{host_path}}/"><img src="{{host_path}}/Pictures/kamokan-icon-gt.png" alt="kamokan icon" class="icon"></a>
+
+		{{#pastie_page}}
+		<img src="{{host_path}}/Pictures/save-grey.png" alt="no-submit" class="icon-green">
+		{{/pastie_page}}
+
+		{{^pastie_page}}
+		<a href="save.html"><input type="image" src="{{host_path}}/Pictures/save-ink.png" alt="Submit" class="icon-green" title="Paste"/></a>
+		{{/pastie_page}}
 
 		<a href="save.html" class="submit-mobile"><input type="submit" title="Paste"/></a>
 
-		<a href="{{base_uri}}"><img src="Pictures/new-ink.png" alt="new icon" class="icon-green" title="New"/></a>
-		<a href="edit.html"><img src="Pictures/edit-ink.png" alt="duplicate and edit icon" class="icon-green" title="Duplicate and Edit"/></a>
-		<a href="text.html"><img src="Pictures/text-ink.png" alt="text icon" class="icon-green" title="Text only"/></a>
+		<a href="{{host_path}}/"><img src="{{host_path}}/Pictures/new-ink.png" alt="new icon" class="icon-green" title="New"/></a>
+
+      {{#pastie_page}}
+		<a href="{{host_path}}/{{pastie_token}}"><img src="{{host_path}}/Pictures/text-ink.png" alt="text icon" class="icon-green" title="Text only"/></a>
+      {{/pastie_page}}
 
 		{{> github }}
 

@@ -1,11 +1,25 @@
-{{>head}}
+{{> head}}
 <body>
-
+	<div id="page">
 	{{> topbar}}
 
-	<div id="content">
-		{{pastie}}
+		<div class="wrap">
+		{{#pastie_lines}}
+			<div class="mar-pad0">
+
+				<div id="numbers" class="mar-pad0">
+				<p class="mar-pad0">{{number}}</p>
+				</div>
+
+				<div id="lines" class="mar-pad0">
+				<li id="code">{{line}}</li>
+				</div>
+
+			</div>
+	{{/pastie_lines}}
+		</div>
 	</div>
+	{{> footer}}
 
 </body>
 </html>

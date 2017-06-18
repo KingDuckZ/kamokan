@@ -1,19 +1,19 @@
 {{> head}}
 <body>
-	<form action="{{base_uri}}/paste.cgi" method="post" accept-charset="UTF-8">
+	<form id="page" action="{{base_uri}}/paste.cgi" method="post" accept-charset="UTF-8">
 
 	{{> topbar}}
 
 	<div id="content">
-		<textarea type="text" id="PasteTextBox" name="pastie" placeholder=">Text..." autofocus required autocomplete="off" name="text"></textarea>
+		<textarea type="text" class="wrap" id="PasteTextBox" name="pastie" placeholder=">Text..." autofocus required autocomplete="off" name="text">ciao a tutti</textarea>
 	</div>
 
-	<div>
+	<div id="button">
 		<p class="title">Syntax Highlighting:</p>
 			<select name="lang" class="selectBox">
 				<option value="colourless" selected="selected">None  </option>
 				{{#languages}}
-				<option value="{{language_name}}">{{language_name}}</option>
+				<option value="{{language_name}}" >{{language_name}}</option>
 				{{/languages}}
 			</select>
 
@@ -21,15 +21,18 @@
 			<select name="ttl" class="selectBox">
 				<option value="600">10 minutes</option>
 				<option value="3600">1 hour</option>
-				<option value="86400" selected="selected">1 day</option>
-				<option value="604800">1 week</option>
+				<option value="86400" >1 day</option>
+				<option value="604800" selected="selected">1 week</option>
 				<option value="1209600">2 weeks</option>
 				<option value="2628000">1 month</option>
 			</select>
+
+		 <input type="checkbox" name="selfdes" value="1"><p id="delete">Delete this text as soon as it has been read.</p>
 	</div>
 
-</form>
+	</form>
 
+	{{> footer}}
 
 </body>
 </html>

@@ -1,19 +1,15 @@
 
 html {
 	height: 100%;
+	margin: 0px;
+	padding: 0px;
 }
 
-/* Tell the browser to render HTML5 elements as block */
-header, footer, aside, nav, article {
-    display: block;
-}
-
-/*caratteristiche generali di tutto il body*/
 body {
     font-family: Helvetica, Arial, sans-serif;
     background: #303030;
-    height: 100%;
-    margin: 10px;
+    margin: 0px;
+    padding-top: 0px;
 }
 
 /*style della barra di navigazione*/
@@ -28,17 +24,16 @@ body {
 	margin: 0;
 	padding: 0;
 	width: 100%;
-	height: 70%;
 }
 
-form {
-	height: 100%;
+#page {
+	margin: 10px;
 }
 
 #version{
 	margin: 0px;
 	padding: 0px 0px;
-	color: RGBA(0, 146, 0, 255);
+	color: RGBA(0, 242, 0, 1);
 	font-weight: bold;
 	font-size: 17px;
 }
@@ -55,18 +50,33 @@ form {
 	float: right;
 }
 
-#PasteTextBox{
-   margin: 20px;
-   border: 0px;
+.wrap {
+	margin: 20px;
+}
+
+#PasteTextBox {
    background-color: #303030;
    color: #EDEDED;
    resize: none;
+   height: calc(95vh - 200px);
+   width: 95%;
+}
+
+#button {
+	margin: 0px 20px 20px 20px;
 }
 
 .title{
 	display: inline-block;
 	color: #EDEDED;
 	font-weight: bold;
+	font-size: 17px;
+}
+
+#delete {
+	font-size: 17px;
+	color: #EDEDED;
+	display: inline;
 }
 
 .selectBox {
@@ -86,4 +96,39 @@ form {
 .error {
 	font-size: 28px;
 	text-align: center;
+}
+
+footer  {
+	margin-left: 30px;
+	bottom: 5px;
+	position: fixed;
+	font-size: 15px;
+	color: #EDEDED;
+}
+
+#numbers {
+	display: table-cell;
+	color: #EDEDED;
+	font-family: monospace;
+	width: 40px;
+	vertical-align: bottom;
+	border: solid red 1px;
+}
+
+#lines {
+	display: table-cell;
+	font-family: monospace;
+	border: solid green 1px;
+}
+
+#code {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px;
+	white-space: pre;
+}
+
+.mar-pad0 {
+	margin: 0px;
+	padding: 0px;
 }
