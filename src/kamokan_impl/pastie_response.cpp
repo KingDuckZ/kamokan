@@ -36,6 +36,13 @@ namespace kamokan {
 			//TODO: make sure the file exists or throw or do something
 			return parSettings.as<std::string>("highlight_css");
 		}
+
+		std::string strip_tags_from_highlighted (const std::string& parPastie) {
+			boost::string_view pastie(parPastie);
+			auto beg_stripped = pastie.substr(pastie.find("<tt>") + 4);
+			auto end_stripped = beg_stripped.substr(0, beg_stripped.size() - 11);
+			return std::string(end_stripped);
+		}
 	} //unnamed namespace
 
 	PastieResponse::PastieResponse (
@@ -100,7 +107,7 @@ namespace kamokan {
 			std::istringstream iss(std::move(processed_pastie));
 			std::ostringstream oss;
 			highlighter.highlight(iss, oss, m_lang_file);
-			processed_pastie = oss.str();
+			processed_pastie = strip_tags_from_highlighted(oss.str());
 		}
 
 		return processed_pastie;
