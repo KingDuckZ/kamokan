@@ -65,8 +65,11 @@ namespace kamokan {
 		assert(not token_invalid());
 		assert(not pastie_not_found());
 
+		auto pastie_lang = (m_pastie_info.lang ? boost::string_view(*m_pastie_info.lang) : boost::string_view());
 		parContext["self_destructed"] = m_pastie_info.self_destructed;
 		parContext["pastie_token"] = get_search_token(cgi_env());
+		parContext["pastie_lang"] = pastie_lang;
+		parContext["colourless"] = pastie_lang.empty() or pastie_lang == "colourless";
 
 		this->on_general_mustache_prepare(std::move(*m_pastie_info.pastie), parContext);
 	}
@@ -78,5 +81,12 @@ namespace kamokan {
 
 	bool GeneralPastieResponse::pastie_not_found() const {
 		return not m_pastie_info.pastie;
+	}
+
+	std::string GeneralPastieResponse::default_pastie_lang() {
+		if (m_pastie_info.lang)
+			return *m_pastie_info.lang;
+		else
+			return std::string();
 	}
 } //namespace kamokan

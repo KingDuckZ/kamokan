@@ -77,11 +77,15 @@ namespace kamokan {
 			return boost::make_optional(buffer.str());
 		}
 
-		mstch::array make_mstch_langmap (const SettingsBag& parSettings) {
+		mstch::array make_mstch_langmap (const SettingsBag& parSettings, const std::string& parSelected) {
 			mstch::array retval;
 
 			for (auto&& lang : list_highlight_langs(parSettings)) {
-				retval.push_back(mstch::map{{"language_name", std::move(lang)}});
+				const bool selected = (parSelected == lang);
+				retval.push_back(mstch::map{
+					{"language_name", std::move(lang)},
+					{"language_selected", selected}
+				});
 			}
 			return retval;
 		}
@@ -173,13 +177,13 @@ namespace kamokan {
 
 		statuslog->info("Sending response");
 		SPDLOG_TRACE(statuslog, "Preparing mustache dictionary");
+		const bool is_submit_page = this->is_submit_page();
 		mstch::map mustache_context {
-			{"submit_page", this->is_submit_page()},
+			{"submit_page", is_submit_page},
 			{"version", boost::string_view{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
 			{"tawashi_version", tawashi::version()},
 			{"base_uri", base_uri()},
-			{"host_path", make_host_path(this->settings())},
-			{"languages", make_mstch_langmap(*m_settings)}
+			{"host_path", make_host_path(this->settings())}
 		};
 
 		m_storage.finalize_connection();
@@ -187,6 +191,11 @@ namespace kamokan {
 		SPDLOG_TRACE(statuslog, "Raising event on_process");
 		tawashi::HttpHeader http_header = this->on_process();
 		*m_stream_out << http_header;
+
+		if (is_submit_page) {
+			SPDLOG_TRACE(statuslog, "Adding language list to mustache context");
+			mustache_context["languages"] = make_mstch_langmap(*m_settings, this->default_pastie_lang());
+		}
 
 		if (http_header.body_required()) {
 			using std::chrono::steady_clock;
@@ -274,5 +283,9 @@ namespace kamokan {
 	void Response::set_app_start_time (const std::chrono::time_point<std::chrono::steady_clock>& parTime) {
 		assert(parTime <= m_time0);
 		m_time0 = parTime;
+	}
+
+	std::string Response::default_pastie_lang() {
+		return std::string();
 	}
 } //namespace kamokan

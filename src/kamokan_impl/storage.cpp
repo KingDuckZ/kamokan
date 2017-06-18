@@ -82,6 +82,7 @@ namespace kamokan {
 
 	Storage::RetrievedPastie::RetrievedPastie() :
 		pastie(),
+		lang(),
 		self_destructed(false),
 		valid_token(false)
 	{
@@ -175,9 +176,10 @@ namespace kamokan {
 		if (not retval.valid_token)
 			return retval;
 
-		opt_string_list pastie_reply = m_redis->hmget(parToken, "pastie", "selfdes");
+		opt_string_list pastie_reply = m_redis->hmget(parToken, "pastie", "selfdes", "lang");
 		retval.pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
 		opt_string selfdes = (pastie_reply and pastie_reply->size() > 1 ? (*pastie_reply)[1] : opt_string());
+		retval.lang = (pastie_reply and pastie_reply->size() > 2 ? (*pastie_reply)[2] : opt_string());
 
 		if (selfdes and string_conv<bool>(*selfdes)) {
 			const bool deleted = m_redis->del(parToken);

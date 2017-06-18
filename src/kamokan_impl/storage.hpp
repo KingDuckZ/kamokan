@@ -45,6 +45,7 @@ namespace kamokan {
 			~RetrievedPastie() = default;
 
 			boost::optional<std::string> pastie;
+			boost::optional<std::string> lang;
 			bool self_destructed;
 			bool valid_token;
 		};

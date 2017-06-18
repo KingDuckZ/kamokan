@@ -69,6 +69,7 @@ namespace kamokan {
 		virtual tawashi::HttpHeader on_process();
 		virtual void on_mustache_prepare (mstch::map& parContext);
 		virtual std::string on_mustache_retrieve();
+		virtual std::string default_pastie_lang();
 		virtual bool is_submit_page() { return false; }
 
 		Storage m_storage;
