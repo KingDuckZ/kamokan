@@ -93,10 +93,7 @@ namespace kamokan {
 		}
 		else {
 			tawashi::Escapist houdini;
-			std::ostringstream oss;
-			oss << R"(<pre><tt><font color="#EDEDED">)";
-			oss << houdini.escape_html(parPastie) << "</font></tt></pre>\n";
-			processed_pastie = oss.str();
+			processed_pastie = houdini.escape_html(parPastie);
 		}
 
 		if (not m_plain_text and m_syntax_highlight) {
