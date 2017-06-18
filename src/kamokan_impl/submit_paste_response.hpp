@@ -59,5 +59,6 @@ namespace kamokan {
 		);
 
 		std::string m_pastie_token;
+		boost::string_view m_pastie_lang;
 	};
 } //namespace kamokan

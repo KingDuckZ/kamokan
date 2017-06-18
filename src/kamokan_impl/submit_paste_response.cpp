@@ -101,7 +101,6 @@ namespace kamokan {
 		using tawashi::ErrorReasons;
 
 		boost::string_view pastie;
-		boost::string_view lang;
 		boost::string_view duration;
 		bool self_destruct;
 
@@ -112,7 +111,7 @@ namespace kamokan {
 		try {
 			auto& post = this->cgi_post();
 			pastie = get_value_from_post(post, make_string_view(g_post_key));
-			lang = get_value_from_post_log_failure(post, make_string_view(g_language_key));
+			m_pastie_lang = get_value_from_post_log_failure(post, make_string_view(g_language_key));
 			duration = get_value_from_post_log_failure(post, make_string_view(g_duration_key));
 			self_destruct = string_conv<bool>(get_value_from_post_log_failure(post, make_string_view(g_self_destruct)));
 		}
@@ -144,15 +143,15 @@ namespace kamokan {
 		//TODO: replace boost's lexical_cast with mine when I have some checks
 		//over invalid inputs
 		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
-		StringOrHeader submit_result = submit_to_storage(pastie, duration_int, lang, self_destruct);
+		StringOrHeader submit_result = submit_to_storage(pastie, duration_int, m_pastie_lang, self_destruct);
 		const boost::optional<std::string>& token = submit_result.first;
 
 		if (token) {
 			m_pastie_token = std::move(*token);
 			std::ostringstream oss;
 			oss << m_pastie_token;
-			if (not lang.empty())
-				oss << '?' << lang;
+			if (not m_pastie_lang.empty())
+				oss << '?' << m_pastie_lang;
 
 			std::string redirect = oss.str();
 			statuslog->info("Pastie token=\"{}\" redirect=\"{}\"", m_pastie_token, redirect);
@@ -190,5 +189,6 @@ namespace kamokan {
 
 	void SubmitPasteResponse::on_mustache_prepare (mstch::map& parContext) {
 		parContext["pastie_token"] = std::move(m_pastie_token);
+		parContext["pastie_lang"] = std::move(m_pastie_lang);
 	}
 } //namespace kamokan
