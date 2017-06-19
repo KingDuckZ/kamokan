@@ -90,6 +90,9 @@ namespace kamokan {
 			using boost::adaptors::transformed;
 			using MatchRange = boost::iterator_range<string_view_iterator>;
 
+			if (not parPastie.empty() and parPastie[parPastie.size() - 1] == '\n')
+				parPastie = parPastie.substr(0, parPastie.size() - 1);
+
 			int line_num = 1;
 			return boost::copy_range<mstch::array>(
 				boost::make_iterator_range(
