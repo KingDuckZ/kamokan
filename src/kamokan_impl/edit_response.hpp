@@ -36,6 +36,6 @@ namespace kamokan {
 	private:
 		virtual void on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) override;
 		virtual tawashi::HttpHeader on_general_pastie_process() override;
-		virtual bool is_submit_page() override { return true; }
+		virtual bool is_submit_page() const override { return true; }
 	};
 } //namespace kamokan
