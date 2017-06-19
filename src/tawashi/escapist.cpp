@@ -25,10 +25,26 @@
 #	include <algorithm>
 #endif
 #include <climits>
+#include <type_traits>
 
 namespace tawashi {
 	namespace {
+		typedef uint_fast32_t uint;
+
 #if !defined(HTML_ESCAPE_WITH_HOUDINI)
+		template <typename T>
+		[[gnu::pure]]
+		T count_bits_set (T parVal) {
+			static_assert(std::is_integral<T>::value and std::is_unsigned<T>::value, "Type T must be an unsigned int");
+			static_assert(sizeof(T) != sizeof(uint32_t), "The specialization should have been chosen");
+			auto& v = parVal;
+			v = v - ((v >> 1) & (T)~(T)0/3);                           // temp
+			v = (v & (T)~(T)0/15*3) + ((v >> 2) & (T)~(T)0/15*3);      // temp
+			v = (v + (v >> 4)) & (T)~(T)0/255*15;                      // temp
+			return (T)(v * ((T)~(T)0/255)) >> (sizeof(T) - 1) * CHAR_BIT; // count
+		}
+
+		template <>
 		[[gnu::pure]]
 		uint32_t count_bits_set (uint32_t parVal) {
 			auto& v = parVal;
@@ -39,35 +55,35 @@ namespace tawashi {
 #endif
 
 #if !defined(HTML_ESCAPE_WITH_HOUDINI)
-		template <uint32_t I, char Haystack, char... HaystackRest>
+		template <int I, char Haystack, char... HaystackRest>
 		struct find_impl {
-			static uint32_t find (char parNeedle) {
+			static int find (char parNeedle) {
 				return (Haystack == parNeedle ?
 					I : find_impl<I + 1, HaystackRest...>::find(parNeedle)
 				);
 			}
 		};
-		template <uint32_t I, char Haystack>
+		template <int I, char Haystack>
 		struct find_impl<I, Haystack> {
-			static uint32_t find (char parNeedle) {
+			static int find (char parNeedle) {
 				return (Haystack == parNeedle ? I : I + 1);
 			}
 		};
 		template <char... Haystack>
 		[[gnu::pure,gnu::flatten]]
-		uint32_t find (char parNeedle) {
+		int find (char parNeedle) {
 			return find_impl<0, Haystack...>::find(parNeedle);
 		}
 #endif
 
 #if !defined(HTML_ESCAPE_WITH_HOUDINI)
 		template <char... Needle, std::size_t... Sizes>
-		void slow_copy (const char* parSource, std::string& parDest, uint32_t parCount, const char (&...parWith)[Sizes]) {
+		void slow_copy (const char* parSource, std::string& parDest, int parCount, const char (&...parWith)[Sizes]) {
 			std::array<const char*, sizeof...(Needle)> withs {parWith...};
-			std::array<uint32_t, sizeof...(Needle)> sizes {(static_cast<uint32_t>(Sizes) - 1)...};
+			std::array<uint16_t, sizeof...(Needle)> sizes {(static_cast<uint16_t>(Sizes) - 1)...};
 
-			for (uint32_t z = 0; z < parCount; ++z) {
-				const uint32_t match_index = find<Needle...>(parSource[z]);
+			for (int z = 0; z < parCount; ++z) {
+				const int match_index = find<Needle...>(parSource[z]);
 				if (sizeof...(Needle) > match_index)
 					parDest.append(withs[match_index], sizes[match_index]);
 				else
@@ -78,7 +94,7 @@ namespace tawashi {
 		void expand (const char* parSource, std::string& parDest, P parWhich, const char (&...parWith)[Sizes]) {
 			static_assert(sizeof...(Needle) + 1 <= 0xFF, "Too many search chars, their indices won't fit in a byte");
 			std::array<const char*, sizeof...(Needle)> withs {parWith...};
-			std::array<uint32_t, sizeof...(Needle)> sizes {(static_cast<uint32_t>(Sizes) - 1)...};
+			std::array<uint16_t, sizeof...(Needle)> sizes {(static_cast<uint16_t>(Sizes) - 1)...};
 
 			for (unsigned int z = 0; z < sizeof(P) * CHAR_BIT; z += CHAR_BIT) {
 				const auto curr = 0xFF bitand (parWhich >> z);
@@ -95,12 +111,12 @@ namespace tawashi {
 		std::string replace_with (const boost::string_view& parStr, const char (&...parWith)[Sizes]) {
 			//Setup data
 			static_assert(sizeof...(Needle) == sizeof...(Sizes), "Size mismatch");
-			const std::array<uint32_t, sizeof...(Needle)> packs = {
-				(compl static_cast<uint32_t>(0) / 0xFF * Needle)...
+			const std::array<uint, sizeof...(Needle)> packs = {
+				(compl static_cast<uint>(0) / 0xFF * Needle)...
 			};
 			const std::array<char, sizeof...(Needle)> needles = { Needle... };
-			const std::array<unsigned int, sizeof...(Needle)> sizes = {
-				(static_cast<unsigned int>(Sizes) - 1)...
+			const std::array<uint16_t, sizeof...(Needle)> sizes = {
+				(static_cast<uint16_t>(Sizes) - 1)...
 			};
 
 			//Calculate the new string's size
@@ -121,18 +137,18 @@ namespace tawashi {
 			}
 
 			assert(0 == (reinterpret_cast<uintptr_t>(parStr.data()) + pre_bytes) % alignof(decltype(packs[0])) or 0 == mid_bytes);
-			const uint32_t c1 = 0x01010101UL;
-			const uint32_t c2 = 0x80808080UL;
+			const uint c1 = compl static_cast<uint>(0) / 0xFF * 0x01; //0x01010101UL;
+			const uint c2 = compl static_cast<uint>(0) / 0xFF * 0x80; //0x80808080UL;
 			assert(inp_size >= pre_bytes + mid_bytes);
 			const unsigned int post_bytes = inp_size - pre_bytes - mid_bytes;
 			assert(post_bytes < alignof(decltype(packs[0])));
 			assert(post_bytes == (inp_size - pre_bytes) % alignof(decltype(packs[0])));
 			assert(inp_size == pre_bytes + mid_bytes + post_bytes);
 			for (unsigned int z = pre_bytes; z < inp_size - post_bytes; z += sizeof(packs[0])) {
-				const uint32_t& val = *reinterpret_cast<const uint32_t*>(parStr.data() + z);
+				const uint& val = *reinterpret_cast<const uint*>(parStr.data() + z);
 				for (unsigned int i = 0; i < sizeof...(Needle); ++i) {
-					const uint32_t t = val xor packs[i];
-					const uint32_t has_zero = (t - c1) bitand compl t bitand c2;
+					const uint t = val xor packs[i];
+					const uint has_zero = (t - c1) bitand compl t bitand c2;
 					new_size += (sizes[i] - 1) * count_bits_set(has_zero);
 					replace_count += count_bits_set(has_zero);
 				}
@@ -155,12 +171,12 @@ namespace tawashi {
 			retval.reserve(new_size);
 			slow_copy<Needle...>(parStr.data(), retval, pre_bytes, parWith...);
 			for (unsigned int z = pre_bytes; z < inp_size - post_bytes; z += sizeof(packs[0])) {
-				const uint32_t& val = *reinterpret_cast<const uint32_t*>(parStr.data() + z);
-				uint32_t escape_bytes = 0;
+				const uint& val = *reinterpret_cast<const uint*>(parStr.data() + z);
+				uint escape_bytes = 0;
 				uint8_t char_index = 1; //indices are 1-based
-				for (uint32_t pack : packs) {
-					const uint32_t t = val xor pack;
-					const uint32_t placeholders = ((t - c1) bitand compl t bitand c2) >> 7;
+				for (uint pack : packs) {
+					const uint t = val xor pack;
+					const uint placeholders = ((t - c1) bitand compl t bitand c2) >> 7;
 					assert((escape_bytes bitand (placeholders * 0xFF)) == 0);
 					escape_bytes |= placeholders * char_index++;
 				}
