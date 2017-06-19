@@ -89,9 +89,13 @@ namespace tawashi {
 			};
 
 			//Calculate the new string's size
-			const unsigned int pre_bytes = reinterpret_cast<uintptr_t>(parStr.data()) % alignof(decltype(packs[0]));
-			const unsigned int in_size = static_cast<unsigned int>(parStr.size());
-			unsigned int new_size = in_size;
+			const std::size_t front_padding = (alignof(decltype(packs[0])) - reinterpret_cast<uintptr_t>(parStr.data()) % alignof(decltype(packs[0]))) % alignof(decltype(packs[0]));
+			const unsigned int pre_bytes = std::min(front_padding, parStr.size());
+			assert(pre_bytes < alignof(decltype(packs[0])));
+			const unsigned int inp_size = static_cast<unsigned int>(parStr.size());
+			const unsigned int mid_bytes = (inp_size - pre_bytes) - (inp_size - pre_bytes) % alignof(decltype(packs[0]));
+			assert(0 == mid_bytes % alignof(decltype(packs[0])));
+			unsigned int new_size = inp_size;
 			unsigned int replace_count = 0;
 			for (unsigned int z = 0; z < pre_bytes; ++z) {
 				const auto needle_index = find<Needle...>(parStr[z]);
@@ -101,11 +105,15 @@ namespace tawashi {
 				}
 			}
 
-			assert(0 == (reinterpret_cast<uintptr_t>(parStr.data()) + pre_bytes) % alignof(decltype(packs[0])));
+			assert(0 == (reinterpret_cast<uintptr_t>(parStr.data()) + pre_bytes) % alignof(decltype(packs[0])) or 0 == mid_bytes);
 			const uint32_t c1 = 0x01010101UL;
 			const uint32_t c2 = 0x80808080UL;
-			const unsigned int post_bytes = (in_size - pre_bytes) % alignof(decltype(packs[0]));
-			for (unsigned int z = pre_bytes; z < in_size - post_bytes; z += sizeof(packs[0])) {
+			assert(inp_size >= pre_bytes + mid_bytes);
+			const unsigned int post_bytes = inp_size - pre_bytes - mid_bytes;
+			assert(post_bytes < alignof(decltype(packs[0])));
+			assert(post_bytes == (inp_size - pre_bytes) % alignof(decltype(packs[0])));
+			assert(inp_size == pre_bytes + mid_bytes + post_bytes);
+			for (unsigned int z = pre_bytes; z < inp_size - post_bytes; z += sizeof(packs[0])) {
 				const uint32_t& val = *reinterpret_cast<const uint32_t*>(parStr.data() + z);
 				for (unsigned int i = 0; i < sizeof...(Needle); ++i) {
 					const uint32_t t = val xor packs[i];
@@ -115,7 +123,7 @@ namespace tawashi {
 				}
 			}
 
-			for (unsigned int z = in_size - post_bytes; z < in_size; ++z) {
+			for (unsigned int z = inp_size - post_bytes; z < inp_size; ++z) {
 				const auto needle_index = find<Needle...>(parStr[z]);
 				if (sizeof...(Needle) > needle_index) {
 					new_size += sizes[needle_index] - 1;
@@ -128,10 +136,10 @@ namespace tawashi {
 
 			//Make the new string
 			std::string retval;
-			assert(new_size >= in_size);
+			assert(new_size >= inp_size);
 			retval.reserve(new_size);
 			slow_copy<Needle...>(parStr.data(), retval, pre_bytes, parWith...);
-			for (unsigned int z = pre_bytes; z < in_size - post_bytes; z += sizeof(packs[0])) {
+			for (unsigned int z = pre_bytes; z < inp_size - post_bytes; z += sizeof(packs[0])) {
 				const uint32_t& val = *reinterpret_cast<const uint32_t*>(parStr.data() + z);
 				uint32_t escape_bytes = 0;
 				for (uint32_t pack : packs) {
@@ -145,7 +153,7 @@ namespace tawashi {
 				else
 					retval.append(parStr.data() + z, sizeof(packs[0]));
 			}
-			slow_copy<Needle...>(parStr.data() + in_size - post_bytes, retval, post_bytes, parWith...);
+			slow_copy<Needle...>(parStr.data() + inp_size - post_bytes, retval, post_bytes, parWith...);
 
 			assert(new_size == retval.size());
 			return retval;

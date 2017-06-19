@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
 	../data/UTF-8-test.txt.c
 	test_invalid_utf8_get.cpp
 	test_mime_split.cpp
+	test_html_escape.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
