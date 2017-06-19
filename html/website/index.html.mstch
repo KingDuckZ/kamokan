@@ -5,7 +5,7 @@
 	{{> topbar}}
 
 	<div id="content">
-		<textarea type="text" class="wrap" id="PasteTextBox" name="pastie" placeholder=">Text..." autofocus required autocomplete="off" name="text">ciao a tutti</textarea>
+		<textarea type="text" class="wrap" id="PasteTextBox" name="pastie" placeholder=">Text..." autofocus required autocomplete="off" name="text"></textarea>
 	</div>
 
 	<div id="button">
