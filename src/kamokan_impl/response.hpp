@@ -71,6 +71,7 @@ namespace kamokan {
 		virtual std::string on_mustache_retrieve();
 		virtual std::string default_pastie_lang();
 		virtual bool is_submit_page() { return false; }
+		virtual bool is_pastie_page() const { return false; }
 
 		Storage m_storage;
 		Kakoune::SafePtr<cgi::Env> m_cgi_env;

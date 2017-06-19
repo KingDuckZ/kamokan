@@ -178,12 +178,14 @@ namespace kamokan {
 		statuslog->info("Sending response");
 		SPDLOG_TRACE(statuslog, "Preparing mustache dictionary");
 		const bool is_submit_page = this->is_submit_page();
+		const bool is_pastie_page = this->is_pastie_page();
 		mstch::map mustache_context {
 			{"submit_page", is_submit_page},
 			{"version", boost::string_view{STRINGIZE(VERSION_MAJOR) "." STRINGIZE(VERSION_MINOR) "." STRINGIZE(VERSION_PATCH)}},
 			{"tawashi_version", tawashi::version()},
 			{"base_uri", base_uri()},
-			{"host_path", make_host_path(this->settings())}
+			{"host_path", make_host_path(this->settings())},
+			{"pastie_page", is_pastie_page}
 		};
 
 		m_storage.finalize_connection();
