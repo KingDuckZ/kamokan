@@ -59,7 +59,8 @@ namespace kamokan {
 				if (parPastie.npos != comment_start) {
 					const auto comment_len = parPastie.find("-->") - comment_start + 3;
 					retval.comment = parPastie.substr(comment_start, comment_len);
-					parPastie.erase(comment_start, comment_len);
+					const std::size_t newline = (comment_len + 1 < parPastie.size() and parPastie[comment_len] == '\n' ? 1 : 0);
+					parPastie.erase(comment_start, comment_len + newline);
 				}
 			}
 
