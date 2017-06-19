@@ -24,6 +24,7 @@
 #if !defined(HTML_ESCAPE_WITH_HOUDINI)
 #	include <algorithm>
 #endif
+#include <climits>
 
 namespace tawashi {
 	namespace {
@@ -71,6 +72,20 @@ namespace tawashi {
 					parDest.append(withs[match_index], sizes[match_index]);
 				else
 					parDest.push_back(parSource[z]);
+			}
+		}
+		template <char... Needle, typename P, std::size_t... Sizes>
+		void expand (const char* parSource, std::string& parDest, P parWhich, const char (&...parWith)[Sizes]) {
+			static_assert(sizeof...(Needle) + 1 <= 0xFF, "Too many search chars, their indices won't fit in a byte");
+			std::array<const char*, sizeof...(Needle)> withs {parWith...};
+			std::array<uint32_t, sizeof...(Needle)> sizes {(static_cast<uint32_t>(Sizes) - 1)...};
+
+			for (unsigned int z = 0; z < sizeof(P) * CHAR_BIT; z += CHAR_BIT) {
+				const auto curr = 0xFF bitand (parWhich >> z);
+				if (curr)
+					parDest.append(withs[curr - 1], sizes[curr - 1]);
+				else
+					parDest.push_back(parSource[z / CHAR_BIT]);
 			}
 		}
 #endif
@@ -142,16 +157,14 @@ namespace tawashi {
 			for (unsigned int z = pre_bytes; z < inp_size - post_bytes; z += sizeof(packs[0])) {
 				const uint32_t& val = *reinterpret_cast<const uint32_t*>(parStr.data() + z);
 				uint32_t escape_bytes = 0;
+				uint8_t char_index = 1; //indices are 1-based
 				for (uint32_t pack : packs) {
 					const uint32_t t = val xor pack;
-					escape_bytes = (t - c1) bitand compl t bitand c2;
-					if (escape_bytes)
-						break;
+					const uint32_t placeholders = ((t - c1) bitand compl t bitand c2) >> 7;
+					assert((escape_bytes bitand (placeholders * 0xFF)) == 0);
+					escape_bytes |= placeholders * char_index++;
 				}
-				if (escape_bytes)
-					slow_copy<Needle...>(parStr.data() + z, retval, sizeof(packs[0]), parWith...);
-				else
-					retval.append(parStr.data() + z, sizeof(packs[0]));
+				expand<Needle...>(parStr.data() + z, retval, escape_bytes, parWith...);
 			}
 			slow_copy<Needle...>(parStr.data() + inp_size - post_bytes, retval, post_bytes, parWith...);
 
