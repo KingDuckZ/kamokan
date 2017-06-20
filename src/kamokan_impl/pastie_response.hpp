@@ -37,7 +37,7 @@ namespace kamokan {
 		virtual std::string on_mustache_retrieve() override;
 		virtual tawashi::HttpHeader on_general_pastie_process() override;
 		virtual void on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) override;
-		virtual bool is_pastie_page() const override { return false; }
+		virtual bool is_pastie_page() const override { return true; }
 
 		std::string m_lang_file;
 		std::string m_langmap_dir;
