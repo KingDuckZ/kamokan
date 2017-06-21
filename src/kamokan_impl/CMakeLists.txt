@@ -1,4 +1,4 @@
-project(kamokan_impl VERSION 0.2.3 LANGUAGES CXX)
+project(kamokan_impl VERSION 0.2.4 LANGUAGES CXX)
 
 find_package(SourceHighlight REQUIRED)
 
