@@ -1,8 +1,8 @@
 
 html {
-	height: 100%;
 	margin: 0px;
 	padding: 0px;
+	width: 100%;
 }
 
 body {
@@ -10,6 +10,7 @@ body {
     background: #303030;
     margin: 0px;
     padding-top: 0px;
+    width: 100%;
 }
 
 /*style della barra di navigazione*/
@@ -48,10 +49,12 @@ body {
 
 .icon-right {
 	float: right;
+   width: 95%;
 }
 
 .wrap {
 	margin: 20px;
+	width: 95%;
 }
 
 #PasteTextBox {
@@ -101,9 +104,10 @@ body {
 footer  {
 	margin-left: 30px;
 	bottom: 5px;
-	position: fixed;
+	/*position: absolute;*/
 	font-size: 15px;
 	color: #EDEDED;
+	width: 100%;
 }
 
 #numbers {
@@ -111,21 +115,36 @@ footer  {
 	color: #EDEDED;
 	font-family: monospace;
 	width: 40px;
-	vertical-align: bottom;
-	border: solid red 1px;
+   user-select: none;
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   -o-user-select: none;
 }
 
 #lines {
 	display: table-cell;
 	font-family: monospace;
-	border: solid green 1px;
 }
 
 #code {
 	list-style-type: none;
 	padding: 0px;
 	margin: 0px;
+	width: 100%;
 	white-space: pre;
+	word-wrap: break-word;
+}
+
+
+#message {
+	color: #EDEDED;
+	font-size: 22px;
+	text-align: center;
+}
+
+.link {
+	color: RGBA(0, 242, 0, 1);
 }
 
 .mar-pad0 {

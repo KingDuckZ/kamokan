@@ -1,25 +1,17 @@
-{{> head}}
-<body>
-	<div id="page">
-	{{> topbar}}
+{{> page2-top}}
 
-		<div class="wrap">
 		{{#pastie_lines}}
-			<div class="mar-pad0">
+			<div>
 
 				<div id="numbers" class="mar-pad0">
 				<p class="mar-pad0">{{number}}</p>
 				</div>
 
 				<div id="lines" class="mar-pad0">
-				<li id="code">{{line}}</li>
+				<p id="code" {{#colourless}}style="color:#EDEDED"{{/colourless}} >{{line}}</p>
 				</div>
 
 			</div>
 	{{/pastie_lines}}
-		</div>
-	</div>
-	{{> footer}}
 
-</body>
-</html>
+{{> page2-bottom}}

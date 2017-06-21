@@ -1,32 +1,7 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-
-<head>
-		<title>KamoKan</title>
-		<meta charset="UTF-8"/>
-		<meta name="description" content="KamoKan, text storage site." />
-		<meta name="keywords" content="text storage, pastebin, source code snippets, code review" />
-		<meta name="author" content="Unknown" />
-		<link rel="stylesheet" href="kamokan.css" />
-		<link rel="icon" href="icon" />
-
-</head>
-<body>
-
-	<div id="topbar">
-		<p id="version">kamokan 1.0.0</p>
-		<a href="index.html"><img src="Pictures/kamokan-icon-new.png" alt="kamokan icon" class="icon"></a>
-		<a href="save.html"><input type="image" src="Pictures/save-ink-t.png" alt="Submit" class="icon-green" title="Save"/></a>
-		<a href="index.html"><img src="Pictures/new-ink-t.png" alt="new icon" class="icon-green" title="New"/></a>
-		<a href=""><img src="Pictures/edit-ink-t.png" alt="duplicate and edit icon" class="icon-green" title="Duplicate and Edit"/></a>
-		<a href=""><img src="Pictures/text-ink-t.png" alt="text icon" class="icon-green" title="Text only"/></a>
-		<img src="Pictures/C++-icon.jpeg" alt="c++ icon" class="icon-right"/>
-		<a href=""><img src="Pictures/github-icon.jpeg" alt="github icon" class="icon-right" /></a>	
-	</div>
+{{> page1-top}}
 
 	<div id="content">
-		<p></p>
+		<textarea type="text" class="wrap" id="PasteTextBox" name="pastie" placeholder=">Text..." autofocus required autocomplete="off" name="text">{{pastie_token}}</textarea>
 	</div>
 
-</body>
-</html>
+{{> page1-bottom}}

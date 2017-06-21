@@ -2,13 +2,13 @@
 		<p id="version">KamoKan</p>
 		<a href="{{host_path}}/"><img src="{{host_path}}/Pictures/kamokan-icon-gt.png" alt="kamokan icon" class="icon"></a>
 
-		{{#pastie_page}}
+		{{^submit_page}}
 		<img src="{{host_path}}/Pictures/save-grey.png" alt="no-submit" class="icon-green">
-		{{/pastie_page}}
+		{{/submit_page}}
 
-		{{^pastie_page}}
+		{{#submit_page}}
 		<a href="save.html"><input type="image" src="{{host_path}}/Pictures/save-ink.png" alt="Submit" class="icon-green" title="Paste"/></a>
-		{{/pastie_page}}
+		{{/submit_page}}
 
 		<a href="save.html" class="submit-mobile"><input type="submit" title="Paste"/></a>
 

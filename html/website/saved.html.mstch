@@ -1,0 +1,9 @@
+{{> page2-top}}
+
+<div id="message">
+<p>Your text has been saved in this link:</p>
+<p class="link">{{base_uri}}/{{pastie_token}}?{{pastie_lang}}</p>
+<p>It will be deleted as soon as the link is open for the first time. Thanks for using KamoKan!</p>
+</div>
+
+{{> page2-bottom}}

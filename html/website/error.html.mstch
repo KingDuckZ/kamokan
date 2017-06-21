@@ -1,11 +1,7 @@
-{{>head}}
-<body>
-{{> topbar}}
-<div id="content" class="error">
+{{> page2-top}}
 
-	{{error_message}}
+<div id="message">
+<p>{{error_message}}</p>
+</div>
 
-	</div>
-
-</body>
-</html>
+{{> page2-bottom}}
