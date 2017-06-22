@@ -23,6 +23,7 @@
 #include "spdlog.hpp"
 #include "truncated_string.hpp"
 #include "string_conv.hpp"
+#include "lua_scripts_for_redis.hpp"
 #include <cassert>
 #include <ciso646>
 #include <string>
@@ -129,6 +130,7 @@ namespace kamokan {
 		const std::string& parRemoteIP
 	) const {
 		using tawashi::ErrorReasons;
+		using redis::RedisInt;
 
 		if (not is_connected())
 			return make_submission_result(ErrorReasons::RedisDisconnected);
@@ -156,7 +158,7 @@ namespace kamokan {
 			"pastie", parText,
 			"max_ttl", dhandy::lexical_cast<std::string>(parExpiry),
 			"lang", parLang,
-			"selfdes", (parSelfDestruct ? "1" : "0"))
+			"selfdes", static_cast<RedisInt>(parSelfDestruct ? 1 : 0))
 		) {
 			redis.set(parRemoteIP, "");
 			redis.expire(parRemoteIP, m_settings->as<uint32_t>("resubmit_wait"));
@@ -168,7 +170,6 @@ namespace kamokan {
 	}
 
 	auto Storage::retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const -> RetrievedPastie {
-		using opt_string = redis::IncRedis::opt_string;
 		using opt_string_list = redis::IncRedis::opt_string_list;
 
 		RetrievedPastie retval;
@@ -176,18 +177,26 @@ namespace kamokan {
 		if (not retval.valid_token)
 			return retval;
 
-		opt_string_list pastie_reply = m_redis->hmget(parToken, "pastie", "selfdes", "lang");
-		retval.pastie = (pastie_reply and not pastie_reply->empty() ? (*pastie_reply)[0] : opt_string());
-		opt_string selfdes = (pastie_reply and pastie_reply->size() > 1 ? (*pastie_reply)[1] : opt_string());
-		retval.lang = (pastie_reply and pastie_reply->size() > 2 ? (*pastie_reply)[2] : opt_string());
 
-		if (selfdes and string_conv<bool>(*selfdes)) {
-			const bool deleted = m_redis->del(parToken);
-			retval.self_destructed = deleted;
-			if (not deleted) {
-				auto statuslog = spdlog::get("statuslog");
-				statuslog->error("Pastie \"{}\" was marked as self-destructing but DEL failed to delete it", parToken);
-			}
+		redis::Script retrieve = m_redis->command().make_script(boost::string_view(g_load_script, g_load_script_size - 1));
+		auto batch = m_redis->command().make_batch();
+		retrieve.run(batch, std::make_tuple(parToken), std::make_tuple());
+		auto raw_replies = batch.replies();
+		if (raw_replies.empty())
+			return retval;
+
+		assert(not raw_replies.front().is_error());
+		auto pastie_reply = get_array(raw_replies.front());
+
+		retval.pastie = get_string(pastie_reply[0]);
+		const redis::RedisInt selfdes = get_integer(pastie_reply[1]);
+		const redis::RedisInt deleted = get_integer(pastie_reply[2]);
+		retval.lang = get_string(pastie_reply[3]);
+		retval.self_destructed = selfdes and deleted;
+
+		if (selfdes and not deleted) {
+			auto statuslog = spdlog::get("statuslog");
+			statuslog->error("Pastie \"{}\" was marked as self-destructing but DEL failed to delete it", parToken);
 		}
 
 #if defined(SPDLOG_DEBUG_ON)

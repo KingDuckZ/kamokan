@@ -22,6 +22,7 @@ add_library(${PROJECT_NAME} STATIC
 	string_conv.cpp
 	edit_response.cpp
 	general_pastie_response.cpp
+	${CMAKE_CURRENT_BINARY_DIR}/include/lua_scripts_for_redis.cpp
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -61,4 +62,11 @@ target_compile_options(${PROJECT_NAME}
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/kamokan_config.h.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/include/kamokan_config.h"
+)
+
+add_custom_command(
+	OUTPUT include/lua_scripts_for_redis.cpp
+	COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}" -P ${CMAKE_CURRENT_SOURCE_DIR}/lua_to_cpp.cmake
+	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/retrieve_pastie.lua ${CMAKE_CURRENT_SOURCE_DIR}/save_pastie.lua
+	COMMENT "Embedding save/load lua scripts into the c++ code"
 )
