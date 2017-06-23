@@ -23,6 +23,7 @@ add_library(${PROJECT_NAME} STATIC
 	edit_response.cpp
 	general_pastie_response.cpp
 	${CMAKE_CURRENT_BINARY_DIR}/include/lua_scripts_for_redis.cpp
+	redis_to_error_reason.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

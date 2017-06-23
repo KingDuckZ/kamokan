@@ -19,6 +19,7 @@
 #include "cgi_env.hpp"
 #include "settings_bag.hpp"
 #include "error_reasons.hpp"
+#include "redis_to_error_reason.hpp"
 #include <cassert>
 #include <ciso646>
 #include <utility>
@@ -47,7 +48,7 @@ namespace kamokan {
 			storage().retrieve_pastie(token, settings().as<uint32_t>("max_token_length"));
 
 		if (m_pastie_info.error)
-			return make_error_redirect(m_pastie_info);
+			return make_error_redirect(redis_to_error_reason(*m_pastie_info.error));
 
 		if (this->token_invalid()) {
 			assert(this->pastie_not_found());
@@ -91,25 +92,5 @@ namespace kamokan {
 			return *m_pastie_info.lang;
 		else
 			return std::string();
-	}
-
-	tawashi::HttpHeader GeneralPastieResponse::make_error_redirect (const Storage::RetrievedPastie& parRetrievedInfo) {
-		using tawashi::ErrorReasons;
-
-		assert(parRetrievedInfo.error);
-		const auto& err = *parRetrievedInfo.error;
-
-		try {
-			return make_error_redirect(ErrorReasons::_from_string(err.c_str()));
-		}
-		catch (const std::runtime_error& e) {
-			auto statuslog = spdlog::get("statuslog");
-			statuslog->error(
-				"Retrieved info generated an unexpected error: \"{}\"; exception raised: \"{}\"",
-				err,
-				e.what()
-			);
-			return make_error_redirect(ErrorReasons::UnknownReason);
-		}
 	}
 } //namespace kamokan

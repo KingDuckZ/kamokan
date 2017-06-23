@@ -17,29 +17,11 @@
 
 #pragma once
 
-#include "response.hpp"
+#include "error_reasons.hpp"
+#include "incredis/incredis.hpp"
 #include <string>
 
 namespace kamokan {
-	class GeneralPastieResponse : public Response {
-	public:
-		GeneralPastieResponse (
-			const Kakoune::SafePtr<SettingsBag>& parSettings,
-			std::ostream* parStreamOut,
-			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
-		);
-
-	protected:
-		bool pastie_not_found() const;
-		bool token_invalid() const;
-
-	private:
-		virtual tawashi::HttpHeader on_process() override final;
-		virtual void on_mustache_prepare (mstch::map& parContext) override final;
-		virtual tawashi::HttpHeader on_general_pastie_process() = 0;
-		virtual void on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) = 0;
-		std::string default_pastie_lang() override;
-
-		Storage::RetrievedPastie m_pastie_info;
-	};
+	tawashi::ErrorReasons redis_to_error_reason (const redis::ErrorString& parError);
+	tawashi::ErrorReasons redis_to_error_reason (const std::string& parError);
 } //namespace kamokan

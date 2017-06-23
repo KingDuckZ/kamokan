@@ -15,31 +15,28 @@
  * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
-#include "response.hpp"
-#include <string>
+#include "redis_to_error_reason.hpp"
+#include "spdlog.hpp"
 
 namespace kamokan {
-	class GeneralPastieResponse : public Response {
-	public:
-		GeneralPastieResponse (
-			const Kakoune::SafePtr<SettingsBag>& parSettings,
-			std::ostream* parStreamOut,
-			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
-		);
+	tawashi::ErrorReasons redis_to_error_reason (const redis::ErrorString& parError) {
+		return redis_to_error_reason(parError.message());
+	}
 
-	protected:
-		bool pastie_not_found() const;
-		bool token_invalid() const;
+	tawashi::ErrorReasons redis_to_error_reason (const std::string& parError) {
+		using tawashi::ErrorReasons;
 
-	private:
-		virtual tawashi::HttpHeader on_process() override final;
-		virtual void on_mustache_prepare (mstch::map& parContext) override final;
-		virtual tawashi::HttpHeader on_general_pastie_process() = 0;
-		virtual void on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) = 0;
-		std::string default_pastie_lang() override;
-
-		Storage::RetrievedPastie m_pastie_info;
-	};
+		try {
+			return ErrorReasons::_from_string(parError.c_str());
+		}
+		catch (const std::runtime_error& e) {
+			auto statuslog = spdlog::get("statuslog");
+			statuslog->error(
+				"Unable to deduce error reason from the received string: \"{}\"; exception raised: \"{}\"",
+				parError,
+				e.what()
+			);
+			return ErrorReasons::UnknownReason;
+		}
+	}
 } //namespace kamokan
