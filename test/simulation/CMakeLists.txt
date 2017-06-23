@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME}
 	test_index_response.cpp
 	test_submit_pastie.cpp
 	fake_storage.cpp
+	num_to_token.cpp
 )
 
 target_include_directories(${PROJECT_NAME}

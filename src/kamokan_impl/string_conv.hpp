@@ -51,6 +51,12 @@ namespace kamokan {
 	}
 
 	template <>
+	[[gnu::pure,gnu::always_inline]] inline
+	long long string_conv (boost::string_view parStr) {
+		return dhandy::lexical_cast<long long>(parStr);
+	}
+
+	template <>
 	inline
 	std::string string_conv (boost::string_view parStr) {
 		return std::string(parStr.data(), parStr.size());

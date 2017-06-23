@@ -18,12 +18,12 @@
 #include "storage.hpp"
 #include "settings_bag.hpp"
 #include "incredis/incredis.hpp"
-#include "num_to_token.hpp"
 #include "duckhandy/stringize.h"
 #include "spdlog.hpp"
 #include "truncated_string.hpp"
 #include "string_conv.hpp"
 #include "lua_scripts_for_redis.hpp"
+#include "redis_to_error_reason.hpp"
 #include <cassert>
 #include <ciso646>
 #include <string>
@@ -32,6 +32,8 @@
 
 namespace kamokan {
 	namespace {
+		const char g_token_prefix[] = "kamokan:{store:}";
+
 		redis::IncRedis make_incredis (const SettingsBag& parSettings) {
 			using redis::IncRedis;
 
@@ -130,54 +132,64 @@ namespace kamokan {
 		const std::string& parRemoteIP
 	) const {
 		using tawashi::ErrorReasons;
-		using redis::RedisInt;
+		using boost::string_view;
+		using dhandy::lexical_cast;
 
 		if (not is_connected())
 			return make_submission_result(ErrorReasons::RedisDisconnected);
 
 		assert(m_redis);
 		auto& redis = *m_redis;
-		if (redis.get(parRemoteIP)) {
-			//please wait and submit again
-			return make_submission_result(ErrorReasons::UserFlooding);
+
+		redis::Script retrieve = m_redis->command().make_script(string_view(g_save_script, g_save_script_size));
+		auto batch = m_redis->command().make_batch();
+		{
+			string_view paste_counter_token("{store:}paste_counter");
+			std::string prefix(g_token_prefix);
+			const auto expiry = lexical_cast<std::string>(parExpiry);
+			const auto self_des = string_view(parSelfDestruct ? "1" : "0");
+			const auto flood_wait = m_settings->as<string_view>("resubmit_wait");
+			retrieve.run(batch,
+				std::make_tuple(paste_counter_token, prefix + parRemoteIP),
+				std::make_tuple(prefix, parText, expiry, parLang, self_des, flood_wait)
+			);
+		}
+		auto raw_replies = batch.replies();
+		auto statuslog = spdlog::get("statuslog");
+		if (raw_replies.empty()) {
+			statuslog->error("Received empty reply from redis");
+			return make_submission_result(ErrorReasons::UnknownReason);
 		}
 
-		auto statuslog = spdlog::get("statuslog");
+		if (raw_replies.front().is_error()) {
+			statuslog->error("Received error reply from redis");
+			return make_submission_result(redis_to_error_reason(get_error_string(raw_replies.front())));
+		}
+
+		std::string token = get_string(raw_replies.front());
+
 		if (statuslog->should_log(spdlog::level::info)) {
 			statuslog->info(
-				"Submitting pastie of size {} to redis -> \"{}\"",
+				"Saved pastie of size {} to redis token \"{}\" -> \"{}\"",
 				parText.size(),
+				token,
 				tawashi::truncated_string(parText, 30)
 			);
 		}
-
-		const auto next_id = redis.incr("paste_counter");
-		std::string token = num_to_token(next_id);
-		assert(not token.empty());
-		if (redis.hmset(token,
-			"pastie", parText,
-			"max_ttl", dhandy::lexical_cast<std::string>(parExpiry),
-			"lang", parLang,
-			"selfdes", static_cast<RedisInt>(parSelfDestruct ? 1 : 0))
-		) {
-			redis.set(parRemoteIP, "");
-			redis.expire(parRemoteIP, m_settings->as<uint32_t>("resubmit_wait"));
-			if (redis.expire(token, parExpiry))
-				return make_submission_result(std::move(token));
-		}
-
-		return make_submission_result(ErrorReasons::PastieNotSaved);
+		return make_submission_result(std::move(token));
 	}
 
 	auto Storage::retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const -> RetrievedPastie {
+		using boost::string_view;
+
 		RetrievedPastie retval;
 		retval.valid_token = is_valid_token(parToken, parMaxTokenLen);
 		if (not retval.valid_token)
 			return retval;
 
-		redis::Script retrieve = m_redis->command().make_script(boost::string_view(g_load_script, g_load_script_size));
+		redis::Script retrieve = m_redis->command().make_script(string_view(g_load_script, g_load_script_size));
 		auto batch = m_redis->command().make_batch();
-		retrieve.run(batch, std::make_tuple(parToken), std::make_tuple());
+		retrieve.run(batch, std::make_tuple(parToken), std::make_tuple(string_view(g_token_prefix)));
 		auto raw_replies = batch.replies();
 		if (raw_replies.empty())
 			return retval;

@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(${PROJECT_NAME} STATIC
 	response.cpp
 	submit_paste_response.cpp
-	num_to_token.cpp
 	index_response.cpp
 	pastie_response.cpp
 	ini_file.cpp
