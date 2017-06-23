@@ -8,7 +8,7 @@ end
 
 local selfdes = 0
 local deleted = 0
-if result[2] == 1 then
+if result[2] == "1" then
 	deleted = redis.call("DEL", full_token)
 	selfdes = 1
 end

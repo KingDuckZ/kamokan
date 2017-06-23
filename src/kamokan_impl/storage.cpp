@@ -30,9 +30,11 @@
 #include <utility>
 #include <algorithm>
 
+#define TOKEN_PREFIX "kamokan:{store:}"
+
 namespace kamokan {
 	namespace {
-		const char g_token_prefix[] = "kamokan:{store:}";
+		const char g_token_prefix[] = TOKEN_PREFIX;
 
 		redis::IncRedis make_incredis (const SettingsBag& parSettings) {
 			using redis::IncRedis;
@@ -144,7 +146,7 @@ namespace kamokan {
 		redis::Script retrieve = m_redis->command().make_script(string_view(g_save_script, g_save_script_size));
 		auto batch = m_redis->command().make_batch();
 		{
-			string_view paste_counter_token("{store:}paste_counter");
+			string_view paste_counter_token(TOKEN_PREFIX "paste_counter");
 			std::string prefix(g_token_prefix);
 			const auto expiry = lexical_cast<std::string>(parExpiry);
 			const auto self_des = string_view(parSelfDestruct ? "1" : "0");
@@ -230,3 +232,5 @@ namespace kamokan {
 	}
 #endif
 } //namespace kamokan
+
+#undef TOKEN_PREFIX
