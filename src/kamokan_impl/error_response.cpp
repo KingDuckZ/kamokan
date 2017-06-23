@@ -41,7 +41,7 @@ namespace kamokan {
 
 		auto get = cgi_env().query_string_split();
 		const int reason_int = boost::lexical_cast<int>(get["reason"]);
-		ErrorReasons reason_code(ErrorReasons::UnkownReason);
+		ErrorReasons reason_code(ErrorReasons::UnknownReason);
 		if (reason_int >= 0 and reason_int < ErrorReasons::_size())
 			reason_code = ErrorReasons::_from_integral(reason_int);
 

@@ -24,7 +24,7 @@ namespace tawashi {
 		PostLengthNotInRange,
 		PastieNotSaved,
 		UserFlooding,
-		UnkownReason,
+		UnknownReason,
 		RedisDisconnected,
 		MissingPostVariable,
 		PastieNotFound,
