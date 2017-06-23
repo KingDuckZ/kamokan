@@ -175,7 +175,7 @@ namespace kamokan {
 		if (not retval.valid_token)
 			return retval;
 
-		redis::Script retrieve = m_redis->command().make_script(boost::string_view(g_load_script, g_load_script_size - 1));
+		redis::Script retrieve = m_redis->command().make_script(boost::string_view(g_load_script, g_load_script_size));
 		auto batch = m_redis->command().make_batch();
 		retrieve.run(batch, std::make_tuple(parToken), std::make_tuple());
 		auto raw_replies = batch.replies();
