@@ -46,6 +46,7 @@ namespace kamokan {
 
 			boost::optional<std::string> pastie;
 			boost::optional<std::string> lang;
+			boost::optional<std::string> error;
 			bool self_destructed;
 			bool valid_token;
 		};

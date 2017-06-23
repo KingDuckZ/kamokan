@@ -39,6 +39,8 @@ namespace kamokan {
 		virtual tawashi::HttpHeader on_general_pastie_process() = 0;
 		virtual void on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) = 0;
 		std::string default_pastie_lang() override;
+		using Response::make_error_redirect;
+		tawashi::HttpHeader make_error_redirect (const Storage::RetrievedPastie& parRetrievedInfo);
 
 		Storage::RetrievedPastie m_pastie_info;
 	};

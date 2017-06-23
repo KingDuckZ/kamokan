@@ -170,13 +170,10 @@ namespace kamokan {
 	}
 
 	auto Storage::retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const -> RetrievedPastie {
-		using opt_string_list = redis::IncRedis::opt_string_list;
-
 		RetrievedPastie retval;
 		retval.valid_token = is_valid_token(parToken, parMaxTokenLen);
 		if (not retval.valid_token)
 			return retval;
-
 
 		redis::Script retrieve = m_redis->command().make_script(boost::string_view(g_load_script, g_load_script_size - 1));
 		auto batch = m_redis->command().make_batch();
@@ -185,7 +182,11 @@ namespace kamokan {
 		if (raw_replies.empty())
 			return retval;
 
-		assert(not raw_replies.front().is_error());
+		if (raw_replies.front().is_error()) {
+			retval.error =
+				boost::make_optional<std::string>(get_error_string(raw_replies.front()).message());
+			return retval;
+		}
 		auto pastie_reply = get_array(raw_replies.front());
 
 		retval.pastie = get_string(pastie_reply[0]);
