@@ -21,10 +21,8 @@
 #include "escapist.hpp"
 #include "cgi_env.hpp"
 #include "spdlog.hpp"
+#include "highlight_functions.hpp"
 #include <ciso646>
-#include <srchilite/sourcehighlight.h>
-#include <srchilite/langmap.h>
-#include <sstream>
 #include <algorithm>
 #include <cassert>
 #include <boost/algorithm/string/find_iterator.hpp>
@@ -35,52 +33,6 @@
 namespace kamokan {
 	namespace {
 		const char g_nolang_token[] = "colourless";
-
-		struct SplitHighlightedPastie {
-			std::string comment;
-			std::string text;
-		};
-
-		std::string highlight_css_path (const SettingsBag& parSettings) {
-			//TODO: make sure the file exists or throw or do something
-			return parSettings.as<std::string>("highlight_css");
-		}
-
-		SplitHighlightedPastie strip_tags_from_highlighted (std::string parPastie) {
-			//I'm expecting some comment at the beginning, like:
-			//		<!-- Generator: GNU source-highlight 3.1.8
-			//		by Lorenzo Bettini
-			//		http://www.lorenzobettini.it
-			//		http://www.gnu.org/software/src-highlite -->
-
-			SplitHighlightedPastie retval;
-			{
-				const auto comment_start = parPastie.find("<!--");
-				if (parPastie.npos != comment_start) {
-					const auto comment_len = parPastie.find("-->") - comment_start + 3;
-					retval.comment = parPastie.substr(comment_start, comment_len);
-					const std::size_t newline = (comment_len + 1 < parPastie.size() and parPastie[comment_len] == '\n' ? 1 : 0);
-					parPastie.erase(comment_start, comment_len + newline);
-				}
-			}
-
-			{
-				const auto pre_start = parPastie.find("<pre><tt>");
-				if (parPastie.npos != pre_start) {
-					parPastie.erase(pre_start, 9);
-				}
-			}
-
-			{
-				const auto pre_cl_start = parPastie.find("</tt></pre>");
-				if (parPastie.npos != pre_cl_start) {
-					parPastie.erase(pre_cl_start, 11);
-				}
-			}
-
-			retval.text = std::move(parPastie);
-			return retval;
-		}
 
 		mstch::array pastie_to_numbered_lines (boost::string_view parPastie) {
 			using boost::string_view;
@@ -115,7 +67,6 @@ namespace kamokan {
 		const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 	) :
 		GeneralPastieResponse(parSettings, parStreamOut, parCgiEnv),
-		m_langmap_dir(parSettings->as<std::string>("langmap_dir")),
 		m_plain_text(false),
 		m_syntax_highlight(true)
 	{
@@ -132,32 +83,14 @@ namespace kamokan {
 			m_syntax_highlight = false;
 		}
 		else {
-			srchilite::LangMap lang_map(m_langmap_dir, "lang.map");
-			lang_map.open();
-			m_lang_file.clear();
+			m_pastie_lang.clear();
 			if (not query_str.empty())
-				m_lang_file = lang_map.getFileName(query_str);
-			if (m_lang_file.empty())
-				m_lang_file = "default.lang";
+				m_pastie_lang = query_str;
 		}
 		return tawashi::make_header_type_html();
 	}
 
 	void PastieResponse::on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) {
-		srchilite::SourceHighlight highlighter;
-		highlighter.setDataDir(settings().as<std::string>("langmap_dir"));
-		highlighter.setGenerateEntireDoc(false);
-		highlighter.setGenerateLineNumbers(true);
-#if defined(NDEBUG)
-		highlighter.setOptimize(true);
-#else
-		highlighter.setOptimize(false);
-#endif
-		highlighter.setCanUseStdOut(false);
-		highlighter.setTabSpaces(4);
-		highlighter.setStyleCssFile(highlight_css_path(settings()));
-		highlighter.setGenerateLineNumbers(false);
-
 		std::string processed_pastie;
 		std::string highlight_comment;
 		if (m_syntax_highlight) {
@@ -169,10 +102,7 @@ namespace kamokan {
 		}
 
 		if (not m_plain_text and m_syntax_highlight) {
-			std::istringstream iss(std::move(processed_pastie));
-			std::ostringstream oss;
-			highlighter.highlight(iss, oss, m_lang_file);
-			SplitHighlightedPastie split = strip_tags_from_highlighted(oss.str());
+			SplitHighlightedPastie split = highlight_string(std::move(processed_pastie), m_pastie_lang, settings());
 			processed_pastie = std::move(split.text);
 			highlight_comment = std::move(split.comment);
 		}

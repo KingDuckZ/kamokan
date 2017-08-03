@@ -19,10 +19,18 @@
 
 #include <vector>
 #include <string>
+#include <boost/utility/string_view.hpp>
+#include <string>
 
 namespace kamokan {
 	class SettingsBag;
 	typedef std::vector<std::string> HighlightLangList;
 
+	struct SplitHighlightedPastie {
+		std::string comment;
+		std::string text;
+	};
+
 	HighlightLangList list_highlight_langs (const SettingsBag& parSettings);
+	SplitHighlightedPastie highlight_string (std::string&& parIn, const std::string& parLang, const SettingsBag& parSettings);
 } //namespace kamokan
