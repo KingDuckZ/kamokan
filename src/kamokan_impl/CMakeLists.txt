@@ -13,7 +13,7 @@ add_library(${PROJECT_NAME} STATIC
 	ini_file.cpp
 	pathname/pathname.cpp
 	response_factory.cpp
-	list_highlight_langs.cpp
+	highlight_functions.cpp
 	settings_bag.cpp
 	error_response.cpp
 	quick_submit_paste_response.cpp

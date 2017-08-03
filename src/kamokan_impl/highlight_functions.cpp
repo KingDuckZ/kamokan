@@ -15,7 +15,7 @@
  * along with "kamokan".  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "list_highlight_langs.hpp"
+#include "highlight_functions.hpp"
 #include "settings_bag.hpp"
 #include <srchilite/langmap.h>
 #include <boost/range/adaptor/map.hpp>

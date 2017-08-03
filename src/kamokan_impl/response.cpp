@@ -20,7 +20,7 @@
 #include "duckhandy/stringize.h"
 #include "duckhandy/lexical_cast.hpp"
 #include "pathname/pathname.hpp"
-#include "list_highlight_langs.hpp"
+#include "highlight_functions.hpp"
 #include "cgi_env.hpp"
 #include "num_conv.hpp"
 #include "kamokan_config.h"
