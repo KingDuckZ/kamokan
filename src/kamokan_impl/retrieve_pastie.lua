@@ -1,6 +1,4 @@
-local token = KEYS[1]
-local token_prefix = ARGV[1]
-local full_token = token_prefix .. token
+local full_token = KEYS[1]
 local result = redis.call("HMGET", full_token, "pastie", "selfdes", "lang")
 if false == result[1] then
 	return redis.error_reply("PastieNotFound")

@@ -191,7 +191,8 @@ namespace kamokan {
 
 		redis::Script retrieve = m_redis->command().make_script(string_view(g_load_script, g_load_script_size));
 		auto batch = m_redis->command().make_batch();
-		retrieve.run(batch, std::make_tuple(parToken), std::make_tuple(string_view(g_token_prefix)));
+		std::string token_with_prefix = std::string(g_token_prefix) + std::string(parToken);
+		retrieve.run(batch, std::make_tuple(token_with_prefix), std::tuple<>());
 		auto raw_replies = batch.replies();
 		if (raw_replies.empty())
 			return retval;
