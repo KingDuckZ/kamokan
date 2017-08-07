@@ -30,10 +30,12 @@
 #include <utility>
 #include <algorithm>
 
-#define TOKEN_PREFIX "kamokan:{store:}"
+#define KAMOKAN_TOKEN_PREFIX "kamokan:"
+#define TOKEN_PREFIX KAMOKAN_TOKEN_PREFIX "{store:}"
 
 namespace kamokan {
 	namespace {
+		const char g_hl_token_prefix[] = KAMOKAN_TOKEN_PREFIX "hl:";
 		const char g_token_prefix[] = TOKEN_PREFIX;
 
 		redis::IncRedis make_incredis (const SettingsBag& parSettings) {
@@ -82,6 +84,10 @@ namespace kamokan {
 				}
 			}
 			return true;
+		}
+
+		std::string make_regular_pastie_token (const boost::string_view& parToken) {
+			return std::string(g_token_prefix) + std::string(parToken);
 		}
 	} //unnamed namespace
 
@@ -191,7 +197,7 @@ namespace kamokan {
 
 		redis::Script retrieve = m_redis->command().make_script(string_view(g_load_script, g_load_script_size));
 		auto batch = m_redis->command().make_batch();
-		std::string token_with_prefix = std::string(g_token_prefix) + std::string(parToken);
+		std::string token_with_prefix = make_regular_pastie_token(parToken);
 		retrieve.run(batch, std::make_tuple(token_with_prefix), std::tuple<>());
 		auto raw_replies = batch.replies();
 		if (raw_replies.empty())
@@ -232,6 +238,28 @@ namespace kamokan {
 		return *m_settings;
 	}
 #endif
+
+	void Storage::submit_highlighted_pastie (
+		const boost::string_view& parToken,
+		const boost::string_view& parText,
+		const boost::string_view& parComment,
+		uint32_t parMaxTokenLen
+	) const {
+		using boost::string_view;
+
+		const bool valid_token = is_valid_token(parToken, parMaxTokenLen);
+		if (not valid_token)
+			return;
+
+		redis::Script retrieve = m_redis->command().make_script(string_view(g_add_highlighted_script, g_add_highlighted_script_size));
+		auto batch = m_redis->command().make_batch();
+		std::string token_with_prefix(make_regular_pastie_token(parToken));
+		retrieve.run(
+			batch,
+			std::make_tuple(token_with_prefix),
+			std::make_tuple(parText, parComment)
+		);
+	}
 } //namespace kamokan
 
 #undef TOKEN_PREFIX

@@ -22,6 +22,8 @@
 namespace kamokan {
 	extern const char g_save_script[];
 	extern const char g_load_script[];
+	extern const char g_add_highlighted_script[];
 	extern const std::size_t g_save_script_size;
 	extern const std::size_t g_load_script_size;
+	extern const std::size_t g_add_highlighted_script_size;
 } //namespace kamokan

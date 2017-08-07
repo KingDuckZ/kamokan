@@ -32,5 +32,5 @@ namespace kamokan {
 	};
 
 	HighlightLangList list_highlight_langs (const SettingsBag& parSettings);
-	SplitHighlightedPastie highlight_string (std::string&& parIn, const std::string& parLang, const SettingsBag& parSettings);
+	SplitHighlightedPastie highlight_string (std::string&& parIn, boost::string_view parLang, const SettingsBag& parSettings);
 } //namespace kamokan

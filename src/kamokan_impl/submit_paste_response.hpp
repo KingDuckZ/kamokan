@@ -23,6 +23,7 @@
 #include <boost/utility/string_view.hpp>
 #include <cassert>
 #include <utility>
+#include <memory>
 
 namespace kamokan {
 	class SubmitPasteResponse : public Response {
@@ -41,6 +42,9 @@ namespace kamokan {
 			std::ostream* parStreamOut,
 			const Kakoune::SafePtr<cgi::Env>& parCgiEnv
 		);
+		~SubmitPasteResponse();
+
+		virtual void join() override;
 
 	protected:
 		virtual boost::string_view page_basename() const override { return boost::string_view("saved"); }
@@ -48,6 +52,7 @@ namespace kamokan {
 
 	private:
 		typedef std::pair<boost::optional<std::string>, tawashi::HttpHeader> StringOrHeader;
+		struct LocalData;
 
 		virtual tawashi::HttpHeader on_process() override;
 		virtual void on_mustache_prepare (mstch::map& parContext) override;
@@ -57,8 +62,8 @@ namespace kamokan {
 			const boost::string_view& parLang,
 			bool parSelfDestruct
 		);
+		void store_highlighted_pastie (boost::string_view parToken, std::string&& parText, boost::string_view parLang);
 
-		std::string m_pastie_token;
-		boost::string_view m_pastie_lang;
+		std::unique_ptr<LocalData> m_local;
 	};
 } //namespace kamokan

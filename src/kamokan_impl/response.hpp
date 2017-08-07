@@ -45,6 +45,7 @@ namespace kamokan {
 
 		void send();
 		void set_app_start_time (const std::chrono::time_point<std::chrono::steady_clock>& parTime);
+		virtual void join();
 
 	protected:
 		Response (

@@ -178,8 +178,10 @@ int main (int parArgc, char* parArgv[], char* parEnvp[]) {
 			tawashi::cgi::drop_arguments(cgi_env->request_uri_relative()),
 			cgi_env->request_method()
 		);
-		if (response)
+		if (response) {
 			response->send();
+			response->join();
+		}
 	}
 	catch (const std::exception& e) {
 		statuslog->critical("Uncaught exception in main(): \"{}\"", e.what());

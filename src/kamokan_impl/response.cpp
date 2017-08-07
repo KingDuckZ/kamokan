@@ -290,4 +290,7 @@ namespace kamokan {
 	std::string Response::default_pastie_lang() {
 		return std::string();
 	}
+
+	void Response::join() {
+	}
 } //namespace kamokan

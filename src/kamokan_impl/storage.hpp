@@ -64,6 +64,12 @@ namespace kamokan {
 			bool parSelfDestruct,
 			const std::string& parRemoteIP
 		) const;
+		kamokan_virtual_testing void submit_highlighted_pastie (
+			const boost::string_view& parToken,
+			const boost::string_view& parText,
+			const boost::string_view& parComment,
+			uint32_t parMaxTokenLen
+		) const;
 
 		kamokan_virtual_testing RetrievedPastie retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const;
 

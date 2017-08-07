@@ -46,6 +46,7 @@ target_link_libraries(${PROJECT_NAME}
 	PUBLIC mstch
 	PRIVATE pthread
 	PUBLIC tawashi
+	PRIVATE pthread
 )
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1
@@ -67,6 +68,9 @@ configure_file(
 add_custom_command(
 	OUTPUT include/lua_scripts_for_redis.cpp
 	COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}" -P ${CMAKE_CURRENT_SOURCE_DIR}/lua_to_cpp.cmake
-	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/retrieve_pastie.lua ${CMAKE_CURRENT_SOURCE_DIR}/save_pastie.lua
+	DEPENDS
+		${CMAKE_CURRENT_SOURCE_DIR}/retrieve_pastie.lua
+		${CMAKE_CURRENT_SOURCE_DIR}/save_pastie.lua
+		${CMAKE_CURRENT_SOURCE_DIR}/add_highlighted_pastie.lua
 	COMMENT "Embedding save/load lua scripts into the c++ code"
 )

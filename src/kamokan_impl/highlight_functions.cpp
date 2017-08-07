@@ -31,13 +31,13 @@ namespace kamokan {
 			return parSettings.as<std::string>("highlight_css");
 		}
 
-		std::string lang_name_to_file_path (const std::string& parLang, const std::string& parLangmapDir) {
+		std::string lang_name_to_file_path (boost::string_view parLang, const std::string& parLangmapDir) {
 			if (parLang.empty())
 				return std::string();
 
 			srchilite::LangMap lang_map(parLangmapDir, "lang.map");
 			lang_map.open();
-			std::string lang_file = lang_map.getFileName(parLang);
+			std::string lang_file = lang_map.getFileName(std::string(parLang));
 			if (lang_file.empty())
 				lang_file = "default.lang";
 
@@ -89,7 +89,7 @@ namespace kamokan {
 		return boost::copy_range<HighlightLangList>(lang_range | boost::adaptors::map_keys);
 	}
 
-	SplitHighlightedPastie highlight_string (std::string&& parIn, const std::string& parLang, const SettingsBag& parSettings) {
+	SplitHighlightedPastie highlight_string (std::string&& parIn, boost::string_view parLang, const SettingsBag& parSettings) {
 		const std::string langmap_dir = parSettings.as<std::string>("langmap_dir");
 		srchilite::SourceHighlight highlighter;
 		highlighter.setDataDir(langmap_dir);
@@ -105,10 +105,16 @@ namespace kamokan {
 		highlighter.setStyleCssFile(highlight_css_path(parSettings));
 		highlighter.setGenerateLineNumbers(false);
 
-		std::istringstream iss(std::move(parIn));
-		std::ostringstream oss;
-		highlighter.highlight(iss, oss, lang_name_to_file_path(parLang, langmap_dir));
-		return strip_tags_from_highlighted(oss.str());
+		std::string lang_file_path = lang_name_to_file_path(parLang, langmap_dir);
+		if (not lang_file_path.empty()) {
+			std::istringstream iss(std::move(parIn));
+			std::ostringstream oss;
+			highlighter.highlight(iss, oss, lang_file_path);
+			return strip_tags_from_highlighted(oss.str());
+		}
+		else {
+			return SplitHighlightedPastie();
+		}
 	}
 } //namespace kamokan
 
