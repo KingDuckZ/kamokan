@@ -2,7 +2,7 @@
 html {
 	margin: 0px;
 	padding: 0px;
-	width: 100%;
+	min-width: 100%;
 }
 
 body {
@@ -10,7 +10,7 @@ body {
     background: #303030;
     margin: 0px;
     padding-top: 0px;
-    width: 100%;
+    min-width: 100%;
 }
 
 /*style della barra di navigazione*/
@@ -55,13 +55,14 @@ body {
 .wrap {
 	margin: 20px;
 	width: 95%;
+	min-height: calc(90vh - 100px);
 }
 
 #PasteTextBox {
    background-color: #303030;
    color: #EDEDED;
    resize: none;
-   height: calc(95vh - 200px);
+   height: calc(80vh - 200px);
    width: 95%;
 }
 
@@ -102,12 +103,11 @@ body {
 }
 
 footer  {
-	margin-left: 30px;
-	bottom: 5px;
-	/*position: absolute;*/
+	padding-left: 30px;
+	position: relative;
 	font-size: 15px;
 	color: #EDEDED;
-	width: 100%;
+	width: calc(100% - 200px);
 }
 
 #numbers {
@@ -135,7 +135,6 @@ footer  {
 	white-space: pre;
 	word-wrap: break-word;
 }
-
 
 #message {
 	color: #EDEDED;

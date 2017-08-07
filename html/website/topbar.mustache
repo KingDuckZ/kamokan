@@ -15,7 +15,10 @@
 		<a href="{{host_path}}/"><img src="{{host_path}}/Pictures/new-ink.png" alt="new icon" class="icon-green" title="New"/></a>
 
       {{#pastie_page}}
+      {{^selfdes}}
 		<a href="{{host_path}}/{{pastie_token}}"><img src="{{host_path}}/Pictures/text-ink.png" alt="text icon" class="icon-green" title="Text only"/></a>
+		<a href="{{host_path}}/edit.cgi?{{pastie_token}}"><img src="{{host_path}}/Pictures/edit-ink.png" alt="edit icon" class="icon-green" title="Edit"/></a>
+		{{/selfdes}}
       {{/pastie_page}}
 
 		{{> github }}

@@ -1,5 +1,6 @@
 {{> page2-top}}
 
+		{{highlight_comment}}
 		{{#pastie_lines}}
 			<div>
 
