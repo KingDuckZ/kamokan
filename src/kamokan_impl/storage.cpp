@@ -92,8 +92,7 @@ namespace kamokan {
 	} //unnamed namespace
 
 	Storage::RetrievedPastie::RetrievedPastie() :
-		pastie(),
-		lang(),
+		highlighted(false),
 		self_destructed(false),
 		valid_token(false)
 	{
@@ -187,8 +186,14 @@ namespace kamokan {
 		return make_submission_result(std::move(token));
 	}
 
-	auto Storage::retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const -> RetrievedPastie {
+	auto Storage::retrieve_pastie (
+		const boost::string_view& parToken,
+		uint32_t parMaxTokenLen,
+		const boost::string_view& parRequestedLang
+	) const -> RetrievedPastie {
+
 		using boost::string_view;
+
 
 		RetrievedPastie retval;
 		retval.valid_token = is_valid_token(parToken, parMaxTokenLen);
@@ -198,7 +203,11 @@ namespace kamokan {
 		redis::Script retrieve = m_redis->command().make_script(string_view(g_load_script, g_load_script_size));
 		auto batch = m_redis->command().make_batch();
 		std::string token_with_prefix = make_regular_pastie_token(parToken);
-		retrieve.run(batch, std::make_tuple(token_with_prefix), std::tuple<>());
+		retrieve.run(
+			batch,
+			std::make_tuple(token_with_prefix),
+			std::make_tuple(parRequestedLang)
+		);
 		auto raw_replies = batch.replies();
 		if (raw_replies.empty())
 			return retval;
@@ -213,8 +222,10 @@ namespace kamokan {
 		retval.pastie = get_string(pastie_reply[0]);
 		const redis::RedisInt selfdes = get_integer(pastie_reply[1]);
 		const redis::RedisInt deleted = get_integer(pastie_reply[2]);
-		retval.lang = get_string(pastie_reply[3]);
+		retval.lang = get_string(pastie_reply[4]);
 		retval.self_destructed = selfdes and deleted;
+		retval.highlighted = static_cast<bool>(get_integer(pastie_reply[3]));
+		retval.comment = get_string(pastie_reply[5]);
 
 		if (selfdes and not deleted) {
 			auto statuslog = spdlog::get("statuslog");

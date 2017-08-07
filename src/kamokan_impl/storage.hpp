@@ -47,6 +47,8 @@ namespace kamokan {
 			boost::optional<std::string> pastie;
 			boost::optional<std::string> lang;
 			boost::optional<std::string> error;
+			boost::optional<std::string> comment;
+			bool highlighted;
 			bool self_destructed;
 			bool valid_token;
 		};
@@ -71,7 +73,11 @@ namespace kamokan {
 			uint32_t parMaxTokenLen
 		) const;
 
-		kamokan_virtual_testing RetrievedPastie retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const;
+		kamokan_virtual_testing RetrievedPastie retrieve_pastie (
+			const boost::string_view& parToken,
+			uint32_t parMaxTokenLen,
+			const boost::string_view& parRequestedLang
+		) const;
 
 #if defined(KAMOKAN_WITH_TESTING)
 		const SettingsBag& settings() const;

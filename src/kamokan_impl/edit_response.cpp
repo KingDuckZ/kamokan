@@ -32,8 +32,13 @@ namespace kamokan {
 		return tawashi::make_header_type_html();
 	}
 
-	void EditResponse::on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) {
+	void EditResponse::on_general_mustache_prepare (
+		GeneralPastieResponse::Pastie&& parPastie,
+		mstch::map& parContext
+	) {
+		assert(not parPastie.highlighted);
+		assert(parPastie.comment.empty());
 		tawashi::Escapist houdini;
-		parContext["pastie"] = houdini.escape_html(parPastie);
+		parContext["pastie"] = houdini.escape_html(parPastie.text);
 	}
 } //namespace kamokan

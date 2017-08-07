@@ -19,6 +19,7 @@
 #include "cgi_env.hpp"
 #include "settings_bag.hpp"
 #include "error_reasons.hpp"
+#include "spdlog.hpp"
 #include "redis_to_error_reason.hpp"
 #include <cassert>
 #include <ciso646>
@@ -45,7 +46,7 @@ namespace kamokan {
 
 		boost::string_view token = get_search_token(cgi_env());
 		m_pastie_info =
-			storage().retrieve_pastie(token, settings().as<uint32_t>("max_token_length"));
+			storage().retrieve_pastie(token, settings().as<uint32_t>("max_token_length"), this->requested_lang());
 
 		if (m_pastie_info.error)
 			return make_error_redirect(redis_to_error_reason(*m_pastie_info.error));
@@ -74,8 +75,25 @@ namespace kamokan {
 		parContext["pastie_token"] = get_search_token(cgi_env());
 		parContext["pastie_lang"] = pastie_lang;
 		parContext["colourless"] = pastie_lang.empty() or pastie_lang == "colourless";
+		parContext["from_cache"] = m_pastie_info.highlighted;
 
-		this->on_general_mustache_prepare(std::move(*m_pastie_info.pastie), parContext);
+		auto statuslog = spdlog::get("statuslog");
+		SPDLOG_TRACE(
+			statuslog,
+			"General mustache response prepared; pastie len={}, comment len={}, highlighted={}",
+			m_pastie_info.pastie->size(),
+			(m_pastie_info.comment ? m_pastie_info.comment->size() : 0),
+			m_pastie_info.highlighted
+		);
+
+		this->on_general_mustache_prepare(
+			Pastie{
+				std::move(*m_pastie_info.pastie),
+				(m_pastie_info.comment ? std::move(*m_pastie_info.comment) : std::string()),
+				m_pastie_info.highlighted
+			},
+			parContext
+		);
 	}
 
 	bool GeneralPastieResponse::token_invalid() const {
@@ -92,5 +110,9 @@ namespace kamokan {
 			return *m_pastie_info.lang;
 		else
 			return std::string();
+	}
+
+	boost::string_view GeneralPastieResponse::requested_lang() const {
+		return boost::string_view();
 	}
 } //namespace kamokan

@@ -62,7 +62,11 @@ namespace kamokan {
 		return submission_res;
 	}
 
-	Storage::RetrievedPastie FakeStorage::retrieve_pastie (const boost::string_view& parToken, uint32_t parMaxTokenLen) const {
+	Storage::RetrievedPastie FakeStorage::retrieve_pastie (
+		const boost::string_view& parToken,
+		uint32_t parMaxTokenLen,
+		const boost::string_view& parLang
+	) const {
 		auto it_found = std::find_if(
 			m_submitted_pasties.begin(),
 			m_submitted_pasties.end(),

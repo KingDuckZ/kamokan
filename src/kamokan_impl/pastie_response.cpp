@@ -20,7 +20,6 @@
 #include "settings_bag.hpp"
 #include "escapist.hpp"
 #include "cgi_env.hpp"
-#include "spdlog.hpp"
 #include "highlight_functions.hpp"
 #include <ciso646>
 #include <algorithm>
@@ -70,41 +69,48 @@ namespace kamokan {
 		m_plain_text(false),
 		m_syntax_highlight(true)
 	{
+		auto get = cgi_env().query_string_split();
+		const std::string& query_str(cgi_env().query_string());
+		if (get["m"] == "plain" or query_str.empty())
+			m_plain_text = true;
+		else if (query_str == g_nolang_token)
+			m_syntax_highlight = false;
+		else if (not query_str.empty())
+			m_pastie_lang = query_str;
 	}
 
 	tawashi::HttpHeader PastieResponse::on_general_pastie_process() {
-		auto get = cgi_env().query_string_split();
-		const std::string& query_str(cgi_env().query_string());
-		if (get["m"] == "plain" or query_str.empty()) {
-			m_plain_text = true;
+		if (m_plain_text)
 			return tawashi::make_header_type_text_utf8();
-		}
-		else if (query_str == g_nolang_token) {
-			m_syntax_highlight = false;
-		}
-		else {
-			m_pastie_lang.clear();
-			if (not query_str.empty())
-				m_pastie_lang = query_str;
-		}
-		return tawashi::make_header_type_html();
+		else
+			return tawashi::make_header_type_html();
 	}
 
-	void PastieResponse::on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) {
+	void PastieResponse::on_general_mustache_prepare (
+		GeneralPastieResponse::Pastie&& parPastie,
+		mstch::map& parContext
+	) {
 		std::string processed_pastie;
 		std::string highlight_comment;
 		if (m_syntax_highlight) {
-			processed_pastie = std::move(parPastie);
+			processed_pastie = std::move(parPastie.text);
 		}
 		else {
+			assert(not parPastie.highlighted);
 			tawashi::Escapist houdini;
-			processed_pastie = houdini.escape_html(parPastie);
+			processed_pastie = houdini.escape_html(parPastie.text);
 		}
 
 		if (not m_plain_text and m_syntax_highlight) {
-			SplitHighlightedPastie split = highlight_string(std::move(processed_pastie), m_pastie_lang, settings());
-			processed_pastie = std::move(split.text);
-			highlight_comment = std::move(split.comment);
+			if (parPastie.highlighted) {
+				assert(not parPastie.comment.empty());
+				highlight_comment = std::move(parPastie.comment);
+			}
+			else {
+				SplitHighlightedPastie split = highlight_string(std::move(processed_pastie), requested_lang(), settings());
+				processed_pastie = std::move(split.text);
+				highlight_comment = std::move(split.comment);
+			}
 		}
 
 		parContext["pastie"] = std::move(processed_pastie);
@@ -120,5 +126,9 @@ namespace kamokan {
 			return "{{pastie}}";
 		else
 			return load_mustache();
+	}
+
+	boost::string_view PastieResponse::requested_lang() const {
+		return m_pastie_lang;
 	}
 } //namespace kamokan

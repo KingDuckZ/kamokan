@@ -30,14 +30,21 @@ namespace kamokan {
 		);
 
 	protected:
+		struct Pastie {
+			std::string text;
+			std::string comment;
+			bool highlighted;
+		};
+
 		bool pastie_not_found() const;
 		bool token_invalid() const;
+		virtual boost::string_view requested_lang() const;
 
 	private:
 		virtual tawashi::HttpHeader on_process() override final;
 		virtual void on_mustache_prepare (mstch::map& parContext) override final;
 		virtual tawashi::HttpHeader on_general_pastie_process() = 0;
-		virtual void on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) = 0;
+		virtual void on_general_mustache_prepare (Pastie&& parPastie, mstch::map& parContext) = 0;
 		std::string default_pastie_lang() override;
 
 		Storage::RetrievedPastie m_pastie_info;

@@ -32,11 +32,12 @@ namespace kamokan {
 
 	protected:
 		virtual boost::string_view page_basename() const override { return boost::string_view("pastie"); }
+		virtual boost::string_view requested_lang() const override;
 
 	private:
 		virtual std::string on_mustache_retrieve() override;
 		virtual tawashi::HttpHeader on_general_pastie_process() override;
-		virtual void on_general_mustache_prepare (std::string&& parPastie, mstch::map& parContext) override;
+		virtual void on_general_mustache_prepare (GeneralPastieResponse::Pastie&& parPastie, mstch::map& parContext) override;
 		virtual bool is_pastie_page() const override { return true; }
 
 		std::string m_pastie_lang;
