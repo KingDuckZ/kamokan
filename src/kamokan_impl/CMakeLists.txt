@@ -1,4 +1,4 @@
-project(kamokan_impl VERSION 0.2.5 LANGUAGES CXX)
+project(kamokan_impl VERSION 0.3.0 LANGUAGES CXX)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
