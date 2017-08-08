@@ -123,6 +123,7 @@ TEST_CASE ("Submit paste response", "[submitpaste][response]") {
 	);
 	SafeStackObject<kamokan::IniFile> ini(std::move(kamokan_settings));
 	SafeStackObject<kamokan::SettingsBag> settings(ini, "kamokan");
+	settings->add_default("cache_highlighted", "false");
 
 	std::ostringstream oss;
 	kamokan::SubmitPasteResponseWithFakeStorage submit_response(
