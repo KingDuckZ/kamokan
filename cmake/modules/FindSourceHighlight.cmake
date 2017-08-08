@@ -34,6 +34,16 @@ else(SourceHighlight_INCLUDE_DIR AND SourceHighlight_LIBRARIES AND Ncurses_LIBRA
 	mark_as_advanced(SourceHighlight_INCLUDE_DIR SourceHighlight_LIBRARIES)
 endif(SourceHighlight_INCLUDE_DIR AND SourceHighlight_LIBRARIES AND Ncurses_LIBRARY)
 
+if (SourceHighlight_FOUND AND NOT TARGET SourceHighlight::SourceHighlight)
+	add_library(SourceHighlight::SourceHighlight INTERFACE IMPORTED)
+	set_property(TARGET SourceHighlight::SourceHighlight
+		PROPERTY INTERFACE_LINK_LIBRARIES "${SourceHighlight_LIBRARIES}"
+	)
+	set_property(TARGET SourceHighlight::SourceHighlight
+		PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${SourceHighlight_INCLUDE_DIR}"
+	)
+endif()
+
 mark_as_advanced(
 	SourceHighlight_INCLUDE_DIR
     SourceHighlight_LIBRARIES

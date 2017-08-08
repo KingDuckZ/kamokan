@@ -37,7 +37,6 @@ target_include_directories(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} SYSTEM
 	PUBLIC ${Boost_INCLUDE_DIRS}
 	PUBLIC ${TAWASHI_SOURCE_ROOT}/lib/better-enums
-	PRIVATE ${SourceHighlight_INCLUDE_DIR}
 	PRIVATE ${TAWASHI_SOURCE_ROOT}/lib/utf8_v2_3_4/source
 	PUBLIC ${TAWASHI_SOURCE_ROOT}/lib/spdlog/include
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include
@@ -45,7 +44,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM
 target_link_libraries(${PROJECT_NAME}
 	PRIVATE ${Boost_LIBRARIES}
 	PRIVATE incredis
-	PRIVATE ${SourceHighlight_LIBRARIES}
+	PRIVATE SourceHighlight::SourceHighlight
 	PUBLIC mstch
 	PRIVATE Threads::Threads
 	PUBLIC tawashi
