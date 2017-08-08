@@ -88,6 +88,7 @@ namespace {
 		parSettings.add_default("highlight_css", "sh_darkness.css");
 		parSettings.add_default("max_post_size", "1048576");
 		parSettings.add_default("max_token_length", "10");
+		parSettings.add_default("cache_highlighted", "true");
 	}
 
 	void print_buildtime_info() {

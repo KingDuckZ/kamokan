@@ -191,7 +191,8 @@ namespace kamokan {
 		Storage::SubmissionResult submission_res = storage.submit_pastie(parText, parExpiry, parLang, parSelfDestruct, remote_ip);
 
 		if (not submission_res.error) {
-			store_highlighted_pastie_async(submission_res.token, parText, parLang);
+			if (settings().as<bool>("cache_highlighted"))
+				store_highlighted_pastie_async(submission_res.token, parText, parLang);
 
 			return std::make_pair(boost::make_optional(std::move(submission_res.token)), tawashi::HttpHeader());
 		}
