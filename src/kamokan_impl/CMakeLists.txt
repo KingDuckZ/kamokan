@@ -1,6 +1,9 @@
 project(kamokan_impl VERSION 0.2.5 LANGUAGES CXX)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+
 find_package(SourceHighlight REQUIRED)
+find_package(Threads REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,9 +47,8 @@ target_link_libraries(${PROJECT_NAME}
 	PRIVATE incredis
 	PRIVATE ${SourceHighlight_LIBRARIES}
 	PUBLIC mstch
-	PRIVATE pthread
+	PRIVATE Threads::Threads
 	PUBLIC tawashi
-	PRIVATE pthread
 )
 target_compile_definitions(${PROJECT_NAME}
 	PRIVATE BOOST_SPIRIT_USE_PHOENIX_V3=1
