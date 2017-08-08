@@ -62,6 +62,7 @@ namespace kamokan {
 			const boost::string_view& parLang,
 			bool parSelfDestruct
 		);
+		void store_highlighted_pastie_async (boost::string_view parToken, boost::string_view parText, boost::string_view parLang);
 		void store_highlighted_pastie (boost::string_view parToken, std::string&& parText, boost::string_view parLang);
 
 		std::unique_ptr<LocalData> m_local;

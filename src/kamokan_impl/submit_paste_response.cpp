@@ -191,15 +191,7 @@ namespace kamokan {
 		Storage::SubmissionResult submission_res = storage.submit_pastie(parText, parExpiry, parLang, parSelfDestruct, remote_ip);
 
 		if (not submission_res.error) {
-			//if data was submitted successfully, start a separate thread to do
-			//the syntax highlighting and upload that to the storage asynchronously
-			//since it's likely to take a long time
-			assert(not m_local->submit_thread.joinable());
-			std::string lang(parLang);
-			std::string text(parText);
-			m_local->submit_thread = std::thread([&,text,token=submission_res.token,lang]() mutable {
-				this->store_highlighted_pastie(token, std::move(text), lang);
-			});
+			store_highlighted_pastie_async(submission_res.token, parText, parLang);
 
 			return std::make_pair(boost::make_optional(std::move(submission_res.token)), tawashi::HttpHeader());
 		}
@@ -222,6 +214,19 @@ namespace kamokan {
 		if (m_local->submit_thread.joinable()) {
 			m_local->submit_thread.join();
 		}
+	}
+
+	void SubmitPasteResponse::store_highlighted_pastie_async (boost::string_view parToken, boost::string_view parText, boost::string_view parLang) {
+		//if data was submitted successfully, start a separate thread to do
+		//the syntax highlighting and upload that to the storage asynchronously
+		//since it's likely to take a long time
+		assert(not m_local->submit_thread.joinable());
+		std::string lang(parLang);
+		std::string text(parText);
+		std::string token(parToken);
+		m_local->submit_thread = std::thread([&,text,token,lang]() mutable {
+			this->store_highlighted_pastie(token, std::move(text), lang);
+		});
 	}
 
 	void SubmitPasteResponse::store_highlighted_pastie (boost::string_view parToken, std::string&& parText, boost::string_view parLang) {
