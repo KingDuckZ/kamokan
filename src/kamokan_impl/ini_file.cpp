@@ -20,13 +20,12 @@
 #include <boost/spirit/include/qi_core.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 #include <boost/spirit/include/qi_plus.hpp>
-#include <boost/spirit/include/qi_difference.hpp>
+#include <boost/spirit/include/qi_not_predicate.hpp>
 #include <boost/spirit/include/qi_raw.hpp>
 #include <boost/spirit/include/qi_lit.hpp>
 #include <boost/spirit/include/qi_kleene.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
 #include <boost/spirit/include/qi_eol.hpp>
-#include <boost/spirit/include/qi_eoi.hpp>
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_hold.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
@@ -62,7 +61,7 @@ namespace kamokan {
 		template <typename Iterator>
 		struct IniCommentSkipper : boost::spirit::qi::grammar<Iterator> {
 			IniCommentSkipper() :
-				IniCommentSkipper::base_type(start),
+				IniCommentSkipper::base_type(skipping),
 				first_char(true)
 			{
 				namespace px = boost::phoenix;
@@ -72,13 +71,12 @@ namespace kamokan {
 				using boost::spirit::qi::char_;
 				using boost::spirit::qi::eps;
 
-				start = skipping[px::ref(first_char) = false];
 				skipping = comment | blank;
 				comment = (eps(px::cref(first_char) == true) | eol) >>
-					*blank >> lit("#") >> *(char_ - eol);
+					*blank >> lit("#")[px::ref(first_char) = false] >>
+					*(!eol >> char_);
 			}
 
-			boost::spirit::qi::rule<Iterator> start;
 			boost::spirit::qi::rule<Iterator> skipping;
 			boost::spirit::qi::rule<Iterator> comment;
 			bool first_char;
@@ -95,7 +93,6 @@ namespace kamokan {
 			using boost::spirit::qi::_val;
 			using boost::spirit::_1;
 			using boost::spirit::qi::eol;
-			using boost::spirit::qi::eoi;
 			using boost::spirit::qi::raw;
 			using boost::string_view;
 			using boost::spirit::qi::hold;
@@ -115,12 +112,12 @@ namespace kamokan {
 				px::begin(_1) - px::cref(m_begin), px::size(_1)
 			)];
 			key_value = key[px::bind(&refpair::first, _val) = _1] >> '=' >>
-				raw[*(graph - eol) % +blank][px::bind(&refpair::second, _val) = px::bind(
+				raw[*(!eol >> graph) % +blank][px::bind(&refpair::second, _val) = px::bind(
 					&string_view::substr,
 					px::construct<string_view>(px::ref(*m_master_string)),
 					px::begin(_1) - px::cref(m_begin), px::size(_1)
 			)];
-			key_values = -(key_value % (+eol));
+			key_values = -(key_value % +eol);
 			start = *eol >> *(section >> +eol >> key_values >> *eol);
 		}
 
