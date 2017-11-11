@@ -26,11 +26,13 @@
 #include <boost/spirit/include/qi_kleene.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
 #include <boost/spirit/include/qi_eol.hpp>
+#include <boost/spirit/include/qi_eoi.hpp>
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_hold.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
 #include <boost/spirit/include/qi_list.hpp>
 #include <boost/spirit/include/qi_optional.hpp>
+#include <boost/spirit/include/qi_eps.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_bind.hpp>
@@ -57,6 +59,31 @@ namespace kamokan {
 			Iterator m_begin;
 		};
 
+		template <typename Iterator>
+		struct IniCommentSkipper : boost::spirit::qi::grammar<Iterator> {
+			IniCommentSkipper() :
+				IniCommentSkipper::base_type(start),
+				first_char(true)
+			{
+				namespace px = boost::phoenix;
+				using boost::spirit::qi::blank;
+				using boost::spirit::qi::lit;
+				using boost::spirit::qi::eol;
+				using boost::spirit::qi::char_;
+				using boost::spirit::qi::eps;
+
+				start = skipping[px::ref(first_char) = false];
+				skipping = comment | blank;
+				comment = (eps(px::cref(first_char) == true) | eol) >>
+					*blank >> lit("#") >> *(char_ - eol);
+			}
+
+			boost::spirit::qi::rule<Iterator> start;
+			boost::spirit::qi::rule<Iterator> skipping;
+			boost::spirit::qi::rule<Iterator> comment;
+			bool first_char;
+		};
+
 		template <typename Iterator, typename Skipper>
 		IniGrammar<Iterator, Skipper>::IniGrammar (const std::string* parString) :
 			IniGrammar::base_type(start),
@@ -68,6 +95,7 @@ namespace kamokan {
 			using boost::spirit::qi::_val;
 			using boost::spirit::_1;
 			using boost::spirit::qi::eol;
+			using boost::spirit::qi::eoi;
 			using boost::spirit::qi::raw;
 			using boost::string_view;
 			using boost::spirit::qi::hold;
@@ -79,28 +107,28 @@ namespace kamokan {
 				[_val = px::bind(
 					&string_view::substr,
 					px::construct<string_view>(px::ref(*m_master_string)),
-					px::begin(_1) - px::ref(m_begin), px::size(_1)
+					px::begin(_1) - px::cref(m_begin), px::size(_1)
 				)] >> ']';
 			key = raw[(graph - '[' - '=') >> *(graph - '=') >> *(hold[+blank >> +(graph - '=')])][_val = px::bind(
 				&string_view::substr,
 				px::construct<string_view>(px::ref(*m_master_string)),
-				px::begin(_1) - px::ref(m_begin), px::size(_1)
+				px::begin(_1) - px::cref(m_begin), px::size(_1)
 			)];
 			key_value = key[px::bind(&refpair::first, _val) = _1] >> '=' >>
-				raw[*(graph - eol) >> *(hold[+blank >> +(graph - eol)])][px::bind(&refpair::second, _val) = px::bind(
+				raw[*(graph - eol) % +blank][px::bind(&refpair::second, _val) = px::bind(
 					&string_view::substr,
 					px::construct<string_view>(px::ref(*m_master_string)),
-					px::begin(_1) - px::ref(m_begin), px::size(_1)
+					px::begin(_1) - px::cref(m_begin), px::size(_1)
 			)];
 			key_values = -(key_value % (+eol));
-			start = *(*eol >> section >> +eol >> key_values >> *eol);
+			start = *eol >> *(section >> +eol >> key_values >> *eol);
 		}
 
 		IniFile::IniMapType parse_ini (const std::string* parIni, bool& parParseOk, int& parParsedCharCount) {
-			using boost::spirit::qi::blank;
 			using boost::spirit::qi::blank_type;
+			using skipper_type = IniCommentSkipper<std::string::const_iterator>;
 
-			IniGrammar<std::string::const_iterator, blank_type> gramm(parIni);
+			IniGrammar<std::string::const_iterator, skipper_type> gramm(parIni);
 			IniFile::IniMapType result;
 
 			parParseOk = false;
@@ -112,7 +140,7 @@ namespace kamokan {
 				start_it,
 				parIni->cend(),
 				gramm,
-				blank,
+				skipper_type(),
 				result
 			);
 

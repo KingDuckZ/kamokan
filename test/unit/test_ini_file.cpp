@@ -97,3 +97,35 @@ TEST_CASE ("Test parsing an ini text", "[ini][parser]") {
 		//CHECK(ini.parsed_characters() == 27);
 	}
 }
+
+TEST_CASE ("Test parsing an ini with comments", "[ini][parser][comments]") {
+	using kamokan::IniFile;
+
+	std::string text(
+		"#leading comment\n"
+		"[section]\n"
+		"value = key\n"
+		"#this = shoul be ignored\n"
+		"\t#indented = comments should also be ignored\n"
+		"this = #should not be ignored #lol\n"
+		"#comment without newline"
+	);
+	const int text_len = static_cast<int>(text.size());
+	IniFile ini(std::move(text));
+
+	CHECK(ini.parse_success());
+	REQUIRE(ini.parsed_characters() == text_len);
+
+	const IniFile::IniMapType& parsed = ini.parsed();
+	CHECK(parsed.size() == 1);
+	REQUIRE_NOTHROW(parsed.at("section"));
+
+	const IniFile::KeyValueMapType& section = parsed.at("section");
+	REQUIRE(section.size() == 2);
+	REQUIRE_NOTHROW(section.at("value"));
+	REQUIRE_NOTHROW(section.at("this"));
+	CHECK_THROWS(section.at("#this"));
+
+	CHECK(section.at("value") == "key");
+	CHECK(section.at("this") == "#should not be ignored #lol");
+}
