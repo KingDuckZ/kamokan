@@ -1,9 +1,11 @@
 local function num_to_token (num)
   local retval = ""
   local running = true
+  num = num + 1
 
   while (running)
   do
+    num = num - 1
     local remainder = num % 26
     retval = string.char(97 + remainder) .. retval
     num = math.floor(num / 26)
@@ -36,6 +38,7 @@ local saved = redis.call("HMSET", token_prefix .. token,
   "selfdes", selfdestruct
 )
 if saved then
+  redis.call("EXPIRE", token_prefix .. token, ttl)
   redis.call("SET", flooding_token, "")
   redis.call("EXPIRE", flooding_token, flood_wait)
 else
