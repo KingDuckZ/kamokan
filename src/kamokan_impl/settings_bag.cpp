@@ -16,7 +16,6 @@
  */
 
 #include "settings_bag.hpp"
-#include "duckhandy/lexical_cast.hpp"
 #include "spdlog.hpp"
 #include <ciso646>
 #include <cassert>

@@ -24,6 +24,7 @@
 #include "string_conv.hpp"
 #include "lua_scripts_for_redis.hpp"
 #include "redis_to_error_reason.hpp"
+#include "incredis/int_conv.hpp"
 #include <cassert>
 #include <ciso646>
 #include <string>
@@ -140,7 +141,6 @@ namespace kamokan {
 	) const {
 		using tawashi::ErrorReasons;
 		using boost::string_view;
-		using dhandy::lexical_cast;
 
 		if (not is_connected())
 			return make_submission_result(ErrorReasons::RedisDisconnected);
@@ -153,12 +153,12 @@ namespace kamokan {
 		{
 			string_view paste_counter_token(TOKEN_PREFIX "paste_counter");
 			std::string prefix(g_token_prefix);
-			const auto expiry = lexical_cast<std::string>(parExpiry);
+			const auto expiry = redis::int_to_ary_dec(parExpiry);
 			const auto self_des = string_view(parSelfDestruct ? "1" : "0");
 			const auto flood_wait = m_settings->as<string_view>("resubmit_wait");
 			retrieve.run(batch,
 				std::make_tuple(paste_counter_token, prefix + parRemoteIP),
-				std::make_tuple(prefix, parText, expiry, parLang, self_des, flood_wait)
+				std::make_tuple(prefix, parText, expiry.to<boost::string_view>(), parLang, self_des, flood_wait)
 			);
 		}
 		auto raw_replies = batch.replies();
@@ -216,7 +216,7 @@ namespace kamokan {
 			using std::string;
 			using boost::make_optional;
 			retval.error =
-				make_optional<string>(string(get_error_string(raw_replies.front()).message()));
+				make_optional<string>(get_error_string(raw_replies.front()).message());
 			return retval;
 		}
 		auto pastie_reply = get_array(raw_replies.front());

@@ -16,8 +16,6 @@
  */
 
 #include "ip_utils.hpp"
-#include "duckhandy/lexical_cast.hpp"
-#include "duckhandy/int_to_string_ary.hpp"
 #include "cgi_env.hpp"
 #include "tawashi_config.h"
 #include <spdlog/spdlog.h>

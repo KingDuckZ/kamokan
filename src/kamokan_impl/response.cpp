@@ -18,7 +18,6 @@
 #include "response.hpp"
 #include "settings_bag.hpp"
 #include "duckhandy/stringize.h"
-#include "duckhandy/lexical_cast.hpp"
 #include "pathname/pathname.hpp"
 #include "highlight_functions.hpp"
 #include "cgi_env.hpp"

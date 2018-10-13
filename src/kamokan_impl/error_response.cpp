@@ -20,8 +20,8 @@
 #include "cgi_env.hpp"
 #include "sprout/array/array.hpp"
 #include "string_lengths.hpp"
+#include "incredis/int_conv.hpp"
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/lexical_cast.hpp>
 #include <ciso646>
 #include <string>
 #include <cassert>
@@ -40,7 +40,7 @@ namespace kamokan {
 		using tawashi::ErrorReasons;
 
 		auto get = cgi_env().query_string_split();
-		const int reason_int = boost::lexical_cast<int>(get["reason"]);
+		const int reason_int = redis::int_conv<int>(get["reason"]);
 		ErrorReasons reason_code(ErrorReasons::UnknownReason);
 		if (reason_int >= 0 and reason_int < ErrorReasons::_size())
 			reason_code = ErrorReasons::_from_integral(reason_int);

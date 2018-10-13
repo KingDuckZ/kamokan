@@ -20,14 +20,13 @@
 #include "cgi_post.hpp"
 #include "settings_bag.hpp"
 #include "duckhandy/compatibility.h"
-#include "duckhandy/lexical_cast.hpp"
+#include "incredis/int_conv.hpp"
 #include "tawashi_exception.hpp"
 #include "ip_utils.hpp"
 #include "string_conv.hpp"
 #include "highlight_functions.hpp"
 #include <ciso646>
 #include <algorithm>
-#include <boost/lexical_cast.hpp>
 #include <cstdint>
 #include <spdlog/spdlog.h>
 #include <utility>
@@ -152,9 +151,7 @@ namespace kamokan {
 			}
 		}
 
-		//TODO: replace boost's lexical_cast with mine when I have some checks
-		//over invalid inputs
-		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : boost::lexical_cast<uint32_t>(duration)), 2628000U), 1U);
+		const uint32_t duration_int = std::max(std::min((duration.empty() ? 86400U : redis::int_conv<uint32_t>(duration)), 2628000U), 1U);
 		StringOrHeader submit_result = submit_to_storage(pastie, duration_int, m_local->pastie_lang, self_destruct);
 		const boost::optional<std::string>& token = submit_result.first;
 

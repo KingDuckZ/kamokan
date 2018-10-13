@@ -16,7 +16,6 @@
  */
 
 #include "http_header.hpp"
-#include "duckhandy/lexical_cast.hpp"
 #include "duckhandy/sequence_bt.hpp"
 #include "sprout/array/array.hpp"
 #include <utility>

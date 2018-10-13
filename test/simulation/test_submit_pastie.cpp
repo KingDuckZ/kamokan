@@ -25,9 +25,9 @@
 #include "cgi_env.hpp"
 #include "cgi_post.hpp"
 #include "fake_storage.hpp"
+#include "duckhandy/int_conv.hpp"
 #include <spdlog/spdlog.h>
 #include <sstream>
-#include <boost/lexical_cast.hpp>
 
 namespace kamokan {
 	class SubmitPasteResponseWithFakeStorage : public SubmitPasteResponse {
@@ -143,7 +143,7 @@ TEST_CASE ("Submit paste response", "[submitpaste][response]") {
 	CHECK(submitted_pastie.remote_ip == "127.0.0.1");
 #endif
 	CHECK(submitted_pastie.token == "b");
-	CHECK(submitted_pastie.expiry == boost::lexical_cast<uint32_t>(original_expiry));
+	CHECK(submitted_pastie.expiry == dhandy::int_conv<uint32_t>(original_expiry));
 
 	{
 		std::string output = oss.str();

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "duckhandy/lexical_cast.hpp"
 #include <boost/utility/string_view.hpp>
+#include <boost/lexical_cast.hpp>
 #include <type_traits>
 #include <cstdint>
 #include <string>
@@ -41,19 +41,19 @@ namespace kamokan {
 	template <>
 	[[gnu::pure,gnu::always_inline]] inline
 	uint16_t string_conv (boost::string_view parStr) {
-		return dhandy::lexical_cast<uint16_t>(parStr);
+		return boost::lexical_cast<uint16_t>(parStr);
 	}
 
 	template <>
 	[[gnu::pure,gnu::always_inline]] inline
 	uint32_t string_conv (boost::string_view parStr) {
-		return dhandy::lexical_cast<uint32_t>(parStr);
+		return boost::lexical_cast<uint32_t>(parStr);
 	}
 
 	template <>
 	[[gnu::pure,gnu::always_inline]] inline
 	long long string_conv (boost::string_view parStr) {
-		return dhandy::lexical_cast<long long>(parStr);
+		return boost::lexical_cast<long long>(parStr);
 	}
 
 	template <>
