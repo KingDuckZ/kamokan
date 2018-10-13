@@ -214,8 +214,9 @@ namespace kamokan {
 
 		if (raw_replies.front().is_error()) {
 			using std::string;
-			retval.error =
-				boost::make_optional<string>(get_error_string(raw_replies.front()).message());
+			retval.error = boost::make_optional<string>(
+				string(get_error_string(raw_replies.front()).message())
+			);
 			return retval;
 		}
 		auto pastie_reply = get_array(raw_replies.front());
