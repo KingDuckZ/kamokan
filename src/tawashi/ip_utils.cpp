@@ -18,6 +18,8 @@
 #include "ip_utils.hpp"
 #include "cgi_env.hpp"
 #include "tawashi_config.h"
+#include "duckhandy/int_conv.hpp"
+#include <boost/utility/string_view.hpp>
 #include <spdlog/spdlog.h>
 #include <cassert>
 #include <algorithm>
@@ -33,14 +35,15 @@ namespace tawashi {
 
 #if !defined(TAWASHI_WITH_IP_LOGGING)
 		std::string hashed_ip (const std::string& parIP) {
-			using dhandy::tags::hex;
-
 			uint64_t hash[3];
 			tiger(parIP.data(), parIP.size(), hash, 0x80);
 
-			auto h1 = dhandy::int_to_string_ary<char, hex>(hash[0]);
-			auto h2 = dhandy::int_to_string_ary<char, hex>(hash[1]);
-			auto h3 = dhandy::int_to_string_ary<char, hex>(hash[2]);
+			auto h1_ary = dhandy::int_to_ary<char, 16>(hash[0]);
+			auto h2_ary = dhandy::int_to_ary<char, 16>(hash[1]);
+			auto h3_ary = dhandy::int_to_ary<char, 16>(hash[2]);
+			auto h1 = h1_ary.to<boost::string_view>();
+			auto h2 = h2_ary.to<boost::string_view>();
+			auto h3 = h3_ary.to<boost::string_view>();
 
 			std::string retval(2 * sizeof(uint64_t) * 3, '0');
 			assert(h1.size() <= 2 * sizeof(uint64_t));
