@@ -213,8 +213,10 @@ namespace kamokan {
 			return retval;
 
 		if (raw_replies.front().is_error()) {
+			using std::string;
+			using boost::make_optional;
 			retval.error =
-				boost::make_optional<std::string>(get_error_string(raw_replies.front()).message());
+				make_optional<string>(string(get_error_string(raw_replies.front()).message()));
 			return retval;
 		}
 		auto pastie_reply = get_array(raw_replies.front());
